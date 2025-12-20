@@ -43,30 +43,28 @@ Imagine you're renovating your house and you hire three specialists:
 
 ### Visual Model
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                   Your Request                          │
-│          "Find all API endpoints in the codebase"       │
-└──────────────────────┬──────────────────────────────────┘
-                       │
-                       ▼
-        ┌──────────────────────────────┐
-        │   Claude Code (Router)       │
-        │   "Which agent should I use?"│
-        └──────────────────────────────┘
-                       │
-        ┌──────────────┼──────────────┐
-        ▼              ▼              ▼
-┌─────────────┐ ┌─────────────┐ ┌─────────────┐
-│   Explore   │ │  General-   │ │    Plan     │
-│   Agent     │ │  Purpose    │ │   Agent     │
-│             │ │  Agent      │ │             │
-│ Read-only   │ │ Read/Write  │ │ Research    │
-│ Fast search │ │ Can modify  │ │ then plan   │
-└─────────────┘ └─────────────┘ └─────────────┘
-       │              │              │
-       ▼              ▼              ▼
-   Search only    Full access    Study first
+```mermaid
+graph TD
+    Request["Your Request<br/>'Find all API endpoints in the codebase'"]
+    Router["Claude Code (Router)<br/>'Which agent should I use?'"]
+    Explore["Explore Agent<br/>Read-only<br/>Fast search"]
+    General["General-Purpose Agent<br/>Read/Write<br/>Can modify"]
+    Plan["Plan Agent<br/>Research<br/>then plan"]
+
+    Request --> Router
+    Router --> Explore
+    Router --> General
+    Router --> Plan
+
+    Explore --> SearchOnly["Search only"]
+    General --> FullAccess["Full access"]
+    Plan --> StudyFirst["Study first"]
+
+    style Request fill:#e1f5ff
+    style Router fill:#fff9e6
+    style Explore fill:#d4f4dd
+    style General fill:#ffd4d4
+    style Plan fill:#f4d4ff
 ```
 
 ---
