@@ -8,7 +8,7 @@
 
 ## What's in This Guide?
 
-Now that you understand [what MCP servers are](overview.md) and [how to install them](installation.md), let's explore the most popular and useful servers available. Think of this as your shopping guide—we'll show you what's available, what each server does best, and help you choose the right ones for your workflow.
+Now that you understand [what MCP servers are](1-overview.md) and [how to install them](2-installation.md), let's explore the most popular and useful servers available. Think of this as your shopping guide—we'll show you what's available, what each server does best, and help you choose the right ones for your workflow.
 
 **By the end of this guide**, you'll know:
 - ✅ The top 5 must-have MCP servers and what they do
@@ -1137,7 +1137,7 @@ Excellent! You now know:
 
 **→ [Create Custom MCP Servers](creating-custom-servers.md)** - Build your own for internal tools
 
-**→ [Learn About Agents](../agents/overview.md)** - Understand how agents use these MCP tools
+**→ [Learn About Agents](../2-agents/overview.md)** - Understand how agents use these MCP tools
 
 **→ [MCP Best Practices](best-practices.md)** - Security, performance, error handling
 
@@ -1167,9 +1167,9 @@ Want to explore more? Here are excellent resources:
 
 ### 🔗 Related Topics
 
-- [MCP Overview](overview.md) - Conceptual foundation
-- [Installation Guide](installation.md) - Setup instructions
-- [Agents Overview](../agents/overview.md) - How agents use MCP servers
+- [MCP Overview](1-overview.md) - Conceptual foundation
+- [Installation Guide](2-installation.md) - Setup instructions
+- [Agents Overview](../2-agents/overview.md) - How agents use MCP servers
 - [Creating Custom Servers](creating-custom-servers.md) - Build your own
 
 ### 💬 Community & Support
@@ -1186,4 +1186,4 @@ Want to explore more? Here are excellent resources:
 
 ---
 
-**Ready to dive into agents?** Continue to [Agents Overview](../agents/overview.md) to learn how Claude uses these MCP tools effectively!
+**Ready to dive into agents?** Continue to [Agents Overview](../2-agents/overview.md) to learn how Claude uses these MCP tools effectively!

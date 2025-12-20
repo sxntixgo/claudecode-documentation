@@ -36,26 +36,29 @@ The documentation is structured in a logical order - each topic builds on previo
 claudecode-docs/
 ├── INTRODUCTION.md           # Start here!
 ├── TABLE_OF_CONTENTS.md      # Full navigation with reading paths
-├── guides/                   # Topic-by-topic guides
-│   ├── mcp-servers/
-│   ├── agents/
-│   ├── skills/
-│   ├── models/
-│   ├── thinking/
-│   └── context/
+├── guides/                   # Topic-by-topic guides (numbered for learning path)
+│   ├── 1-mcp-servers/        # 1. MCP Servers (foundation)
+│   │   ├── 1-overview.md
+│   │   ├── 2-installation.md
+│   │   └── 3-popular-servers.md
+│   ├── 2-agents/             # 2. Agents (building on MCP)
+│   │   ├── 1-overview.md
+│   │   └── 2-built-in-agents.md
+│   ├── 3-skills/             # 3. Skills (leveraging agents)
+│   ├── 4-models/             # 4. Models (understanding the engine)
+│   ├── 5-thinking/           # 5. Thinking Modes (optimizing reasoning)
+│   ├── 6-context/            # 6. Context Management (advanced control)
+│   ├── 7-keywords/           # 7. Keywords & Triggers (power user features)
+│   └── 8-optimization/       # 8. Token Optimization (synthesis)
 ├── examples/                 # Real-world examples
 │   ├── skills/
 │   ├── agents/
 │   ├── claude-md-templates/
 │   └── projects/
-├── reference/                # Quick lookup
-│   ├── keywords.md
-│   ├── hooks.md
-│   └── commands.md
-└── optimization/             # Cost and performance
-    ├── token-usage.md
-    ├── cost-comparison.md
-    └── strategies.md
+└── reference/                # Quick lookup
+    ├── keywords.md
+    ├── hooks.md
+    └── commands.md
 ```
 
 ## ✨ Key Features

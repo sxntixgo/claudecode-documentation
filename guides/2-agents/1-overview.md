@@ -8,7 +8,7 @@
 
 ## What Are Agents?
 
-Remember how we learned about [MCP servers](../mcp-servers/overview.md)? They give Claude Code access to external tools—GitHub, databases, web search, and more. Now here's where it gets interesting: **agents are specialized AI assistants that know how to use those tools effectively**.
+Remember how we learned about [MCP servers](../1-mcp-servers/overview.md)? They give Claude Code access to external tools—GitHub, databases, web search, and more. Now here's where it gets interesting: **agents are specialized AI assistants that know how to use those tools effectively**.
 
 Think of it this way:
 
@@ -672,7 +672,7 @@ Great! You now understand:
 
 **Ready to go deeper?**
 
-**→ [Built-in Agents Deep Dive](built-in-agents.md)** - Detailed capabilities, limitations, and advanced usage
+**→ [Built-in Agents Deep Dive](2-built-in-agents.md)** - Detailed capabilities, limitations, and advanced usage
 
 **→ [Agent Model Assignment](model-assignment.md)** - Assign Haiku/Sonnet/Opus to different agents for cost optimization
 
@@ -756,10 +756,10 @@ Want to dive deeper? Here are excellent resources:
 
 ### 🔗 Related Topics
 
-- [MCP Servers Overview](../mcp-servers/overview.md) - Agents use MCP tools
-- [Skills Overview](../skills/overview.md) - Skills leverage agent capabilities
+- [MCP Servers Overview](../1-mcp-servers/overview.md) - Agents use MCP tools
+- [Skills Overview](../3-skills/overview.md) - Skills leverage agent capabilities
 - [Model Selection](../models/model-comparison.md) - Assign different models to agents
-- [Built-in Agents](built-in-agents.md) - Deep dive into each agent type
+- [Built-in Agents](2-built-in-agents.md) - Deep dive into each agent type
 
 ### 💬 Community & Support
 
@@ -775,4 +775,4 @@ Want to dive deeper? Here are excellent resources:
 
 ---
 
-**Ready to explore agent capabilities in detail?** Continue to [Built-in Agents Deep Dive](built-in-agents.md)!
+**Ready to explore agent capabilities in detail?** Continue to [Built-in Agents Deep Dive](2-built-in-agents.md)!

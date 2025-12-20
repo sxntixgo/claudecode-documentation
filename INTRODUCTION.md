@@ -183,8 +183,8 @@ We've designed four different paths through this documentation based on your goa
 **Approach**: Sequential learning from MCP Servers → Token Optimization
 
 **Your Journey**:
-1. Start with [MCP Servers](guides/mcp-servers/installation.md)
-2. Progress through [Agents](guides/agents/overview.md)
+1. Start with [MCP Servers](guides/1-mcp-servers/2-installation.md)
+2. Progress through [Agents](guides/2-agents/1-overview.md)
 3. Learn [Skills](guides/skills/overview.md)
 4. Master [Model Selection](guides/models/model-comparison.md)
 5. Understand [Thinking Modes](guides/thinking/extended-thinking.md)
@@ -207,8 +207,8 @@ We've designed four different paths through this documentation based on your goa
 **Approach**: Cover fundamentals quickly, deep dive into cost optimization
 
 **Your Journey**:
-1. **Quick overview**: [MCP Servers](guides/mcp-servers/overview.md) (15 min)
-2. **Quick overview**: [Agents](guides/agents/overview.md) (15 min)
+1. **Quick overview**: [MCP Servers](guides/1-mcp-servers/1-overview.md) (15 min)
+2. **Quick overview**: [Agents](guides/2-agents/1-overview.md) (15 min)
 3. **Deep dive**: [Model Selection](guides/models/selection-guide.md) (30 min)
 4. **Deep dive**: [Thinking Modes](guides/thinking/when-to-use.md) (25 min)
 5. **Deep dive**: [Token Optimization](optimization/strategies.md) (60 min)
@@ -325,7 +325,7 @@ This documentation serves three primary audiences:
 **You are**: New to Claude Code, maybe new to AI-assisted development
 **You need**: Step-by-step guidance, foundational concepts first
 **Your path**: Sequential (Path 1)
-**Start here**: [MCP Servers Overview](guides/mcp-servers/overview.md)
+**Start here**: [MCP Servers Overview](guides/1-mcp-servers/1-overview.md)
 
 **We've got you covered with**:
 - Clear explanations of every concept
@@ -472,7 +472,7 @@ Congratulations! You now understand:
 
 **Choose your next step:**
 
-**→ [New to Claude Code? Start with MCP Servers](guides/mcp-servers/overview.md)**
+**→ [New to Claude Code? Start with MCP Servers](guides/1-mcp-servers/1-overview.md)**
 **→ [Want cost savings? Jump to Optimization](optimization/strategies.md)**
 **→ [Need quick answers? Use the References](reference/)**
 **→ [Want examples? Browse Templates](examples/)**

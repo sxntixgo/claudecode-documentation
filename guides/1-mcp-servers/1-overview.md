@@ -232,7 +232,7 @@ export GITHUB_TOKEN="ghp_..."
 }
 ```
 
-We'll cover secure configuration in the [Installation Guide](installation.md).
+We'll cover secure configuration in the [Installation Guide](2-installation.md).
 
 ---
 
@@ -452,7 +452,7 @@ Here are the most commonly used MCP servers:
 - One-click installation
 - Automatic updates
 
-See the complete catalog in [Popular MCP Servers](popular-servers.md).
+See the complete catalog in [Popular MCP Servers](3-popular-servers.md).
 
 ---
 
@@ -503,8 +503,8 @@ See the complete catalog in [Popular MCP Servers](popular-servers.md).
 
 Great! Now you understand what MCP servers are and why they matter. You're ready to:
 
-**→ [Install Your First MCP Server](installation.md)** - Hands-on setup guide
-**→ [Explore Popular Servers](popular-servers.md)** - See what's available
+**→ [Install Your First MCP Server](2-installation.md)** - Hands-on setup guide
+**→ [Explore Popular Servers](3-popular-servers.md)** - See what's available
 **→ [Create Custom Servers](creating-custom-servers.md)** - Build your own (advanced)
 
 ---
@@ -579,9 +579,9 @@ Want to dive deeper? Here are some excellent resources:
 - [Building with MCP](https://anthropic.com/engineering/mcp-servers) - Architecture and design patterns
 
 ### 🔗 Related Topics
-- [Installing MCP Servers](installation.md) - Hands-on setup next
-- [Agents Overview](../agents/overview.md) - How agents use MCP tools
-- [Skills Overview](../skills/overview.md) - Skills that leverage MCP capabilities
+- [Installing MCP Servers](2-installation.md) - Hands-on setup next
+- [Agents Overview](../2-agents/overview.md) - How agents use MCP tools
+- [Skills Overview](../3-skills/overview.md) - Skills that leverage MCP capabilities
 
 ### 💬 Community & Support
 - [MCP GitHub Discussions](https://github.com/modelcontextprotocol/specification/discussions) - Ask questions
@@ -593,4 +593,4 @@ Want to dive deeper? Here are some excellent resources:
 
 ---
 
-**Ready to get hands-on?** Continue to [MCP Server Installation](installation.md) to set up your first server!
+**Ready to get hands-on?** Continue to [MCP Server Installation](2-installation.md) to set up your first server!
