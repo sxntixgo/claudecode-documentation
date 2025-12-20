@@ -64,15 +64,17 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| [What Are MCP Servers?](guides/1-mcp-servers/1-overview.md) | 10 min | Protocol overview, benefits, architecture |
-| [Installation Guide](guides/1-mcp-servers/2-installation.md) | 20 min | CLI, manual, Docker installation methods |
-| [Popular MCP Servers](guides/1-mcp-servers/3-popular-servers.md) | 15 min | GitHub, Perplexity, Context7, and more |
-| [Creating Custom Servers](guides/1-mcp-servers/creating-custom-servers.md) | 45 min | Build your own MCP server from scratch |
-| [Best Practices](guides/1-mcp-servers/best-practices.md) | 20 min | Security, performance, error handling |
+| [What Are MCP Servers?](guides/1-mcp-servers/1-overview.md) | 15 min | Protocol overview, benefits, architecture |
+| [Installation Guide](guides/1-mcp-servers/2-installation.md) | 30 min | CLI, manual, Docker installation methods |
+| [Popular MCP Servers](guides/1-mcp-servers/3-popular-servers.md) | 25 min | GitHub, Perplexity, Context7, and more |
+| **[Creating Custom MCP Servers](guides/1-mcp-servers/4-creating-custom-servers.md)** | **60 min** | **Build your own MCP server from scratch** |
+| [Best Practices](guides/1-mcp-servers/5-best-practices.md) | 20 min | Security, performance, error handling |
 
-**Total Time**: ~2 hours
+**Total Time**: ~2.5 hours
 **Dependencies**: None
 **Next**: Agents (use MCP tools effectively)
+
+**🔨 Creation Guide Included**: Learn to build custom MCP servers for your specific needs
 
 ---
 
@@ -84,14 +86,16 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| [What Are Agents?](guides/2-agents/1-overview.md) | 15 min | Concept, purpose, when to use |
+| [What Are Agents?](guides/2-agents/1-overview.md) | 20 min | Concept, purpose, when to use |
 | [Built-in Agent Types](guides/2-agents/2-built-in-agents.md) | 30 min | Explore, General-Purpose, Plan agents |
-| [Custom Agents](guides/2-agents/custom-agents.md) | 45 min | Create specialized agents |
-| [Model Assignment](guides/2-agents/model-assignment.md) | 25 min | Per-agent model selection for cost optimization |
+| [Model Assignment](guides/2-agents/3-model-assignment.md) | 25 min | Per-agent model selection for cost optimization |
+| **[Creating Custom Agents](guides/2-agents/4-custom-agents.md)** | **50 min** | **Build specialized agents for your workflows** |
 
 **Total Time**: ~2 hours
 **Dependencies**: MCP Servers (Agents use MCP tools)
 **Next**: Skills (leverage agents with reusable instructions)
+
+**🔨 Creation Guide Included**: Learn to build custom agents with specialized capabilities
 
 ---
 
@@ -103,15 +107,17 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| [What Are Skills?](guides/skills/overview.md) | 15 min | Progressive disclosure, model invocation |
-| [Marketplace Skills](guides/skills/marketplace-skills.md) | 20 min | Installing official and community skills |
-| [Creating Skills](guides/skills/creating-skills.md) | 60 min | SKILL.md structure, best practices |
-| [Model Assignment](guides/skills/model-assignment.md) | 20 min | Per-skill model selection |
-| [Best Practices](guides/skills/best-practices.md) | 30 min | Description quality, testing, optimization |
+| [What Are Skills?](guides/3-skills/1-overview.md) | 20 min | Progressive disclosure, model invocation |
+| [Marketplace Skills](guides/3-skills/2-marketplace-skills.md) | 20 min | Installing official and community skills |
+| **[Creating Custom Skills](guides/3-skills/3-creating-skills.md)** | **70 min** | **SKILL.md structure, frontmatter, best practices** |
+| [Model Assignment](guides/3-skills/4-model-assignment.md) | 20 min | Per-skill model selection |
+| [Advanced Patterns](guides/3-skills/5-advanced-patterns.md) | 30 min | Progressive disclosure, testing, optimization |
 
 **Total Time**: ~2.5 hours
 **Dependencies**: Agents (Skills leverage agent capabilities)
 **Next**: Models (choose the right engine for each task)
+
+**🔨 Creation Guide Included**: Learn to build custom skills with progressive disclosure patterns
 
 ---
 
