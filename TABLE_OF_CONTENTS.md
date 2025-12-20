@@ -64,11 +64,11 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| [What Are MCP Servers?](guides/mcp-servers/overview.md) | 10 min | Protocol overview, benefits, architecture |
-| [Installation Guide](guides/mcp-servers/installation.md) | 20 min | CLI, manual, Docker installation methods |
-| [Popular MCP Servers](guides/mcp-servers/popular-servers.md) | 15 min | GitHub, Perplexity, Context7, and more |
-| [Creating Custom Servers](guides/mcp-servers/creating-custom-servers.md) | 45 min | Build your own MCP server from scratch |
-| [Best Practices](guides/mcp-servers/best-practices.md) | 20 min | Security, performance, error handling |
+| [What Are MCP Servers?](guides/1-mcp-servers/1-overview.md) | 10 min | Protocol overview, benefits, architecture |
+| [Installation Guide](guides/1-mcp-servers/2-installation.md) | 20 min | CLI, manual, Docker installation methods |
+| [Popular MCP Servers](guides/1-mcp-servers/3-popular-servers.md) | 15 min | GitHub, Perplexity, Context7, and more |
+| [Creating Custom Servers](guides/1-mcp-servers/creating-custom-servers.md) | 45 min | Build your own MCP server from scratch |
+| [Best Practices](guides/1-mcp-servers/best-practices.md) | 20 min | Security, performance, error handling |
 
 **Total Time**: ~2 hours
 **Dependencies**: None
@@ -84,10 +84,10 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| [What Are Agents?](guides/agents/overview.md) | 15 min | Concept, purpose, when to use |
-| [Built-in Agent Types](guides/agents/built-in-agents.md) | 30 min | Explore, General-Purpose, Plan agents |
-| [Custom Agents](guides/agents/custom-agents.md) | 45 min | Create specialized agents |
-| [Model Assignment](guides/agents/model-assignment.md) | 25 min | Per-agent model selection for cost optimization |
+| [What Are Agents?](guides/2-agents/1-overview.md) | 15 min | Concept, purpose, when to use |
+| [Built-in Agent Types](guides/2-agents/2-built-in-agents.md) | 30 min | Explore, General-Purpose, Plan agents |
+| [Custom Agents](guides/2-agents/custom-agents.md) | 45 min | Create specialized agents |
+| [Model Assignment](guides/2-agents/model-assignment.md) | 25 min | Per-agent model selection for cost optimization |
 
 **Total Time**: ~2 hours
 **Dependencies**: MCP Servers (Agents use MCP tools)

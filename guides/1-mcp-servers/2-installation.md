@@ -974,9 +974,9 @@ After installation, verify everything works:
 
 Great! You've successfully installed MCP servers. You're ready to:
 
-**→ [Explore Popular MCP Servers](popular-servers.md)** - Discover GitHub, Perplexity, Context7, and 200+ more
+**→ [Explore Popular MCP Servers](3-popular-servers.md)** - Discover GitHub, Perplexity, Context7, and 200+ more
 
-**→ [Learn About Agents](../agents/overview.md)** - Understand how agents use MCP tools
+**→ [Learn About Agents](../2-agents/overview.md)** - Understand how agents use MCP tools
 
 **→ [Create Custom MCP Servers](creating-custom-servers.md)** - Build your own (advanced)
 
@@ -1049,8 +1049,8 @@ export CONTEXT7_API_KEY="..."
 
 ### 🔗 Related Topics
 
-- [MCP Servers Overview](overview.md) - Conceptual foundation
-- [Popular MCP Servers](popular-servers.md) - Discover available servers
+- [MCP Servers Overview](1-overview.md) - Conceptual foundation
+- [Popular MCP Servers](3-popular-servers.md) - Discover available servers
 - [Creating Custom Servers](creating-custom-servers.md) - Build your own
 
 ### 💬 Community & Support
@@ -1061,4 +1061,4 @@ export CONTEXT7_API_KEY="..."
 
 ---
 
-**Ready to explore what's available?** Continue to [Popular MCP Servers](popular-servers.md) to discover GitHub, Perplexity, Context7, and hundreds more!
+**Ready to explore what's available?** Continue to [Popular MCP Servers](3-popular-servers.md) to discover GitHub, Perplexity, Context7, and hundreds more!
