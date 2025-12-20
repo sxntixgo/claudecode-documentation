@@ -304,13 +304,17 @@ When working on this documentation:
 ### Task Planning Workflow
 **ALWAYS follow this workflow:**
 
-1. **Before Starting** (if user asked to choose): Provide task plan with time, model, tokens, usage %
-2. **During Work**: Focus on completing the task efficiently
-3. **After Completion**: Brief summary (status, files, commit) - NO estimates for completed work
-4. **Next Steps**: List 3-5 next tasks with full planning details (time, model, tokens, usage %)
-5. **Usage Check**: Show remaining usage budget and recommendations
+1. **User Selects Task**: When user says "continue with task 1" or "continue with agents" or similar
+2. **Start Immediately**: Begin working on the task right away WITHOUT asking for confirmation
+3. **During Work**: Focus on completing the task efficiently
+4. **After Completion**: Brief summary (status, files, commit) - NO estimates for completed work
+5. **Next Steps**: List 3-5 next tasks with full planning details (time, model, tokens, usage %)
+6. **Usage Check**: Show remaining usage budget and recommendations
 
-**Key Principle**: Show estimates ONLY for future tasks the user is choosing between, NOT for completed work.
+**Key Principles**:
+- Show estimates ONLY for future tasks the user is choosing between, NOT for completed work
+- Once user selects a task, START IMMEDIATELY without asking "continue" or waiting for confirmation
+- User should only need to say the task name/number ONCE to trigger execution
 
 ### Example Task Planning
 
