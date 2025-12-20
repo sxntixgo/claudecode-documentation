@@ -22,34 +22,24 @@ Just as power tools dramatically expand what a craftsperson can build, MCP serve
 
 ### Visual Model
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    Claude Code                          │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │  Built-in Capabilities                           │  │
-│  │  • Read/Write Files                              │  │
-│  │  • Execute Commands                              │  │
-│  │  • Code Generation                               │  │
-│  └──────────────────────────────────────────────────┘  │
-│                          │                              │
-│                          ▼                              │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │  MCP Protocol Layer                              │  │
-│  └──────────────────────────────────────────────────┘  │
-│         │              │              │                 │
-│         ▼              ▼              ▼                 │
-│  ┌──────────┐   ┌──────────┐   ┌──────────┐          │
-│  │ GitHub   │   │Perplexity│   │ Context7 │   ...    │
-│  │  MCP     │   │   MCP    │   │   MCP    │          │
-│  │ Server   │   │  Server  │   │  Server  │          │
-│  └──────────┘   └──────────┘   └──────────┘          │
-│         │              │              │                 │
-└─────────┼──────────────┼──────────────┼─────────────────┘
-          ▼              ▼              ▼
-    ┌──────────┐   ┌──────────┐   ┌──────────┐
-    │ GitHub   │   │   Web    │   │   Docs   │
-    │   API    │   │  Search  │   │ Database │
-    └──────────┘   └──────────┘   └──────────┘
+```mermaid
+graph TB
+    subgraph Claude["Claude Code"]
+        Built["Built-in Capabilities<br/>• Read/Write Files<br/>• Execute Commands<br/>• Code Generation"]
+        Built --> MCP["MCP Protocol Layer"]
+        MCP --> Server1["GitHub<br/>MCP Server"]
+        MCP --> Server2["Perplexity<br/>MCP Server"]
+        MCP --> Server3["Context7<br/>MCP Server"]
+        MCP --> More["..."]
+    end
+
+    Server1 --> API1["GitHub<br/>API"]
+    Server2 --> API2["Web<br/>Search"]
+    Server3 --> API3["Docs<br/>Database"]
+
+    style Claude fill:#e1f5ff
+    style Built fill:#fff9e6
+    style MCP fill:#f0f0f0
 ```
 
 ## Why Should You Care?

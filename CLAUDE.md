@@ -39,7 +39,7 @@ The documentation follows a **pedagogical progression** from fundamental to adva
 - Use GitHub-flavored Markdown
 - Include table of contents for long documents
 - Use code fencing with language tags
-- Add visual diagrams where helpful (especially for dependencies)
+- **Visual diagrams**: ALWAYS use Mermaid diagrams (never ASCII art)
 - Link to official sources and references
 
 ### Tone and Style
