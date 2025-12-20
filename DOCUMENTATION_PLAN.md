@@ -1373,6 +1373,10 @@ claudecode-docs/
 ├── README.md                          # Repository overview and quick start
 ├── INTRODUCTION.md                    # Comprehensive introduction to Claude Code
 ├── TABLE_OF_CONTENTS.md               # Master navigation and reading paths
+├── .claude/                           # Claude Code configuration
+│   └── skills/                        # Active skills used in this repo
+│       └── documentation-professor/   # Skill for writing documentation
+│           └── SKILL.md
 ├── guides/
 │   ├── mcp-servers/
 │   │   ├── installation.md
@@ -1401,12 +1405,15 @@ claudecode-docs/
 │       ├── memory-management.md
 │       └── optimization.md
 ├── examples/
-│   ├── skills/
-│   │   ├── documentation-professor/
+│   ├── skills/                        # Example skills for documentation/learning
+│   │   ├── documentation-professor/   # Copy of active skill (for reference)
 │   │   │   └── SKILL.md
-│   │   ├── tdd-workflow.md
-│   │   ├── api-documentation.md
-│   │   └── code-review.md
+│   │   ├── tdd-workflow/
+│   │   │   └── SKILL.md
+│   │   ├── api-documentation/
+│   │   │   └── SKILL.md
+│   │   └── code-review/
+│   │       └── SKILL.md
 │   ├── agents/
 │   │   ├── quick-search.json
 │   │   ├── feature-implementer.json
