@@ -151,8 +151,143 @@ For each documentation page:
 - [Anthropic Skills Repository](https://github.com/anthropics/skills)
 - [Community Skills (obra/superpowers)](https://github.com/obra/superpowers)
 
+## Task Planning and Tracking Requirements
+
+### Claude Pro Subscription Context
+The user has a **Claude Pro subscription** with the following limits:
+- **Usage tracking**: Monitor token consumption as percentage of daily/monthly limits
+- **Model costs**: Different models consume different amounts of usage quota
+- **Smart allocation**: Choose models based on task complexity vs. usage efficiency
+
+### Required Task Planning Format
+
+**BEFORE starting any task**, provide a task plan with:
+
+```markdown
+## Task Plan: [Task Name]
+
+⏱️ **Estimated Time**: [X minutes/hours for Claude to complete]
+🤖 **Recommended Model**: [Haiku 4.5 / Sonnet 4.5 / Opus 4.5]
+🎯 **Estimated Tokens**: ~[X,XXX] tokens (input + output)
+📊 **Usage Impact**: ~[X]% of Claude Pro daily usage
+💰 **Rationale**: [Why this model? Why these tokens?]
+
+### Task Breakdown:
+1. [Subtask 1] - [X min] - [Y tokens]
+2. [Subtask 2] - [X min] - [Y tokens]
+3. [Subtask 3] - [X min] - [Y tokens]
+```
+
+### Model Selection Guidelines
+
+| Model | When to Use | Token Efficiency | Speed | Cost Impact |
+|-------|-------------|------------------|-------|-------------|
+| **Haiku 4.5** | Simple tasks, searches, formatting | ⭐⭐⭐ Excellent | 🚀 Fastest | ✅ Lowest (3x cheaper) |
+| **Sonnet 4.5** | Standard documentation, coding | ⭐⭐ Good | 🏃 Fast | ⚠️ Medium (baseline) |
+| **Opus 4.5** | Complex architecture, deep analysis | ⭐ Higher usage | 🚶 Slower | ❌ Highest (premium) |
+
+### Task Completion Format
+
+**AFTER completing any task**, provide a completion summary with:
+
+```markdown
+## Task Complete: [Task Name]
+
+✅ **Completed In**: [Actual time taken]
+🤖 **Model Used**: [Haiku 4.5 / Sonnet 4.5 / Opus 4.5]
+📈 **Actual Tokens**: ~[X,XXX] tokens consumed
+📊 **Usage Consumed**: ~[X]% of Claude Pro daily usage
+💾 **Files Changed**: [List of files]
+🔗 **Commit**: [Commit hash and message]
+
+---
+
+## Next Available Tasks
+
+Choose your next task based on priority and usage budget:
+
+### High Priority Tasks
+
+#### 1. [Task Name]
+⏱️ **Time**: [X min]
+🤖 **Model**: [Haiku/Sonnet/Opus]
+🎯 **Tokens**: ~[X,XXX]
+📊 **Usage**: ~[X]%
+📝 **Description**: [What needs to be done]
+🎯 **Value**: [Why this matters]
+
+#### 2. [Task Name]
+⏱️ **Time**: [X min]
+🤖 **Model**: [Haiku/Sonnet/Opus]
+🎯 **Tokens**: ~[X,XXX]
+📊 **Usage**: ~[X]%
+📝 **Description**: [What needs to be done]
+🎯 **Value**: [Why this matters]
+
+### Medium Priority Tasks
+
+[Same format as above]
+
+### Quick Wins (Low Usage)
+
+[Tasks that use Haiku and minimal tokens]
+
+---
+
+## Usage Budget Summary
+
+**Used So Far**: [X]% of daily Claude Pro usage
+**Remaining**: [X]% available
+**Recommendation**: [Choose Haiku/Sonnet/Opus tasks based on remaining budget]
+```
+
+### Token Estimation Guidelines
+
+**Documentation Writing Tasks:**
+- Simple markdown page (500 words): ~2,000-3,000 tokens (Haiku)
+- Complex guide with examples (1,500 words): ~6,000-10,000 tokens (Sonnet)
+- Comprehensive reference (3,000+ words): ~15,000-25,000 tokens (Sonnet/Opus)
+
+**Code Generation Tasks:**
+- Simple skill/template: ~3,000-5,000 tokens (Haiku)
+- Complex skill with tests: ~8,000-12,000 tokens (Sonnet)
+- Advanced architecture design: ~15,000-30,000 tokens (Opus)
+
+**Research Tasks:**
+- Quick lookup: ~1,000-2,000 tokens (Haiku)
+- Comprehensive research: ~5,000-10,000 tokens (Sonnet)
+- Deep analysis with synthesis: ~15,000-25,000 tokens (Opus)
+
+**Planning Tasks:**
+- Simple task breakdown: ~2,000-4,000 tokens (Haiku)
+- Detailed implementation plan: ~8,000-15,000 tokens (Sonnet)
+- Complex architectural planning: ~20,000-40,000 tokens (Opus)
+
+### Claude Pro Usage Estimation
+
+**Approximate Daily Limits (subject to change):**
+- Claude Pro provides usage-based limits rather than hard token counts
+- Usage percentage is measured across conversation turns
+- Different models impact usage differently
+
+**Rule of Thumb for This Project:**
+- Small tasks (<5,000 tokens): ~1-2% of daily usage
+- Medium tasks (5,000-15,000 tokens): ~3-5% of daily usage
+- Large tasks (15,000-30,000 tokens): ~6-10% of daily usage
+- Very large tasks (30,000+ tokens): ~10-15% of daily usage
+
+**Usage Optimization Strategies:**
+1. **Batch similar tasks**: Complete multiple small tasks in one session
+2. **Choose Haiku when possible**: 3x more efficient than Sonnet
+3. **Avoid Opus for routine work**: Reserve for complex architecture/analysis
+4. **Monitor usage after each task**: Track actual vs. estimated consumption
+5. **Plan ahead**: Prioritize high-value tasks when usage budget is available
+
 ## Notes for AI Assistants
+
 When working on this documentation:
+
+### Core Principles
 1. **Maintain pedagogical order**: Ensure new content fits the logical progression
 2. **Include cost analysis**: Always show token usage and savings potential
 3. **Real examples only**: No hypothetical or untested code
@@ -161,3 +296,46 @@ When working on this documentation:
 6. **Update plan**: Keep DOCUMENTATION_PLAN.md in sync with actual content
 7. **Cross-reference**: Link related topics together
 8. **Multiple skill levels**: Provide basic and advanced examples for each topic
+
+### Task Planning Workflow
+**ALWAYS follow this workflow:**
+
+1. **Before Starting**: Provide task plan with time, model, tokens, usage %
+2. **During Work**: Monitor actual token usage if possible
+3. **After Completion**: Provide completion summary with actuals
+4. **Next Steps**: List 3-5 next tasks with full planning details
+5. **Usage Check**: Show remaining usage budget and recommendations
+
+### Example Task Planning
+
+**Good Example:**
+```markdown
+## Task Plan: Create INTRODUCTION.md
+
+⏱️ **Estimated Time**: 45 minutes
+🤖 **Recommended Model**: Sonnet 4.5
+🎯 **Estimated Tokens**: ~12,000 tokens
+📊 **Usage Impact**: ~4% of Claude Pro daily usage
+💰 **Rationale**: Sonnet balances quality and efficiency for this medium-complexity writing task
+
+### Task Breakdown:
+1. Draft welcome section - 10 min - 2,000 tokens
+2. Write learning path explanation - 15 min - 4,000 tokens
+3. Create prerequisite section - 10 min - 2,000 tokens
+4. Add navigation guide - 10 min - 4,000 tokens
+```
+
+**Bad Example:**
+```markdown
+I'll create the introduction now.
+```
+❌ Missing: time estimate, model choice, token count, usage impact
+
+### When User Requests Task Estimates
+
+If user asks "What tasks are next?" or "What should we do?", ALWAYS respond with:
+1. List of 5-10 available tasks
+2. Each with: time, model, tokens, usage %, description, value
+3. Grouped by priority (High/Medium/Quick Wins)
+4. Usage budget summary
+5. Recommendation based on remaining budget
