@@ -3,6 +3,19 @@
 ## Overview
 This plan outlines a complete documentation structure for Claude Code, covering MCP servers, agents, skills, model selection, thinking modes, context management, and practical examples for optimizing token usage and behavior customization.
 
+### Pedagogical Approach
+The documentation follows a **logical progression from fundamental to advanced concepts**, where each topic builds upon the previous ones:
+1. **MCP Servers** - Foundation: Extending Claude's capabilities with external tools
+2. **Agents** - Building on MCP: Specialized AI assistants that use tools effectively
+3. **Skills** - Leveraging agents: Reusable instruction sets for complex tasks
+4. **Models** - Understanding the engine: Choosing the right model for each task
+5. **Thinking Modes** - Optimizing reasoning: Controlling depth of analysis
+6. **Context Management** - Advanced control: Managing information flow and memory
+7. **Keywords & Triggers** - Power user features: Customizing behavior
+8. **Token Optimization** - Synthesis: Applying all concepts for cost efficiency
+
+This structured approach ensures readers develop a solid foundation before tackling advanced optimization strategies.
+
 ---
 
 ## 1. MCP Servers (Model Context Protocol)
@@ -1187,22 +1200,27 @@ Annual (250 work days): $2,375 savings
 1. **Introduction Document**
    - Welcome and overview of Claude Code
    - What readers will learn from the documentation
+   - **Explanation of logical topic progression**: How fundamental concepts (MCP, Agents, Skills) build toward advanced topics (Context Management, Optimization)
    - Prerequisites and setup requirements
    - How to navigate the documentation
    - Quick start guide for immediate value
    - Target audience definition (beginners, intermediate, advanced users)
    - Benefits of using Claude Code effectively
+   - **Learning path philosophy**: Why topics are ordered from foundation to mastery
 
 2. **Comprehensive Table of Contents**
    - Master navigation document
    - Hierarchical structure of all documentation sections
+   - **Clear indication of logical topic progression**: Visual markers showing the learning path from fundamentals to advanced
    - Quick links to major topics (MCP, Agents, Skills, Models, etc.)
    - Recommended reading paths for different user types:
-     * "New to Claude Code" path
-     * "Optimization focused" path
-     * "Advanced customization" path
+     * "New to Claude Code" path (follows sequential order for complete understanding)
+     * "Optimization focused" path (can skip to optimization after foundational topics)
+     * "Advanced customization" path (assumes foundational knowledge)
+   - **Dependency diagram**: Shows which topics build on others (e.g., "Skills leverage Agents and MCP")
    - Visual roadmap/diagram showing documentation structure
    - Cross-references and related topics index
+   - **"Why this order?"** section explaining the pedagogical rationale
 
 3. **README.md**
    - Repository overview
@@ -1216,6 +1234,8 @@ Annual (250 work days): $2,375 savings
 - Users can easily find relevant documentation sections
 - Clear entry points for different skill levels
 - Navigation structure is intuitive and comprehensive
+- **Readers understand why topics are ordered sequentially and how they build on each other**
+- **First-time readers know whether to follow the sequential path or jump to specific sections**
 
 ### Phase 1: Foundation Documentation
 **Duration**: 2-3 weeks
