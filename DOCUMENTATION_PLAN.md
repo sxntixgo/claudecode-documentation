@@ -804,6 +804,23 @@ Task: Complex algorithm optimization
 @path/to/additional/context.md
 ```
 
+**Template Examples**:
+Multiple CLAUDE.md templates will be provided for different project types:
+- Web application projects
+- API service projects
+- Library/package projects
+- Monorepo projects
+- Documentation projects
+- Machine learning projects
+
+Each template will demonstrate:
+- Project-specific context organization
+- Common commands relevant to the tech stack
+- Code style guidelines
+- Testing requirements
+- Git workflow conventions
+- Notes for AI assistants working on the project
+
 ### 6.3 Memory Files and Hierarchy
 **Objective**: Explain memory file organization.
 
@@ -1311,7 +1328,25 @@ Annual (250 work days): $2,375 savings
    - Architecture reviewer
    - Test runner
 
-3. Example Projects
+3. **Example CLAUDE.md Templates**
+   - **Web Application CLAUDE.md**: React/Vue/Angular projects with frontend build commands
+   - **API Service CLAUDE.md**: Node.js/Python/Go backend services with database migrations
+   - **Library/Package CLAUDE.md**: Open source packages with versioning and publishing workflows
+   - **Monorepo CLAUDE.md**: Multi-package projects with workspace management
+   - **Documentation Project CLAUDE.md**: Documentation sites with build and deploy commands
+   - **Machine Learning CLAUDE.md**: ML projects with training, evaluation, and model management
+
+   Each template includes:
+   - Project overview and structure
+   - Common commands for the tech stack
+   - Core files and their purposes
+   - Code style guidelines
+   - Testing requirements
+   - Git workflow conventions
+   - Notes for AI assistants
+   - Examples of file imports for additional context
+
+4. Example Projects
    - Web application setup
    - API service configuration
    - Monorepo management
@@ -1373,6 +1408,13 @@ claudecode-docs/
 │   │   ├── quick-search.json
 │   │   ├── feature-implementer.json
 │   │   └── architecture-reviewer.json
+│   ├── claude-md-templates/
+│   │   ├── web-application-CLAUDE.md
+│   │   ├── api-service-CLAUDE.md
+│   │   ├── library-package-CLAUDE.md
+│   │   ├── monorepo-CLAUDE.md
+│   │   ├── documentation-project-CLAUDE.md
+│   │   └── machine-learning-CLAUDE.md
 │   └── projects/
 │       ├── web-app-setup.md
 │       ├── api-service.md
