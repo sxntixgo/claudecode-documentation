@@ -1353,15 +1353,558 @@ Annual (250 work days): $2,375 savings
    - Monorepo management
    - Microservices architecture
 
-### Phase 5: Reference and Maintenance
-**Ongoing**
+### Phase 5: Reference, Troubleshooting, and Advanced Topics
+**Duration**: 3-4 weeks (ongoing maintenance after initial completion)
+
+**Objectives**:
+- Provide comprehensive reference documentation for API schemas and configurations
+- Create practical troubleshooting guides for common issues
+- Build extensive FAQ covering all major topics
+- Add more project templates (Python/Django/Flask ecosystems)
+- Document all essential workflows (bug fixing, code review, refactoring, etc.)
+- Cover security, testing, performance, and monitoring best practices
+- Create quick reference materials for daily use
+- Establish community contribution guidelines
 
 **Deliverables**:
-1. Complete API Reference
-2. Troubleshooting Guide
-3. FAQ Section
-4. Community Patterns
-5. Changelog and Updates
+
+#### 5.1 Complete API Reference
+**File**: `guides/10-reference/1-api-reference.md`
+
+**Topics to Cover**:
+- **AGENT.md Schema**: Complete YAML/JSON schema for custom agents
+  ```yaml
+  name: string (required)
+  description: string (required)
+  model: "haiku" | "sonnet" | "opus" (optional)
+  tools: string[] (optional)
+  constraints:
+    allowedPaths: string[] (optional)
+    deniedPaths: string[] (optional)
+  autoActions:
+    beforeRead: Command[] (optional)
+    afterWrite: Command[] (optional)
+  ```
+
+- **SKILL.md Schema**: Complete frontmatter and structure specification
+  ```yaml
+  ---
+  name: string (required)
+  version: semver (optional)
+  description: string (required, 100-200 chars)
+  model: "claude-haiku-4-5" | "claude-sonnet-4-5" | "claude-opus-4-5" (optional)
+  modelOverrides: object (optional)
+  dependencies: string[] (optional)
+  ---
+  ```
+
+- **config.json Schema**: Complete configuration reference
+  ```json
+  {
+    "agents": {...},
+    "defaultModel": "sonnet",
+    "costTracking": {...},
+    "hooks": {...},
+    "projectContext": {...},
+    "experimentalFeatures": {...}
+  }
+  ```
+
+- **Hook Specifications**: Complete reference for all hook types
+  - PreToolUse hook format and examples
+  - PostToolUse hook format and examples
+  - Notification hook format and examples
+  - Stop hook format and examples
+  - Matcher patterns and variables
+
+- **Slash Command Schema**: Complete specification
+  ```yaml
+  ---
+  command: string (required)
+  description: string (required)
+  usage: string (optional)
+  skill: string (optional)
+  model: string (optional)
+  options: array (optional)
+  ---
+  ```
+
+- **Environment Variables**: Complete list and descriptions
+  - CLAUDE_DEFAULT_MODEL
+  - CLAUDE_CONFIG_PATH
+  - CLAUDE_MEMORY_PATH
+  - GITHUB_TOKEN (for MCP servers)
+  - Custom environment variables
+
+#### 5.2 Troubleshooting Guide
+**File**: `guides/10-reference/2-troubleshooting.md`
+
+**Topics to Cover**:
+- **MCP Server Issues**
+  - Server not loading or connecting
+  - Authentication failures
+  - Permission denied errors
+  - Server timeout issues
+  - Debugging server logs
+  - Restarting servers
+
+- **Agent and Subagent Issues**
+  - Agent timeout errors
+  - Agent not using correct model
+  - Context overflow in agents
+  - Agent permission errors
+  - Debugging agent behavior
+
+- **Skill Loading Issues**
+  - Skill not being invoked
+  - Skill description not clear enough
+  - Progressive disclosure not working
+  - Skill file format errors
+  - Model override not working
+
+- **Token and Cost Issues**
+  - Unexpected high token usage
+  - Context window exceeded
+  - Thinking tokens not allocated correctly
+  - Cost tracking not working
+
+- **Configuration Issues**
+  - config.json syntax errors
+  - CLAUDE.md not being loaded
+  - Memory files not taking precedence
+  - Environment variables not recognized
+  - Path resolution issues
+
+- **Git and Version Control Issues**
+  - Hooks blocking git operations
+  - Branch naming conflicts
+  - Commit message formatting
+  - Pre-commit hook failures
+
+- **Performance Issues**
+  - Slow response times
+  - High memory usage
+  - Context clearing too frequently
+  - Large file operations timing out
+
+Each issue includes:
+- Symptoms and error messages
+- Root cause explanation
+- Step-by-step resolution
+- Prevention strategies
+- Related issues and cross-references
+
+#### 5.3 FAQ Section
+**File**: `guides/10-reference/3-faq.md`
+
+**Categories**:
+
+**General Questions**:
+- What is Claude Code and how does it differ from Claude?
+- What are the system requirements?
+- Can I use Claude Code offline?
+- How do I update Claude Code?
+- What's the difference between Claude Code and GitHub Copilot?
+- What's the difference between Claude Code and Cursor?
+
+**MCP Server Questions**:
+- Why is my MCP server not loading?
+- How do I debug MCP server connection issues?
+- Can I use multiple MCP servers at once?
+- How do I create a custom MCP server?
+- Are MCP servers secure?
+- Can MCP servers access my credentials?
+
+**Agent Questions**:
+- What's the difference between agents and skills?
+- When should I use Explore vs General-Purpose agents?
+- How do I create a custom agent?
+- Can agents share context?
+- Why does my agent timeout?
+- How do I debug agent behavior?
+
+**Skill Questions**:
+- How do I install a skill?
+- How do I create a custom skill?
+- Why isn't my skill being invoked?
+- Can skills call other skills?
+- How do I test a skill?
+- What makes a good skill description?
+
+**Model Questions**:
+- Which model should I use for my task?
+- How do I change the model mid-conversation?
+- Can I assign different models to different agents?
+- What's the cost difference between models?
+- When should I use extended thinking?
+- How do thinking keywords work?
+
+**Context Management Questions**:
+- What is CLAUDE.md and where should I put it?
+- How do memory files work?
+- What happens when context gets too large?
+- How do I prevent context clearing?
+- Can I import files into CLAUDE.md?
+- What should I include in CLAUDE.md?
+
+**Optimization Questions**:
+- How can I reduce token usage?
+- What's the best model configuration for cost savings?
+- How do I track my token usage?
+- Can I set a daily budget?
+- What workflows save the most tokens?
+- How much can I really save with optimization?
+
+**Customization Questions**:
+- How do I create a slash command?
+- What are hooks and how do I use them?
+- Can I automate tasks with hooks?
+- How do I customize Claude's behavior?
+- What are the available hook types?
+- How do I debug hook execution?
+
+#### 5.4 Additional Project Templates
+**Files**:
+- `guides/9-examples/projects/3-python-flask.md`
+- `guides/9-examples/projects/4-python-django.md`
+- `guides/9-examples/projects/5-python-fastapi.md`
+- `guides/9-examples/projects/6-go-microservices.md`
+- `guides/9-examples/projects/7-rust-project.md`
+
+Each template includes:
+- Complete `.claude/` directory structure
+- Technology-specific CLAUDE.md
+- Common commands for that ecosystem
+- Framework-specific slash commands
+- Custom skills for framework patterns
+- Testing and deployment workflows
+- Cost estimates for typical usage
+
+**Python/Flask Template** (`3-python-flask.md`):
+- Flask project structure
+- Virtual environment management
+- Database migrations with Alembic
+- Testing with pytest
+- Deployment commands
+- Skills: API endpoint generator, Flask blueprint creator
+- Slash commands: /test, /migrate, /deploy
+
+**Python/Django Template** (`4-python-django.md`):
+- Django project structure
+- App management commands
+- Database migrations
+- Testing with Django test framework
+- Celery task management
+- Skills: Django model generator, admin panel creator, REST API skill
+- Slash commands: /makemigrations, /migrate, /test, /collectstatic
+
+**Python/FastAPI Template** (`5-python-fastapi.md`):
+- FastAPI project structure
+- Pydantic model definitions
+- Async endpoint patterns
+- Testing with pytest-asyncio
+- OpenAPI documentation
+- Skills: FastAPI endpoint generator, Pydantic model creator
+- Slash commands: /test, /docs, /deploy
+
+#### 5.5 Complete Workflow Documentation
+**Files**:
+- `guides/9-examples/workflows/2-bug-fixing.md`
+- `guides/9-examples/workflows/3-code-review.md`
+- `guides/9-examples/workflows/4-refactoring.md`
+- `guides/9-examples/workflows/5-documentation-writing.md`
+- `guides/9-examples/workflows/6-performance-optimization.md`
+- `guides/9-examples/workflows/7-testing.md`
+
+Each workflow includes:
+- Step-by-step process
+- Recommended agents and models
+- Slash commands to use
+- Skills to leverage
+- Time estimates
+- Token usage estimates
+- Before/after examples
+- ROI calculations
+
+**Bug Fixing Workflow** (`2-bug-fixing.md`):
+1. Reproduce the bug (Explore agent, Haiku)
+2. Identify root cause (General-Purpose agent, Sonnet)
+3. Write failing test (TDD skill, Sonnet)
+4. Implement fix (General-Purpose agent, Sonnet)
+5. Verify fix (Test runner, Haiku)
+6. Update documentation (Documentation skill, Haiku)
+- Time: 30-60 minutes
+- Tokens: ~15,000-25,000
+- Cost: ~$0.30-$0.50
+
+**Code Review Workflow** (`3-code-review.md`):
+1. Understand changes (Explore agent, Haiku)
+2. Check code quality (Code review skill, Sonnet)
+3. Verify tests (Test runner, Haiku)
+4. Check security (Security audit skill, Sonnet)
+5. Provide feedback (Documentation skill, Haiku)
+- Time: 15-30 minutes
+- Tokens: ~10,000-15,000
+- Cost: ~$0.15-$0.25
+
+**Refactoring Workflow** (`4-refactoring.md`):
+1. Analyze current code (Explore agent, Sonnet with "think")
+2. Plan refactoring (Plan agent, Opus for complex, Sonnet for simple)
+3. Write tests for current behavior (TDD skill, Sonnet)
+4. Implement refactoring (General-Purpose agent, Sonnet/Opus)
+5. Verify tests pass (Test runner, Haiku)
+6. Update documentation (Documentation skill, Haiku)
+- Time: 1-3 hours
+- Tokens: ~40,000-80,000
+- Cost: ~$1.00-$2.50
+
+#### 5.6 Security and Compliance Guide
+**File**: `guides/11-security/1-security-compliance.md`
+
+**Topics to Cover**:
+- **Secrets Management**
+  - Never commit API keys or credentials
+  - Using environment variables
+  - .gitignore best practices
+  - Secrets detection hooks
+  - Rotating credentials
+  - MCP server authentication best practices
+
+- **Code Security**
+  - Common vulnerabilities to avoid (OWASP Top 10)
+  - Input validation
+  - SQL injection prevention
+  - XSS prevention
+  - CSRF protection
+  - Dependency security
+
+- **Compliance Considerations**
+  - GDPR compliance for EU projects
+  - SOC 2 compliance requirements
+  - HIPAA considerations for healthcare
+  - Data residency requirements
+  - Audit logging
+
+- **AI Safety**
+  - Reviewing Claude-generated code for security
+  - Preventing prompt injection
+  - Sandboxing untrusted code
+  - Rate limiting and abuse prevention
+
+- **Access Control**
+  - Agent permission restrictions
+  - Tool access limitations
+  - File path constraints
+  - Environment isolation
+
+#### 5.7 Testing and Quality Guide
+**File**: `guides/11-security/2-testing-quality.md`
+
+**Topics to Cover**:
+- **Testing MCP Servers**
+  - Unit testing server handlers
+  - Integration testing with Claude
+  - Mocking external APIs
+  - Testing error scenarios
+  - Performance testing
+
+- **Testing Custom Skills**
+  - Skill invocation testing
+  - Progressive disclosure validation
+  - Model assignment verification
+  - Edge case testing
+  - Regression testing
+
+- **Testing Agents**
+  - Agent behavior validation
+  - Context isolation testing
+  - Model assignment testing
+  - Performance benchmarking
+  - Integration testing
+
+- **Quality Gates**
+  - Pre-commit hooks for quality
+  - Automated testing on push
+  - Code coverage requirements
+  - Linting and formatting
+  - Security scanning
+
+- **Testing Workflows**
+  - TDD with Claude Code
+  - BDD patterns
+  - Integration testing strategies
+  - End-to-end testing
+  - Load testing
+
+#### 5.8 Performance and Monitoring Guide
+**File**: `guides/11-security/3-performance-monitoring.md`
+
+**Topics to Cover**:
+- **Performance Benchmarks**
+  - Model performance comparison (Haiku vs Sonnet vs Opus)
+  - Task completion time metrics
+  - Token usage by task type
+  - Memory consumption patterns
+  - Context clearing impact
+
+- **Monitoring Token Usage**
+  - Real-time usage tracking
+  - Daily/weekly/monthly reports
+  - Cost projection
+  - Budget alerts
+  - Usage anomaly detection
+
+- **Performance Optimization**
+  - Choosing the right model for speed
+  - Minimizing context size
+  - Efficient agent usage
+  - Caching strategies
+  - Parallel task execution
+
+- **Profiling and Debugging**
+  - Identifying bottlenecks
+  - Measuring agent performance
+  - Tracking skill execution time
+  - Analyzing context usage
+  - Debugging slow operations
+
+- **Monitoring Infrastructure**
+  - Setting up cost tracking
+  - Log aggregation
+  - Metrics dashboards
+  - Alerting configuration
+  - Performance reporting
+
+#### 5.9 Quick Reference Materials
+**Files**:
+- `guides/10-reference/4-cheat-sheet.md`
+- `guides/10-reference/5-model-selection-tree.md`
+- `guides/10-reference/6-optimization-checklist.md`
+- `guides/10-reference/7-glossary.md`
+
+**Quick Reference Cheat Sheet** (`4-cheat-sheet.md`):
+- All slash commands with syntax
+- Common CLI commands
+- Keyboard shortcuts
+- Hook types and matchers
+- Environment variables
+- File locations
+- Model pricing table
+- Thinking keywords
+- One-page printable format
+
+**Model Selection Decision Tree** (`5-model-selection-tree.md`):
+- Interactive flowchart (Mermaid diagram)
+- Task type → Model recommendation
+- Cost vs quality trade-offs
+- Real-world scenarios
+- One-page decision aid
+
+**Optimization Checklist** (`6-optimization-checklist.md`):
+- Pre-implementation checklist
+- Configuration checklist
+- Agent optimization checklist
+- Skill optimization checklist
+- Context optimization checklist
+- Monitoring checklist
+- Monthly review checklist
+
+**Glossary** (`7-glossary.md`):
+- Complete terminology reference
+- Acronym definitions (MCP, TDD, API, etc.)
+- Claude Code specific terms
+- Industry standard terms
+- Cross-references to detailed guides
+
+#### 5.10 Community and Contribution
+**Files**:
+- `CONTRIBUTING.md`
+- `guides/12-community/1-resources.md`
+- `guides/12-community/2-contribution-guide.md`
+- `guides/12-community/3-best-practices-catalog.md`
+
+**Community Resources** (`1-resources.md`):
+- Official Anthropic resources
+  - Claude Code documentation
+  - Anthropic engineering blog
+  - Model Context Protocol spec
+- Community forums and Discord
+- GitHub repositories
+  - anthropics/skills
+  - obra/superpowers
+  - Community MCP servers
+- Video tutorials and courses
+- Blog posts and articles
+- Conference talks
+- Social media channels
+
+**Contribution Guide** (`2-contribution-guide.md`):
+- How to contribute to Claude Code ecosystem
+- Creating and sharing skills
+- Building MCP servers for the community
+- Reporting bugs effectively
+  - Required information
+  - Reproduction steps
+  - Example issues
+- Suggesting features
+- Contributing to documentation
+- Code of conduct
+- License information
+
+**Community Best Practices Catalog** (`3-best-practices-catalog.md`):
+- Curated list of community-contributed patterns
+- Real-world configurations that work
+- Lessons learned from production use
+- Case studies from teams
+- Performance optimization discoveries
+- Creative skill implementations
+- Novel workflow patterns
+- Industry-specific best practices
+
+#### 5.11 Changelog and Updates
+**File**: `CHANGELOG.md`
+
+**Format**:
+```markdown
+# Changelog
+
+## [Unreleased]
+### Added
+### Changed
+### Fixed
+### Deprecated
+
+## [Version 1.0.0] - 2025-01-15
+### Added
+- Initial comprehensive documentation release
+- 38 guides covering all major topics
+- 4 creation guides (MCP, Agents, Skills, Slash Commands)
+- 5 project templates
+- Complete optimization strategies
+
+### Documentation Updates
+- Monthly updates aligned with Claude Code releases
+- Weekly community contribution reviews
+- Quarterly example testing and validation
+```
+
+**Update Schedule**:
+- Major updates within 1 week of Claude Code releases
+- Minor updates weekly for community contributions
+- Quarterly comprehensive review and testing
+- Annual major documentation refresh
+
+**Success Criteria for Phase 5**:
+- Complete API reference covers all schemas
+- Troubleshooting guide resolves 90%+ of common issues
+- FAQ answers all frequently asked questions
+- All major ecosystems have project templates (Node, Python, Go, Rust)
+- All essential workflows documented with examples
+- Security and quality guidelines established
+- Performance monitoring framework in place
+- Quick reference materials used daily by power users
+- Active community contribution pipeline
+- Documentation stays current with Claude Code releases
 
 ---
 
