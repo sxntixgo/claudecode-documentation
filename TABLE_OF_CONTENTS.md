@@ -223,6 +223,9 @@ graph TD
 | **Projects** |||
 | [React + TypeScript Project](guides/9-examples/projects/1-react-typescript.md) | 45 min | Complete frontend project setup |
 | [Node.js API Service](guides/9-examples/projects/2-nodejs-api.md) | 40 min | Backend API configuration |
+| **[Python/Django Project](guides/9-examples/projects/python/1-django.md)** | **45 min** | **Django with custom skills and workflows** |
+| **[Python/FastAPI Project](guides/9-examples/projects/python/2-fastapi.md)** | **40 min** | **Modern async Python API** |
+| **[Python/Flask Project](guides/9-examples/projects/python/3-flask.md)** | **30 min** | **Lightweight Flask web framework** |
 | **Workflows** |||
 | [Feature Development Workflow](guides/9-examples/workflows/1-feature-development.md) | 30 min | 6-phase development process |
 | **[Bug Fixing Workflow](guides/9-examples/workflows/2-bug-fixing.md)** | **30 min** | **Systematic debugging with TDD approach** |
@@ -231,7 +234,7 @@ graph TD
 | **Teams** |||
 | [Solo Developer Setup](guides/9-examples/teams/1-solo-developer.md) | 25 min | Optimized individual configuration |
 
-**Total Time**: ~4 hours
+**Total Time**: ~6 hours
 **Dependencies**: Understanding of core concepts
 **Outcome**: Production-ready project configurations
 
@@ -253,6 +256,43 @@ graph TD
 **Total Time**: ~2 hours (reference as needed)
 **Dependencies**: None
 **Use For**: Quick lookups, troubleshooting, technical specifications
+
+---
+
+### 🔒 Security & Compliance (Production Readiness)
+
+**Level**: 🔴 Advanced
+**Prerequisites**: Understanding of core concepts, project experience
+**What You'll Master**: Production deployment, security, testing, and performance
+
+| Guide | Time | Topics |
+|-------|------|--------|
+| **[Security & Compliance](guides/11-security/1-security-compliance.md)** | **45 min** | **Secrets management, OWASP Top 10, GDPR/SOC 2/HIPAA, AI safety** |
+| **[Testing & Quality](guides/11-security/2-testing-quality.md)** | **50 min** | **MCP/skill/agent testing, TDD/BDD, quality gates, CI/CD** |
+| **[Performance & Monitoring](guides/11-security/3-performance-monitoring.md)** | **40 min** | **Benchmarks, token tracking, cost monitoring, optimization** |
+
+**Total Time**: ~2 hours
+**Dependencies**: Core concepts, project experience
+**Outcome**: Production-ready, secure, and optimized deployments
+
+---
+
+### ⚡ Quick Reference (Power User Tools)
+
+**Level**: All levels
+**Prerequisites**: None
+**What You'll Master**: Decision trees, checklists, and lookup tables
+
+| Guide | Time | Topics |
+|-------|------|--------|
+| **[Model Selection Decision Tree](guides/12-quick-reference/1-model-selection-tree.md)** | **15 min** | **Haiku/Sonnet/Opus decision flowchart, cost calculator** |
+| **[Optimization Checklist](guides/12-quick-reference/2-optimization-checklist.md)** | **20 min** | **Pre-implementation, configuration, runtime, monitoring** |
+| **[Glossary](guides/12-quick-reference/3-glossary.md)** | **25 min** | **Complete terminology reference (80+ terms)** |
+| **[Community Resources](guides/12-quick-reference/4-community-resources.md)** | **20 min** | **Official docs, community channels, learning materials** |
+
+**Total Time**: ~1.5 hours (use as needed)
+**Dependencies**: None
+**Use For**: Quick decisions, daily optimization, learning resources
 
 ---
 
