@@ -220,12 +220,18 @@ graph TD
 | Guide | Time | Topics |
 |-------|------|--------|
 | [Examples Overview](guides/9-examples/1-overview.md) | 10 min | How to use templates and examples |
+| **Projects** |||
 | [React + TypeScript Project](guides/9-examples/projects/1-react-typescript.md) | 45 min | Complete frontend project setup |
 | [Node.js API Service](guides/9-examples/projects/2-nodejs-api.md) | 40 min | Backend API configuration |
+| **Workflows** |||
 | [Feature Development Workflow](guides/9-examples/workflows/1-feature-development.md) | 30 min | 6-phase development process |
+| **[Bug Fixing Workflow](guides/9-examples/workflows/2-bug-fixing.md)** | **30 min** | **Systematic debugging with TDD approach** |
+| **[Code Review Workflow](guides/9-examples/workflows/3-code-review.md)** | **25 min** | **AI-assisted PR reviews with security checks** |
+| **[Refactoring Workflow](guides/9-examples/workflows/4-refactoring.md)** | **35 min** | **Safe refactoring with Plan agent and tests** |
+| **Teams** |||
 | [Solo Developer Setup](guides/9-examples/teams/1-solo-developer.md) | 25 min | Optimized individual configuration |
 
-**Total Time**: ~2.5 hours
+**Total Time**: ~4 hours
 **Dependencies**: Understanding of core concepts
 **Outcome**: Production-ready project configurations
 
