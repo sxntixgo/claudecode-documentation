@@ -39,7 +39,7 @@ The documentation follows a **pedagogical progression** from fundamental to adva
 - Use GitHub-flavored Markdown
 - Include table of contents for long documents
 - Use code fencing with language tags
-- Add visual diagrams where helpful (especially for dependencies)
+- **Visual diagrams**: ALWAYS use Mermaid diagrams (never ASCII art)
 - Link to official sources and references
 
 ### Tone and Style
@@ -161,7 +161,7 @@ The user has a **Claude Pro subscription** with the following limits:
 
 ### Required Task Planning Format
 
-**BEFORE starting any task**, provide a task plan with:
+**ONLY when asking the user to choose a task**, provide estimates with:
 
 ```markdown
 ## Task Plan: [Task Name]
@@ -178,6 +178,8 @@ The user has a **Claude Pro subscription** with the following limits:
 3. [Subtask 3] - [X min] - [Y tokens]
 ```
 
+**Note**: Do NOT show estimates for tasks that are already completed. Estimates are only for helping the user choose future tasks.
+
 ### Model Selection Guidelines
 
 | Model | When to Use | Token Efficiency | Speed | Cost Impact |
@@ -188,15 +190,12 @@ The user has a **Claude Pro subscription** with the following limits:
 
 ### Task Completion Format
 
-**AFTER completing any task**, provide a completion summary with:
+**AFTER completing any task**, provide a brief completion summary:
 
 ```markdown
 ## Task Complete: [Task Name]
 
-✅ **Completed In**: [Actual time taken]
-🤖 **Model Used**: [Haiku 4.5 / Sonnet 4.5 / Opus 4.5]
-📈 **Actual Tokens**: ~[X,XXX] tokens consumed
-📊 **Usage Consumed**: ~[X]% of Claude Pro daily usage
+✅ **Status**: Complete
 💾 **Files Changed**: [List of files]
 🔗 **Commit**: [Commit hash and message]
 
@@ -240,6 +239,11 @@ Choose your next task based on priority and usage budget:
 **Remaining**: [X]% available
 **Recommendation**: [Choose Haiku/Sonnet/Opus tasks based on remaining budget]
 ```
+
+**Important**:
+- Completion summaries should be brief - just status, files, and commit
+- Full estimates (time, model, tokens, usage %) are ONLY shown for next available tasks
+- This helps the user choose future tasks without cluttering completed work reports
 
 ### Token Estimation Guidelines
 
@@ -300,36 +304,57 @@ When working on this documentation:
 ### Task Planning Workflow
 **ALWAYS follow this workflow:**
 
-1. **Before Starting**: Provide task plan with time, model, tokens, usage %
-2. **During Work**: Monitor actual token usage if possible
-3. **After Completion**: Provide completion summary with actuals
-4. **Next Steps**: List 3-5 next tasks with full planning details
-5. **Usage Check**: Show remaining usage budget and recommendations
+1. **User Selects Task**: When user says "continue with task 1" or "continue with agents" or similar
+2. **Start Immediately**: Begin working on the task right away WITHOUT asking for confirmation
+3. **During Work**: Focus on completing the task efficiently
+4. **After Completion**: Brief summary (status, files, commit) - NO estimates for completed work
+5. **Next Steps**: List 3-5 next tasks with full planning details (time, model, tokens, usage %)
+6. **Usage Check**: Show remaining usage budget and recommendations
+
+**Key Principles**:
+- Show estimates ONLY for future tasks the user is choosing between, NOT for completed work
+- Once user selects a task, START IMMEDIATELY without asking "continue" or waiting for confirmation
+- User should only need to say the task name/number ONCE to trigger execution
 
 ### Example Task Planning
 
-**Good Example:**
+**Good Example (when asking user to choose):**
 ```markdown
-## Task Plan: Create INTRODUCTION.md
+## Next Available Tasks
 
-⏱️ **Estimated Time**: 45 minutes
-🤖 **Recommended Model**: Sonnet 4.5
-🎯 **Estimated Tokens**: ~12,000 tokens
-📊 **Usage Impact**: ~4% of Claude Pro daily usage
+#### 1. Create INTRODUCTION.md
+⏱️ **Time**: 45 minutes
+🤖 **Model**: Sonnet 4.5
+🎯 **Tokens**: ~12,000 tokens
+📊 **Usage**: ~4% of Claude Pro daily usage
 💰 **Rationale**: Sonnet balances quality and efficiency for this medium-complexity writing task
+📝 **Description**: Write comprehensive introduction with welcome, learning path, and navigation
+🎯 **Value**: Critical foundation - first thing users see
 
-### Task Breakdown:
-1. Draft welcome section - 10 min - 2,000 tokens
-2. Write learning path explanation - 15 min - 4,000 tokens
-3. Create prerequisite section - 10 min - 2,000 tokens
-4. Add navigation guide - 10 min - 4,000 tokens
+Which task would you like me to tackle?
+```
+
+**Good Example (after completing task):**
+```markdown
+## Task Complete: Create TABLE_OF_CONTENTS.md
+
+✅ **Status**: Complete
+💾 **Files Changed**: TABLE_OF_CONTENTS.md
+🔗 **Commit**: 861b8de - Create comprehensive TABLE_OF_CONTENTS.md with navigation
+
+[Then show next available tasks with estimates]
 ```
 
 **Bad Example:**
 ```markdown
-I'll create the introduction now.
+## Task Complete: Create TABLE_OF_CONTENTS.md
+
+✅ Completed In: 35 minutes
+🤖 Model Used: Sonnet 4.5
+📈 Actual Tokens: ~8,500 tokens consumed
+📊 Usage Consumed: ~3% of Claude Pro daily usage
 ```
-❌ Missing: time estimate, model choice, token count, usage impact
+❌ Don't show estimates/actuals for completed work - keep it brief!
 
 ### When User Requests Task Estimates
 
