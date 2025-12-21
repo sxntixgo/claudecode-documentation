@@ -211,6 +211,55 @@ graph TD
 
 ---
 
+### 9️⃣ Examples & Templates (Practical Application)
+
+**Level**: 🟢 Intermediate
+**Prerequisites**: Basic understanding of Claude Code
+**What You'll Master**: Real-world project configurations and workflows
+
+| Guide | Time | Topics |
+|-------|------|--------|
+| [Examples Overview](guides/9-examples/1-overview.md) | 10 min | How to use templates and examples |
+| [React + TypeScript Project](guides/9-examples/projects/1-react-typescript.md) | 45 min | Complete frontend project setup |
+| [Node.js API Service](guides/9-examples/projects/2-nodejs-api.md) | 40 min | Backend API configuration |
+| [Feature Development Workflow](guides/9-examples/workflows/1-feature-development.md) | 30 min | 6-phase development process |
+| [Solo Developer Setup](guides/9-examples/teams/1-solo-developer.md) | 25 min | Optimized individual configuration |
+
+**Total Time**: ~2.5 hours
+**Dependencies**: Understanding of core concepts
+**Outcome**: Production-ready project configurations
+
+---
+
+### 🔟 Reference Documentation (Quick Lookup)
+
+**Level**: All levels
+**Prerequisites**: None for quick reference, intermediate for deep understanding
+**What You'll Master**: Technical specifications and troubleshooting
+
+| Guide | Time | Topics |
+|-------|------|--------|
+| **[Complete API Reference](guides/10-reference/1-api-reference.md)** | **45 min** | **AGENT.md, SKILL.md, config.json schemas** |
+| **[Troubleshooting Guide](guides/10-reference/2-troubleshooting.md)** | **35 min** | **Common issues and solutions** |
+| **[FAQ](guides/10-reference/3-faq.md)** | **40 min** | **50+ frequently asked questions** |
+| **[Quick Reference Cheat Sheet](guides/10-reference/4-cheat-sheet.md)** | **10 min** | **One-page printable reference** |
+
+**Total Time**: ~2 hours (reference as needed)
+**Dependencies**: None
+**Use For**: Quick lookups, troubleshooting, technical specifications
+
+---
+
+### 📄 Project Documentation
+
+| Document | Purpose |
+|----------|---------|
+| [CHANGELOG.md](CHANGELOG.md) | Version history and updates |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute to this documentation |
+| [DOCUMENTATION_PLAN.md](DOCUMENTATION_PLAN.md) | Complete documentation roadmap and plan |
+
+---
+
 ## 🎯 Reading Paths for Different Users
 
 ### Path 1: "New to Claude Code" (Complete Learning)
