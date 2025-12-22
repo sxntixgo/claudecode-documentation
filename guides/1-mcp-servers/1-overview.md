@@ -2,7 +2,10 @@
 
 ⏱️ **Time**: 15 minutes
 📊 **Level**: Beginner
+**Prerequisites**: [Plugin Ecosystem Overview](../0-plugins/1-overview.md) (recommended)
 🎯 **You'll Learn**: What MCP servers are, how they work, why they matter, and when to use them
+
+> **📌 Plugin Type 1 of 4**: MCP Servers extend Claude Code's capabilities by connecting to external tools and APIs. See [Plugin Ecosystem Overview](../0-plugins/1-overview.md) to understand how MCP Servers fit with Skills, Hooks, and Slash Commands.
 
 ---
 

@@ -2,7 +2,9 @@
 
 **Reading Time**: 20 minutes
 **Skill Level**: Intermediate
-**Prerequisites**: [What Are Agents?](../2-agents/1-overview.md), [Built-in Agent Types](../2-agents/2-built-in-agents.md)
+**Prerequisites**: [Plugin Ecosystem Overview](../0-plugins/1-overview.md), [What Are Agents?](../2-agents/1-overview.md), [Built-in Agent Types](../2-agents/2-built-in-agents.md)
+
+> **📌 Plugin Type 2 of 4**: Skills provide custom instructions and workflows for Claude Code. See [Plugin Ecosystem Overview](../0-plugins/1-overview.md) to understand how Skills fit with MCP Servers, Hooks, and Slash Commands.
 
 ---
 

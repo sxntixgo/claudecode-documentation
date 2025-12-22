@@ -2,7 +2,9 @@
 
 **Reading Time**: 15 minutes
 **Skill Level**: Intermediate
-**Prerequisites**: Basic Claude Code usage
+**Prerequisites**: [Plugin Ecosystem Overview](../0-plugins/1-overview.md), Basic Claude Code usage
+
+> **📌 Includes Plugin Types 3 & 4**: This section covers Slash Commands (Plugin Type 3) and references Hooks (Plugin Type 4). See [Plugin Ecosystem Overview](../0-plugins/1-overview.md) to understand how these fit with MCP Servers and Skills. For detailed hooks documentation, see [Hooks & Automation](../7-hooks/1-overview.md).
 
 ---
 

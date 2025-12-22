@@ -41,19 +41,22 @@ By working through this documentation, you'll learn:
 This documentation isn't just a random collection of topics—it follows a **pedagogical progression** where each concept builds on the previous ones. Here's the journey we'll take together:
 
 ```
-Foundation → Building Blocks → Advanced → Mastery
-   MCP     →  Agents/Skills  → Context → Optimization
+ Overview  → Foundation → Building Blocks → Advanced → Mastery
+  Plugins  →    MCP     →  Agents/Skills  → Context → Optimization
 ```
 
-### The 8-Stage Learning Path
+### The 9-Stage Learning Path
 
-**1. MCP Servers** (Foundation)
+**0. Plugin Ecosystem Overview** (Big Picture - Start Here!)
+Before diving into specifics, understand the four plugin types (MCP Servers, Skills, Hooks, Slash Commands) and how they work together. This 20-minute overview gives you the mental framework to organize everything you'll learn. Think of it as seeing the map before exploring the territory.
+
+**1. MCP Servers** (Foundation - Plugin Type 1)
 Think of MCP as the foundation of a house. You can't build anything solid without it. MCP servers extend Claude Code by connecting it to external tools—GitHub, databases, APIs, and more. Once you understand how to add capabilities to Claude, everything else makes sense.
 
 **2. Agents** (Building on MCP)
 Now that Claude has tools (via MCP), agents are the workers who use those tools intelligently. The Explore agent searches your codebase, the General-Purpose agent makes changes, and the Plan agent researches before implementation. Understanding agents helps you delegate work effectively.
 
-**3. Skills** (Leveraging Agents)
+**3. Skills** (Leveraging Agents - Plugin Type 2)
 Skills are like training manuals that agents follow. Once you know how agents work, you can write instructions (skills) that make them experts at specific tasks—TDD workflows, API documentation, code reviews. Skills turn generic agents into specialists.
 
 **4. Model Selection** (Understanding the Engine)
@@ -65,8 +68,11 @@ Sometimes you need Claude to think deeply about a problem; other times, a quick 
 **6. Context Management** (Advanced Control)
 As you work on larger projects, managing what Claude "remembers" becomes important. CLAUDE.md files, memory hierarchies, and context clearing strategies keep your workflows efficient.
 
-**7. Keywords & Triggers** (Power User Features)
-Hooks, custom commands, and behavioral keywords let you customize Claude Code to match your workflow. This builds on everything you've learned about how Claude Code operates.
+**7. Keywords & Triggers** (Power User Features - Slash Commands = Plugin Type 3)
+Custom slash commands and behavioral keywords let you customize Claude Code to match your workflow. This builds on everything you've learned about how Claude Code operates.
+
+**7.5. Hooks** (Automation - Plugin Type 4)
+Hooks automate workflows by running commands at specific trigger points (before/after tool use, on prompts). Set up automated testing, code formatting, and validation that happens without manual intervention.
 
 **8. Token Optimization** (Synthesis)
 Finally, you'll apply everything—model selection, thinking budgets, context management, strategic agent/skill usage—to dramatically reduce costs while maintaining quality.
@@ -75,6 +81,7 @@ Finally, you'll apply everything—model selection, thinking budgets, context ma
 
 You might be tempted to skip straight to "Token Optimization" or "Advanced Techniques." Here's why following the sequence matters:
 
+**❌ Without Plugin Overview**: You won't understand how MCP, Skills, Hooks, and Commands fit together
 **❌ Without MCP knowledge**: You won't understand what agents are actually doing
 **❌ Without Agent knowledge**: Skills won't make sense (they're instructions for agents)
 **❌ Without Model knowledge**: You can't optimize costs effectively
@@ -145,14 +152,16 @@ graph TB
     Choose -->|Advanced User| Custom[Advanced Customization]
     Choose -->|Need Answer Now| Ref[Reference & Examples]
 
-    Sequential --> MCP[1. MCP Servers]
+    Sequential --> Plugins[0. Plugin Overview]
+    Plugins --> MCP[1. MCP Servers]
     MCP --> Agents[2. Agents]
     Agents --> Skills[3. Skills]
     Skills --> Models[4. Models]
     Models --> Thinking[5. Thinking]
     Thinking --> Context[6. Context]
     Context --> Keywords[7. Keywords]
-    Keywords --> Optimization[8. Optimization]
+    Keywords --> Hooks[7.5. Hooks]
+    Hooks --> Optimization[8. Optimization]
 
     Quick --> ModelsQ[Models Quick Guide]
     Quick --> ThinkingQ[Thinking Quick Guide]
@@ -183,14 +192,16 @@ We've designed four different paths through this documentation based on your goa
 **Approach**: Sequential learning from MCP Servers → Token Optimization
 
 **Your Journey**:
-1. Start with [MCP Servers](guides/1-mcp-servers/2-installation.md)
-2. Progress through [Agents](guides/2-agents/1-overview.md)
-3. Learn [Skills](guides/3-skills/1-overview.md)
-4. Master [Model Selection](guides/4-models/1-overview.md)
-5. Understand [Thinking Modes](guides/5-thinking/1-overview.md)
-6. Deep dive into [Context Management](guides/6-context/2-claude-md.md)
-7. Explore [Keywords & Triggers](guides/7-keywords/1-overview.md)
-8. Apply everything in [Token Optimization](guides/8-optimization/2-advanced-techniques.md)
+1. **Start with**: [Plugin Ecosystem Overview](guides/0-plugins/1-overview.md) (20 min) - See the big picture first!
+2. **Deep dive**: [MCP Servers](guides/1-mcp-servers/2-installation.md) (Plugin Type 1)
+3. Progress through [Agents](guides/2-agents/1-overview.md)
+4. Learn [Skills](guides/3-skills/1-overview.md) (Plugin Type 2)
+5. Master [Model Selection](guides/4-models/1-overview.md)
+6. Understand [Thinking Modes](guides/5-thinking/1-overview.md)
+7. Deep dive into [Context Management](guides/6-context/2-claude-md.md)
+8. Explore [Keywords & Triggers](guides/7-keywords/1-overview.md) (Slash Commands = Plugin Type 3)
+9. Learn [Hooks & Automation](guides/7-hooks/1-overview.md) (Plugin Type 4)
+10. Apply everything in [Token Optimization](guides/8-optimization/2-advanced-techniques.md)
 
 **Why this path?**
 - Builds solid foundation
@@ -207,12 +218,13 @@ We've designed four different paths through this documentation based on your goa
 **Approach**: Cover fundamentals quickly, deep dive into cost optimization
 
 **Your Journey**:
-1. **Quick overview**: [MCP Servers](guides/1-mcp-servers/1-overview.md) (15 min)
-2. **Quick overview**: [Agents](guides/2-agents/1-overview.md) (15 min)
-3. **Deep dive**: [Model Selection](guides/4-models/5-selection-guide.md) (30 min)
-4. **Deep dive**: [Thinking Modes](guides/5-thinking/1-overview.md) (25 min)
-5. **Deep dive**: [Token Optimization](guides/8-optimization/2-advanced-techniques.md) (60 min)
-6. **Reference**: Other topics as needed
+1. **Quick overview**: [Plugin Ecosystem](guides/0-plugins/1-overview.md) (20 min) - Understand the 4 plugin types
+2. **Quick overview**: [MCP Servers](guides/1-mcp-servers/1-overview.md) (15 min)
+3. **Quick overview**: [Agents](guides/2-agents/1-overview.md) (15 min)
+4. **Deep dive**: [Model Selection](guides/4-models/5-selection-guide.md) (30 min)
+5. **Deep dive**: [Thinking Modes](guides/5-thinking/1-overview.md) (25 min)
+6. **Deep dive**: [Token Optimization](guides/8-optimization/2-advanced-techniques.md) (60 min)
+7. **Reference**: Other topics as needed
 
 **Why this path?**
 - Fast path to 50%+ cost savings
