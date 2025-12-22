@@ -8,7 +8,7 @@
 
 ## What Are Agents?
 
-Remember how we learned about [MCP servers](../01-mcp-servers/overview.md)? They give Claude Code access to external tools—GitHub, databases, web search, and more. Now here's where it gets interesting: **agents are specialized AI assistants that know how to use those tools effectively**.
+Remember how we learned about [MCP servers](../01-mcp-servers/1-overview.md)? They give Claude Code access to external tools—GitHub, databases, web search, and more. Now here's where it gets interesting: **agents are specialized AI assistants that know how to use those tools effectively**.
 
 Think of it this way:
 
@@ -754,9 +754,9 @@ Want to dive deeper? Here are excellent resources:
 
 ### 🔗 Related Topics
 
-- [MCP Servers Overview](../01-mcp-servers/overview.md) - Agents use MCP tools
-- [Skills Overview](../03-skills/overview.md) - Skills leverage agent capabilities
-- [Model Selection](../models/model-comparison.md) - Assign different models to agents
+- [MCP Servers Overview](../01-mcp-servers/1-overview.md) - Agents use MCP tools
+- [Skills Overview](../03-skills/1-overview.md) - Skills leverage agent capabilities
+- [Model Selection](../05-models/1-overview.md) - Assign different models to agents
 - [Built-in Agents](2-built-in-agents.md) - Deep dive into each agent type
 
 ### 💬 Community & Support

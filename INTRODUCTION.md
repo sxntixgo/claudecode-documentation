@@ -136,7 +136,7 @@ This documentation is organized like a university course with clear progression:
 ### Main Documentation Structure
 
 ```
-📚 guides/           Step-by-step learning by topic (00-13 sections)
+📚 guides/           Step-by-step learning by topic (01-15 sections)
 📖 .claude/skills/   Active skills for this project
 📋 Reference/        Quick lookup for keywords, hooks, commands
 💰 Optimization/     Cost-saving strategies and comparisons
@@ -152,16 +152,17 @@ graph TB
     Choose -->|Advanced User| Custom[Advanced Customization]
     Choose -->|Need Answer Now| Ref[Reference & Examples]
 
-    Sequential --> Plugins[00. Plugin Overview]
-    Plugins --> MCP[01. MCP Servers]
+    Sequential --> MCP[01. MCP Servers]
     MCP --> Agents[02. Agents]
     Agents --> Skills[03. Skills]
-    Skills --> Models[04. Models]
-    Models --> Thinking[05. Thinking]
-    Thinking --> Context[06. Context]
-    Context --> Keywords[07. Keywords]
-    Keywords --> Hooks[08. Hooks]
-    Hooks --> Optimization[09. Optimization]
+    Skills --> Commands[04. Commands]
+    Commands --> Models[05. Models]
+    Models --> Plugins[06. Plugins Overview]
+    Plugins --> Thinking[07. Thinking]
+    Thinking --> Context[08. Context]
+    Context --> Keywords[09. Keywords]
+    Keywords --> Hooks[10. Hooks]
+    Hooks --> Optimization[11. Optimization]
 
     Quick --> ModelsQ[Models Quick Guide]
     Quick --> ThinkingQ[Thinking Quick Guide]

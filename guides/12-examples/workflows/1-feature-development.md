@@ -238,4 +238,4 @@ git push
 
 ---
 
-**Next**: [Bug Fix Workflow](2-bug-fix.md)
+**Next**: [Bug Fix Workflow](2-bug-fixing.md)

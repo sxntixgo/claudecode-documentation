@@ -1115,7 +1115,7 @@ Use appropriate template:
 
 - [Explore Agent](../../02-agents/2-built-in-agents.md#explore-agent) - Read-only analysis
 - [Model Selection](../../05-models/5-selection-guide.md) - Choosing models
-- [Cost Optimization](../../8-token-optimization/1-cost-optimization.md) - Save on reviews
+- [Cost Optimization](../../11-optimization/1-cost-optimization.md) - Save on reviews
 
 ---
 
