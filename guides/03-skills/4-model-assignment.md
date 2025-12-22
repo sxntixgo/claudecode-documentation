@@ -685,9 +685,9 @@ Congratulations! You now know how to optimize skill costs through smart model as
 Master progressive disclosure, testing, and skill composition patterns.
 
 **Also Explore**:
-- [Model Selection Deep Dive](../04-models/1-overview.md) - Complete guide to all models
-- [Token Optimization](../09-optimization/1-cost-optimization.md) - Advanced cost-saving strategies
-- [Context Management](../06-context/1-overview.md) - Control what skills see
+- [Model Selection Deep Dive](../05-models/1-overview.md) - Complete guide to all models
+- [Token Optimization](../11-optimization/1-cost-optimization.md) - Advanced cost-saving strategies
+- [Context Management](../08-context/1-overview.md) - Control what skills see
 
 ---
 

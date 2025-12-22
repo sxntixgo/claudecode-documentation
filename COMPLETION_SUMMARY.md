@@ -58,7 +58,7 @@
    - Real-world examples (code review, TDD, API scaffold)
    - Testing and versioning
 
-4. ✅ **Creating Slash Commands** - `guides/07-keywords/2-slash-commands.md`
+4. ✅ **Creating Slash Commands** - `guides/09-keywords/2-slash-commands.md`
    - Complete command structure
    - Real-world examples (review, test, deploy)
    - Advanced features (chaining, interactive)
@@ -284,12 +284,12 @@ claudecode-documentation/
 │   ├── 01-mcp-servers/              # 5 guides (Foundation)
 │   ├── 02-agents/                   # 4 guides (Foundation)
 │   ├── 03-skills/                   # 5 guides (Foundation)
-│   ├── 04-models/                   # 5 guides (Advanced Config)
-│   ├── 05-thinking/                 # 3 guides (Advanced Config)
-│   ├── 06-context/                  # 3 guides (Advanced Config)
-│   ├── 07-keywords/                 # 3 guides (Optimization)
-│   ├── 09-optimization/             # 3 guides (Optimization)
-│   └── 10-examples/                 # 5 guides (Practical)
+│   ├── 05-models/                   # 5 guides (Advanced Config)
+│   ├── 07-thinking/                 # 3 guides (Advanced Config)
+│   ├── 08-context/                  # 3 guides (Advanced Config)
+│   ├── 09-keywords/                 # 3 guides (Optimization)
+│   ├── 11-optimization/             # 3 guides (Optimization)
+│   └── 12-examples/                 # 5 guides (Practical)
 │
 └── .claude/
     └── skills/

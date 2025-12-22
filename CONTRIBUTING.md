@@ -584,7 +584,7 @@ We value **all contributions**, including:
 ### Questions About Contributing?
 
 - **Documentation questions**: Open a GitHub issue
-- **Technical questions**: Check the [FAQ](guides/11-reference/3-faq.md)
+- **Technical questions**: Check the [FAQ](guides/13-reference/3-faq.md)
 - **Process questions**: Comment on existing PRs or issues
 - **General help**: Reach out to maintainers
 

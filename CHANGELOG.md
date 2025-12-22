@@ -71,7 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.0] - 2025-01-15
 
 ### Added - Phase 5: Reference & Advanced Topics
-- **Complete API Reference** (guides/11-reference/1-api-reference.md)
+- **Complete API Reference** (guides/13-reference/1-api-reference.md)
   - AGENT.md schema with complete examples
   - SKILL.md schema with frontmatter specification
   - config.json schema with all options
@@ -81,7 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Environment variables reference
   - File locations guide
 
-- **Troubleshooting Guide** (guides/11-reference/2-troubleshooting.md)
+- **Troubleshooting Guide** (guides/13-reference/2-troubleshooting.md)
   - MCP server issues (loading, authentication, timeout)
   - Agent and subagent issues (timeout, model assignment, debugging)
   - Skill loading issues (invocation, progressive disclosure)
@@ -91,7 +91,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Performance issues (slow response, high memory)
   - Installation and setup issues
 
-- **Comprehensive FAQ** (guides/11-reference/3-faq.md)
+- **Comprehensive FAQ** (guides/13-reference/3-faq.md)
   - 50+ questions across 8 categories
   - General questions about Claude Code
   - MCP server questions
@@ -102,7 +102,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Optimization questions
   - Customization questions
 
-- **Quick Reference Cheat Sheet** (guides/11-reference/4-cheat-sheet.md)
+- **Quick Reference Cheat Sheet** (guides/13-reference/4-cheat-sheet.md)
   - One-page printable reference
   - Command line commands
   - Model pricing table
