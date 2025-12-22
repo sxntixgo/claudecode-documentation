@@ -1,5 +1,9 @@
 # Solo Developer Setup
 
+**Reading Time**: 5 minutes
+**Skill Level**: Beginner to Intermediate
+**Prerequisites**: Basic understanding of Claude Code
+
 Optimal Claude Code configuration for individual developers.
 
 ---
