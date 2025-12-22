@@ -1,8 +1,31 @@
-# Claude Code Plugin Ecosystem
+# Claude Code Plugin Ecosystem: Complete Reference
 
 ⏱️ **Time**: 45 minutes
 📊 **Level**: Beginner to Intermediate
-🎯 **You'll Learn**: How to extend Claude Code with plugins, understand the plugin types, install and configure plugins, and create your own extensions
+🎯 **What You'll Learn**: Comprehensive coverage of all four plugin types with code examples, exercises, and advanced patterns
+
+---
+
+## 📌 About This Guide
+
+**This is a comprehensive reference** that covers all four Claude Code plugin types in one place. It synthesizes concepts from multiple sections with detailed examples and exercises.
+
+### Prerequisites (Read These First)
+
+Before diving into this guide, we recommend reading:
+- **[Plugin Ecosystem Overview (Section 0)](../0-plugins/1-overview.md)** - Quick 20-min introduction to the 4 plugin types
+- **[MCP Servers (Section 1)](../1-mcp-servers/1-overview.md)** - Deep dive on plugin type 1
+- **[Skills (Section 3)](../3-skills/1-overview.md)** - Deep dive on plugin type 2
+- **[Hooks (Section 7.5)](../7-hooks/1-overview.md)** - Deep dive on plugin type 4
+- **[Slash Commands (Section 7)](../7-keywords/2-slash-commands.md)** - Plugin type 3 details
+
+### How to Use This Guide
+
+**For Learning**: Start with Section 0 overview, then read individual sections (1, 3, 7, 7.5) before this comprehensive guide.
+
+**For Reference**: Use this guide as a single place to review all plugin types, see comparisons, and access complete code examples.
+
+**For Exercises**: This guide includes hands-on exercises and comprehension questions not found in other sections.
 
 ---
 

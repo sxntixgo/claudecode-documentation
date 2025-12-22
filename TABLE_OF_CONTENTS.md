@@ -17,14 +17,17 @@ Foundation → Building Blocks → Advanced → Mastery
 
 ```mermaid
 graph TD
-    A[1. MCP Servers] --> B[2. Agents]
+    Z[0. Plugin Overview] --> A[1. MCP Servers]
+    A --> B[2. Agents]
     B --> C[3. Skills]
     C --> D[4. Models]
     D --> E[5. Thinking Modes]
     E --> F[6. Context Management]
     F --> G[7. Keywords & Triggers]
-    G --> H[8. Token Optimization]
+    G --> H[7.5. Hooks]
+    H --> I[8. Token Optimization]
 
+    style Z fill:#90EE90
     style A fill:#87CEEB
     style B fill:#87CEEB
     style C fill:#87CEEB
@@ -32,7 +35,8 @@ graph TD
     style E fill:#90EE90
     style F fill:#FFD700
     style G fill:#FFD700
-    style H fill:#FF6347
+    style H fill:#FFD700
+    style I fill:#FF6347
 
     classDef beginner fill:#87CEEB
     classDef intermediate fill:#90EE90
@@ -56,11 +60,29 @@ graph TD
 
 ---
 
+### 0️⃣ Plugin Ecosystem (Big Picture)
+
+**Level**: 🟦 Beginner
+**Prerequisites**: None - start here for the overview!
+**What You'll Master**: Understanding the four plugin types and how they extend Claude Code
+
+| Guide | Time | Topics |
+|-------|------|--------|
+| **[Plugin Ecosystem Overview](guides/0-plugins/1-overview.md)** | **20 min** | **4 plugin types, comparison, when to use each** |
+
+**Total Time**: 20 minutes
+**Dependencies**: None
+**Next**: MCP Servers (deep dive on plugin type 1)
+
+**💡 Why Start Here**: Get the big picture before diving into details. Understand how MCP Servers, Skills, Hooks, and Slash Commands fit together.
+
+---
+
 ### 1️⃣ MCP Servers (Foundation)
 
 **Level**: 🟦 Beginner
-**Prerequisites**: None - start here!
-**What You'll Master**: Extending Claude Code with external tools and services
+**Prerequisites**: Plugin Ecosystem Overview (recommended)
+**What You'll Master**: Extending Claude Code with external tools and services (Plugin Type 1)
 
 | Guide | Time | Topics |
 |-------|------|--------|
@@ -186,7 +208,25 @@ graph TD
 
 **Total Time**: ~1 hour
 **Dependencies**: Context Management
-**Next**: Token Optimization (put it all together)
+**Next**: Hooks & Automation (plugin type 4)
+
+---
+
+### 7️⃣.5️⃣ Hooks & Automation (Plugin Type 4)
+
+**Level**: 🟡 Advanced
+**Prerequisites**: Keywords & Triggers, Plugin Ecosystem Overview
+**What You'll Master**: Automated workflows with pre/post tool use hooks
+
+| Guide | Time | Topics |
+|-------|------|--------|
+| **[Hooks Overview](guides/7-hooks/1-overview.md)** | **25 min** | **Hook types, configuration, automation patterns** |
+
+**Total Time**: 25 minutes
+**Dependencies**: Understanding of tools and workflows
+**Next**: Token Optimization (optimize automated workflows)
+
+**🎣 Why Hooks Matter**: Automate testing, formatting, and validation. Run commands automatically on file changes, commits, or any tool use.
 
 ---
 
@@ -295,7 +335,25 @@ graph TD
 
 ---
 
-### 1️⃣3️⃣ Community & Contribution
+### 1️⃣3️⃣ Plugin Ecosystem - Complete Reference
+
+**Level**: 🟦 Beginner → 🟡 Advanced
+**Prerequisites**: Section 0 (Overview), Sections 1, 3, 7, 7.5 (individual plugin types)
+**What You'll Master**: Comprehensive understanding of all 4 plugin types with exercises
+
+| Guide | Time | Topics |
+|-------|------|--------|
+| **[Complete Plugin Ecosystem Guide](guides/13-plugins/1-plugin-ecosystem.md)** | **45 min** | **All 4 types, code examples, exercises, deep dives** |
+
+**Total Time**: 45 minutes
+**Dependencies**: Sections 0, 1, 3, 7, 7.5 (synthesizes all plugin knowledge)
+**Use For**: Comprehensive reference, exercises, seeing all plugins together
+
+**📚 Comprehensive Reference**: This guide synthesizes all plugin types in one place with detailed examples, exercises, and advanced patterns. Read prerequisite sections first for learning.
+
+---
+
+### 1️⃣4️⃣ Community & Contribution
 
 **Level**: All levels
 **Prerequisites**: None
