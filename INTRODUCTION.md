@@ -136,10 +136,10 @@ This documentation is organized like a university course with clear progression:
 ### Main Documentation Structure
 
 ```
-📚 Guides/          Step-by-step learning by topic
-📦 Examples/        Copy-paste ready templates and skills
-📖 Reference/       Quick lookup for keywords, hooks, commands
-💰 Optimization/    Cost-saving strategies and comparisons
+📚 guides/           Step-by-step learning by topic (00-13 sections)
+📖 .claude/skills/   Active skills for this project
+📋 Reference/        Quick lookup for keywords, hooks, commands
+💰 Optimization/     Cost-saving strategies and comparisons
 ```
 
 ### Visual Navigation Aid
@@ -152,16 +152,16 @@ graph TB
     Choose -->|Advanced User| Custom[Advanced Customization]
     Choose -->|Need Answer Now| Ref[Reference & Examples]
 
-    Sequential --> Plugins[0. Plugin Overview]
-    Plugins --> MCP[1. MCP Servers]
-    MCP --> Agents[2. Agents]
-    Agents --> Skills[3. Skills]
-    Skills --> Models[4. Models]
-    Models --> Thinking[5. Thinking]
-    Thinking --> Context[6. Context]
-    Context --> Keywords[7. Keywords]
-    Keywords --> Hooks[7.5. Hooks]
-    Hooks --> Optimization[8. Optimization]
+    Sequential --> Plugins[00. Plugin Overview]
+    Plugins --> MCP[01. MCP Servers]
+    MCP --> Agents[02. Agents]
+    Agents --> Skills[03. Skills]
+    Skills --> Models[04. Models]
+    Models --> Thinking[05. Thinking]
+    Thinking --> Context[06. Context]
+    Context --> Keywords[07. Keywords]
+    Keywords --> Hooks[08. Hooks]
+    Hooks --> Optimization[09. Optimization]
 
     Quick --> ModelsQ[Models Quick Guide]
     Quick --> ThinkingQ[Thinking Quick Guide]
@@ -192,16 +192,16 @@ We've designed four different paths through this documentation based on your goa
 **Approach**: Sequential learning from MCP Servers → Token Optimization
 
 **Your Journey**:
-1. **Start with**: [Plugin Ecosystem Overview](guides/0-plugins/1-overview.md) (20 min) - See the big picture first!
-2. **Deep dive**: [MCP Servers](guides/1-mcp-servers/2-installation.md) (Plugin Type 1)
-3. Progress through [Agents](guides/2-agents/1-overview.md)
-4. Learn [Skills](guides/3-skills/1-overview.md) (Plugin Type 2)
-5. Master [Model Selection](guides/4-models/1-overview.md)
-6. Understand [Thinking Modes](guides/5-thinking/1-overview.md)
-7. Deep dive into [Context Management](guides/6-context/2-claude-md.md)
-8. Explore [Keywords & Triggers](guides/7-keywords/1-overview.md) (Slash Commands = Plugin Type 3)
-9. Learn [Hooks & Automation](guides/7-hooks/1-overview.md) (Plugin Type 4)
-10. Apply everything in [Token Optimization](guides/8-optimization/2-advanced-techniques.md)
+1. **Start with**: [Plugin Ecosystem Overview](guides/00-plugins-overview/1-overview.md) (20 min) - See the big picture first!
+2. **Deep dive**: [MCP Servers](guides/01-mcp-servers/2-installation.md) (Plugin Type 1)
+3. Progress through [Agents](guides/02-agents/1-overview.md)
+4. Learn [Skills](guides/03-skills/1-overview.md) (Plugin Type 2)
+5. Master [Model Selection](guides/04-models/1-overview.md)
+6. Understand [Thinking Modes](guides/05-thinking/1-overview.md)
+7. Deep dive into [Context Management](guides/06-context/2-claude-md.md)
+8. Explore [Keywords & Triggers](guides/07-keywords/1-overview.md) (Slash Commands = Plugin Type 3)
+9. Learn [Hooks & Automation](guides/08-hooks/1-overview.md) (Plugin Type 4)
+10. Apply everything in [Token Optimization](guides/09-optimization/2-advanced-techniques.md)
 
 **Why this path?**
 - Builds solid foundation
@@ -218,12 +218,12 @@ We've designed four different paths through this documentation based on your goa
 **Approach**: Cover fundamentals quickly, deep dive into cost optimization
 
 **Your Journey**:
-1. **Quick overview**: [Plugin Ecosystem](guides/0-plugins/1-overview.md) (20 min) - Understand the 4 plugin types
-2. **Quick overview**: [MCP Servers](guides/1-mcp-servers/1-overview.md) (15 min)
-3. **Quick overview**: [Agents](guides/2-agents/1-overview.md) (15 min)
-4. **Deep dive**: [Model Selection](guides/4-models/5-selection-guide.md) (30 min)
-5. **Deep dive**: [Thinking Modes](guides/5-thinking/1-overview.md) (25 min)
-6. **Deep dive**: [Token Optimization](guides/8-optimization/2-advanced-techniques.md) (60 min)
+1. **Quick overview**: [Plugin Ecosystem](guides/00-plugins-overview/1-overview.md) (20 min) - Understand the 4 plugin types
+2. **Quick overview**: [MCP Servers](guides/01-mcp-servers/1-overview.md) (15 min)
+3. **Quick overview**: [Agents](guides/02-agents/1-overview.md) (15 min)
+4. **Deep dive**: [Model Selection](guides/04-models/5-selection-guide.md) (30 min)
+5. **Deep dive**: [Thinking Modes](guides/05-thinking/1-overview.md) (25 min)
+6. **Deep dive**: [Token Optimization](guides/09-optimization/2-advanced-techniques.md) (60 min)
 7. **Reference**: Other topics as needed
 
 **Why this path?**
@@ -241,11 +241,11 @@ We've designed four different paths through this documentation based on your goa
 **Approach**: Skip basics, focus on customization and advanced patterns
 
 **Your Journey**:
-1. **Deep dive**: [Creating Custom Skills](guides/3-skills/3-creating-skills.md) (60 min)
-2. **Deep dive**: [CLAUDE.md Best Practices](guides/6-context/2-claude-md.md) (30 min)
-3. **Deep dive**: [Hooks and Commands](guides/7-keywords/3-automation-patterns.md) (45 min)
-4. **Deep dive**: [Advanced Context Patterns](guides/6-context/1-overview.md) (35 min)
-5. **Practice**: [Example Skills](guides/9-examples/1-overview.md) for inspiration
+1. **Deep dive**: [Creating Custom Skills](guides/03-skills/3-creating-skills.md) (60 min)
+2. **Deep dive**: [CLAUDE.md Best Practices](guides/06-context/2-claude-md.md) (30 min)
+3. **Deep dive**: [Hooks and Commands](guides/07-keywords/3-automation-patterns.md) (45 min)
+4. **Deep dive**: [Advanced Context Patterns](guides/06-context/1-overview.md) (35 min)
+5. **Practice**: [Example Skills](guides/10-examples/1-overview.md) for inspiration
 
 **Why this path?**
 - Customize Claude Code to your workflow
@@ -262,11 +262,11 @@ We've designed four different paths through this documentation based on your goa
 **Approach**: Use references and examples as needed
 
 **Your Resources**:
-- [Keywords Overview](guides/7-keywords/1-overview.md) - All keywords at a glance
-- [Model Overview](guides/4-models/1-overview.md) - Quick model selection
-- [Slash Commands](guides/7-keywords/2-slash-commands.md) - Frequently used commands
-- [Project Templates](guides/9-examples/1-overview.md) - Copy-paste ready
-- [Example Workflows](guides/9-examples/1-overview.md) - Real-world implementations
+- [Keywords Overview](guides/07-keywords/1-overview.md) - All keywords at a glance
+- [Model Overview](guides/04-models/1-overview.md) - Quick model selection
+- [Slash Commands](guides/07-keywords/2-slash-commands.md) - Frequently used commands
+- [Project Templates](guides/10-examples/1-overview.md) - Copy-paste ready
+- [Example Workflows](guides/10-examples/1-overview.md) - Real-world implementations
 
 **Why this path?**
 - Get answers immediately
@@ -337,7 +337,7 @@ This documentation serves three primary audiences:
 **You are**: New to Claude Code, maybe new to AI-assisted development
 **You need**: Step-by-step guidance, foundational concepts first
 **Your path**: Sequential (Path 1)
-**Start here**: [MCP Servers Overview](guides/1-mcp-servers/1-overview.md)
+**Start here**: [MCP Servers Overview](guides/01-mcp-servers/1-overview.md)
 
 **We've got you covered with**:
 - Clear explanations of every concept
@@ -352,7 +352,7 @@ This documentation serves three primary audiences:
 **You are**: Familiar with basics, want to optimize and expand
 **You need**: Real-world examples, optimization strategies
 **Your path**: Optimization Focused (Path 2) or skip around as needed
-**Start here**: [Model Selection Guide](guides/4-models/5-selection-guide.md)
+**Start here**: [Model Selection Guide](guides/04-models/5-selection-guide.md)
 
 **We've got you covered with**:
 - Practical optimization strategies
@@ -367,7 +367,7 @@ This documentation serves three primary audiences:
 **You are**: Power user, team lead, looking to customize
 **You need**: Reference docs, advanced patterns, edge cases
 **Your path**: Advanced Customization (Path 3) or Quick Reference (Path 4)
-**Start here**: [Custom Skills](guides/3-skills/3-creating-skills.md) or [References](guides/10-reference/)
+**Start here**: [Custom Skills](guides/03-skills/3-creating-skills.md) or [References](guides/11-reference/)
 
 **We've got you covered with**:
 - Advanced customization techniques
@@ -449,8 +449,8 @@ You'll know this documentation succeeded if you can:
 ### While Learning
 
 **Questions about concepts?**
-- Check the [FAQ](guides/10-reference/3-faq.md)
-- Review [Troubleshooting Guide](guides/10-reference/2-troubleshooting.md)
+- Check the [FAQ](guides/11-reference/3-faq.md)
+- Review [Troubleshooting Guide](guides/11-reference/2-troubleshooting.md)
 - Search the [Table of Contents](TABLE_OF_CONTENTS.md)
 
 **Code not working?**
@@ -484,14 +484,14 @@ Congratulations! You now understand:
 
 **Choose your next step:**
 
-**→ [New to Claude Code? Start with MCP Servers](guides/1-mcp-servers/1-overview.md)**
-**→ [Want cost savings? Jump to Optimization](guides/8-optimization/2-advanced-techniques.md)**
-**→ [Need quick answers? Use the References](guides/10-reference/)**
-**→ [Want examples? Browse Templates](guides/9-examples/1-overview.md)**
+**→ [New to Claude Code? Start with MCP Servers](guides/01-mcp-servers/1-overview.md)**
+**→ [Want cost savings? Jump to Optimization](guides/09-optimization/2-advanced-techniques.md)**
+**→ [Need quick answers? Use the References](guides/11-reference/)**
+**→ [Want examples? Browse Templates](guides/10-examples/1-overview.md)**
 
 ---
 
-**Have questions before diving in?** Check out our [FAQ](guides/10-reference/3-faq.md) or review the [TABLE_OF_CONTENTS.md](TABLE_OF_CONTENTS.md) for a complete navigation map.
+**Have questions before diving in?** Check out our [FAQ](guides/11-reference/3-faq.md) or review the [TABLE_OF_CONTENTS.md](TABLE_OF_CONTENTS.md) for a complete navigation map.
 
 **Already know what you need?** Use the search function or jump directly to any topic in the [Table of Contents](TABLE_OF_CONTENTS.md).
 
