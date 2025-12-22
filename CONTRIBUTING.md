@@ -143,6 +143,8 @@ git push origin feature/improve-mcp-docs
 **Skill Level**: Beginner/Intermediate/Advanced
 **Prerequisites**: Link to prerequisite guides
 
+> **Note**: "Last Updated" metadata is optional. Git commit history is the primary source of truth for when content was last modified.
+
 ---
 
 ## Welcome! [Engaging intro with emoji]
