@@ -1,8 +1,8 @@
 ---
 name: documentation-reviewer
-description: Comprehensive documentation review for production readiness. Reviews entire documentation project for content quality, technical accuracy, formatting, structure, links, cross-references, accessibility, and security. Generates action plan for fixes needed before production release.
+description: Comprehensive documentation review for production readiness. Reviews entire documentation project for content quality, technical accuracy, formatting, structure, links, cross-references, pedagogical coherence (logical topic ordering), accessibility, and security. Generates action plan for fixes needed before production release.
 model: claude-opus-4-5
-version: 1.0.0
+version: 1.1.0
 author: Claude Code Documentation Project
 ---
 
@@ -12,9 +12,11 @@ Performs a comprehensive production readiness review of the entire documentation
 
 ## Overview
 
-This skill conducts a thorough, systematic review of all documentation to ensure it meets production quality standards. It checks content quality, technical accuracy, formatting consistency, navigation structure, link validity, cross-references, accessibility, security, and style guide compliance.
+This skill conducts a thorough, systematic review of all documentation to ensure it meets production quality standards. It checks content quality, technical accuracy, formatting consistency, navigation structure, link validity, cross-references, accessibility, security, style guide compliance, and **pedagogical coherence** (logical topic ordering).
 
 **Output**: A detailed action plan in `DOCUMENTATION_REVIEW_PLAN.md` with prioritized action items.
+
+**Key Focus**: Ensures documentation follows a logical learning progression where fundamental concepts come before advanced topics, prerequisites are satisfied by earlier sections, and no circular dependencies exist.
 
 ## Review Scope
 
@@ -45,6 +47,8 @@ This skill conducts a thorough, systematic review of all documentation to ensure
 - **Table of Contents**: Check TOC is complete and accurate
 - **Cross-references**: Validate all internal links point to existing content
 - **Reading flow**: Ensure logical progression of topics
+- **Pedagogical ordering**: Verify topics ordered for learning (fundamentals before advanced)
+- **Prerequisites chain**: Validate all prerequisites can be satisfied by earlier sections
 - **File organization**: Check files are in correct directories
 - **Naming conventions**: Verify consistent file naming
 
@@ -215,8 +219,88 @@ Go through the checklist:
 - [ ] **Costs**: Token/cost estimates are reasonable
 - [ ] **Accessibility**: Jargon explained, progressive examples
 - [ ] **Consistency**: Style guide followed throughout
+- [ ] **Pedagogical order**: Topics ordered logically for learning
+- [ ] **Prerequisites valid**: All prerequisites can be satisfied by earlier sections
+- [ ] **No circular dependencies**: No section requires a later section
+- [ ] **Advance organizers**: Overview/introduction provided for complex topics
 
-### Phase 7: Generate Action Plan (5 min)
+### Phase 7: Pedagogical Coherence & Topic Ordering (10-15 min)
+
+**CRITICAL**: Verify topics are ordered logically for learning.
+
+1. **Check Prerequisites Chain**
+   - Does each section list prerequisites correctly?
+   - Can prerequisites be satisfied by earlier sections?
+   - Are there circular dependencies? (Section A requires B, B requires A)
+   - Are prerequisites realistic? (Advanced topic requiring beginner topic is OK, reverse is not)
+
+2. **Verify Learning Progression**
+   - Do fundamental concepts come before advanced concepts?
+   - Does each section build on previous sections?
+   - Is there a clear path from beginner → intermediate → advanced?
+   - Are concepts introduced in the right order?
+
+3. **Validate Section Ordering**
+   - Check TABLE_OF_CONTENTS.md section numbering (0, 1, 2, 3, etc.)
+   - Verify sections follow pedagogical progression (foundation → building blocks → advanced → mastery)
+   - Ensure "overview" or "introduction" sections come before deep dives
+   - Check that synthesis/optimization sections come after component sections
+
+4. **Check for Pedagogical Anti-Patterns**
+   - ❌ Advanced concepts introduced before fundamentals
+   - ❌ Deep dive before overview
+   - ❌ Synthesis before components explained
+   - ❌ Examples/applications before concepts
+   - ❌ Optimization before understanding what's being optimized
+   - ❌ Plugin type 4 introduced before types 1-3
+
+5. **Verify Cross-Reference Logic**
+   - Do "See also" links point to logical next steps?
+   - Do "Prerequisites" links point to earlier sections?
+   - Do "Next steps" links point to later sections?
+   - Are cross-references bidirectional where appropriate?
+
+6. **Validate Learning Paths** (from INTRODUCTION.md)
+   - Do learning paths follow logical progression?
+   - Are shortcuts provided for experienced users?
+   - Do quick paths skip appropriately (not skipping prerequisites)?
+   - Are alternative paths coherent?
+
+7. **Check for Missing Advance Organizers**
+   - Is there an overview before detailed sections?
+   - Do users get the "big picture" before diving into specifics?
+   - Are comparisons/relationships explained before individual topics?
+   - Is there a conceptual framework provided early?
+
+**Pedagogical Ordering Issues to Flag**:
+- **Critical**: Section introduces concept X but requires knowledge of Y which comes later
+- **Critical**: Prerequisites listed are impossible to satisfy (circular or forward dependencies)
+- **Important**: Advanced section comes before fundamental section
+- **Important**: Synthesis section comes before component sections
+- **Important**: Missing overview/introduction for complex topics
+- **Minor**: Cross-references could be improved for better learning flow
+- **Minor**: Learning paths could be optimized
+
+**Example Good Progression**:
+```
+0. Overview (advance organizer)
+1. Component A (foundation)
+2. Component B (builds on A)
+3. Component C (builds on A+B)
+4. Integration (uses A+B+C)
+5. Optimization (optimizes integrated system)
+```
+
+**Example Bad Progression** (flag as critical):
+```
+1. Optimization (requires understanding of what's being optimized)
+2. Component A (should come first)
+3. Integration (requires A+B+C but they come later)
+4. Component B
+5. Component C
+```
+
+### Phase 8: Generate Action Plan (5 min)
 
 Create `DOCUMENTATION_REVIEW_PLAN.md` with:
 
@@ -294,6 +378,24 @@ Create `DOCUMENTATION_REVIEW_PLAN.md` with this structure:
 - [x/☐] Security best practices
 - [x/☐] Accurate costs/tokens
 - [x/☐] Style guide compliance
+- [x/☐] Pedagogical order correct
+- [x/☐] Prerequisites valid
+- [x/☐] No circular dependencies
+- [x/☐] Advance organizers present
+
+---
+
+## Pedagogical Coherence Assessment
+
+**Topic Ordering**: [Excellent / Good / Needs Improvement / Poor]
+**Prerequisites Chain**: [Valid / Has Issues / Broken]
+**Learning Progression**: [Clear / Mostly Clear / Unclear]
+
+**Key Findings**:
+- [List any pedagogical ordering issues]
+- [Note any circular dependencies]
+- [Identify missing advance organizers]
+- [Flag sections out of logical order]
 
 ---
 
@@ -452,7 +554,7 @@ Output: DOCUMENTATION_REVIEW_PLAN.md created with:
 
 When executing this skill:
 
-1. Be **thorough and systematic** - follow all phases
+1. Be **thorough and systematic** - follow all phases including Phase 7 (Pedagogical Coherence)
 2. Be **specific** - include file names, line numbers when possible
 3. Be **objective** - identify real issues, not preferences
 4. Be **prioritized** - categorize by severity correctly
@@ -460,7 +562,10 @@ When executing this skill:
 6. Be **comprehensive** - don't skip sections
 7. **Don't suggest fixes** - only identify issues
 8. **Focus on facts** - not opinions or style preferences
-9. **Use the checklist** - verify all criteria
-10. **Generate the plan** - always output DOCUMENTATION_REVIEW_PLAN.md
+9. **Use the checklist** - verify all criteria including pedagogical ordering
+10. **Check topic ordering** - ensure fundamentals come before advanced concepts
+11. **Validate prerequisites** - check no circular dependencies, all prerequisites satisfiable
+12. **Verify learning paths** - confirm logical progression in INTRODUCTION.md and TABLE_OF_CONTENTS.md
+13. **Generate the plan** - always output DOCUMENTATION_REVIEW_PLAN.md
 
-Remember: This is a production readiness review. Be thorough, be critical, but be fair. The goal is to ensure the documentation is polished, accurate, and ready for public release.
+Remember: This is a production readiness review with **emphasis on pedagogical coherence**. Documentation must be polished, accurate, AND properly ordered for learning. Be thorough, be critical, but be fair. The goal is to ensure the documentation is ready for public release and users can learn effectively.
