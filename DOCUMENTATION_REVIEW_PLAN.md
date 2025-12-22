@@ -52,19 +52,19 @@
 
 **Broken Links Found**:
 ```
-guides/models/model-comparison.md → should be guides/04-models/1-overview.md
-guides/models/selection-guide.md → should be guides/04-models/5-selection-guide.md
+guides/models/model-comparison.md → should be guides/05-models/1-overview.md
+guides/models/selection-guide.md → should be guides/05-models/5-selection-guide.md
 guides/models/configuration.md → doesn't exist (content in other files)
-guides/thinking/extended-thinking.md → should be guides/05-thinking/1-overview.md
-guides/thinking/keywords-reference.md → should be guides/05-thinking/2-keywords.md
+guides/thinking/extended-thinking.md → should be guides/07-thinking/1-overview.md
+guides/thinking/keywords-reference.md → should be guides/07-thinking/2-keywords.md
 guides/thinking/when-to-use.md → doesn't exist (content in overview)
-guides/context/claude-md-files.md → should be guides/06-context/2-claude-md.md
-guides/context/memory-management.md → should be guides/06-context/3-memory-hierarchy.md
+guides/context/claude-md-files.md → should be guides/08-context/2-claude-md.md
+guides/context/memory-management.md → should be guides/08-context/3-memory-hierarchy.md
 guides/context/optimization.md → doesn't exist (content in other files)
-guides/12-quick-reference/1-model-selection-tree.md → moved to guides/11-reference/5-model-selection-tree.md
-guides/12-quick-reference/2-optimization-checklist.md → moved to guides/11-reference/6-optimization-checklist.md
-guides/12-quick-reference/3-glossary.md → moved to guides/11-reference/7-glossary.md
-guides/12-quick-reference/4-community-resources.md → moved to guides/13-community/1-resources.md
+guides/12-quick-reference/1-model-selection-tree.md → moved to guides/13-reference/5-model-selection-tree.md
+guides/12-quick-reference/2-optimization-checklist.md → moved to guides/13-reference/6-optimization-checklist.md
+guides/12-quick-reference/3-glossary.md → moved to guides/13-reference/7-glossary.md
+guides/12-quick-reference/4-community-resources.md → moved to guides/15-community/1-resources.md
 ```
 
 ### Issue 2: Broken Links in INTRODUCTION.md
@@ -76,10 +76,10 @@ guides/12-quick-reference/4-community-resources.md → moved to guides/13-commun
 **Broken Links Found**:
 ```
 guides/skills/overview.md → should be guides/03-skills/1-overview.md
-guides/models/model-comparison.md → should be guides/04-models/1-overview.md
-guides/thinking/extended-thinking.md → should be guides/05-thinking/1-overview.md
-guides/context/claude-md-files.md → should be guides/06-context/2-claude-md.md
-guides/models/selection-guide.md → should be guides/04-models/5-selection-guide.md
+guides/models/model-comparison.md → should be guides/05-models/1-overview.md
+guides/thinking/extended-thinking.md → should be guides/07-thinking/1-overview.md
+guides/context/claude-md-files.md → should be guides/08-context/2-claude-md.md
+guides/models/selection-guide.md → should be guides/05-models/5-selection-guide.md
 guides/thinking/when-to-use.md → doesn't exist
 guides/skills/creating-skills.md → should be guides/03-skills/3-creating-skills.md
 guides/context/optimization.md → doesn't exist
@@ -93,8 +93,8 @@ guides/context/optimization.md → doesn't exist
 **Files Affected**:
 1. `guides/02-agents/1-overview.md`
 2. `guides/02-agents/2-built-in-agents.md`
-3. `guides/04-models/5-selection-guide.md`
-4. `guides/04-models/2-haiku.md`
+3. `guides/05-models/5-selection-guide.md`
+4. `guides/05-models/2-haiku.md`
 5. `guides/01-mcp-servers/3-popular-servers.md`
 
 ### Issue 4: TABLE_OF_CONTENTS.md References Sections Not Yet Created
@@ -148,14 +148,14 @@ examples/agents/quick-search.json
 examples/agents/feature-implementer.json
 examples/agents/architecture-reviewer.json
 examples/claude-md-templates/ (entire directory)
-examples/projects/ (different from guides/10-examples/projects/)
+examples/projects/ (different from guides/12-examples/projects/)
 ```
 
 ### Issue 8: Reference Paths Use Different Convention
 - **File**: `TABLE_OF_CONTENTS.md`
 - **Lines**: 184-189, 385-388, 565-567
 - **Category**: Broken Link
-- **Description**: TOC references `reference/` directory but actual structure uses `guides/11-reference/` and `guides/07-keywords/`.
+- **Description**: TOC references `reference/` directory but actual structure uses `guides/13-reference/` and `guides/09-keywords/`.
 
 ### Issue 9: Workflow Guides Missing from TOC
 - **File**: `TABLE_OF_CONTENTS.md`
@@ -163,9 +163,9 @@ examples/projects/ (different from guides/10-examples/projects/)
 - **Description**: TOC lists workflow guides 1-4 but Phase 5 added workflows 5-7 which aren't listed.
 
 **Missing Workflows**:
-- Workflow 5: Documentation Writing (`guides/10-examples/workflows/5-documentation-writing.md`)
-- Workflow 6: Performance Optimization (`guides/10-examples/workflows/6-performance-optimization.md`)
-- Workflow 7: Testing (`guides/10-examples/workflows/7-testing.md`)
+- Workflow 5: Documentation Writing (`guides/12-examples/workflows/5-documentation-writing.md`)
+- Workflow 6: Performance Optimization (`guides/12-examples/workflows/6-performance-optimization.md`)
+- Workflow 7: Testing (`guides/12-examples/workflows/7-testing.md`)
 
 ### Issue 10: Python Project Templates Not Listed in Main TOC
 - **File**: `TABLE_OF_CONTENTS.md`
@@ -273,11 +273,11 @@ examples/projects/ (different from guides/10-examples/projects/)
 **Estimated Time**: 2-3 hours
 
 1. [ ] **Update TABLE_OF_CONTENTS.md with correct file paths**
-   - Fix all `guides/models/` → `guides/04-models/` references
-   - Fix all `guides/thinking/` → `guides/05-thinking/` references
-   - Fix all `guides/context/` → `guides/06-context/` references
+   - Fix all `guides/models/` → `guides/05-models/` references
+   - Fix all `guides/thinking/` → `guides/07-thinking/` references
+   - Fix all `guides/context/` → `guides/08-context/` references
    - Fix all `guides/skills/` → `guides/03-skills/` references
-   - Fix all `guides/12-quick-reference/` → `guides/11-reference/` and `guides/13-community/` references
+   - Fix all `guides/12-quick-reference/` → `guides/13-reference/` and `guides/15-community/` references
    - Remove or update references to non-existent files (configuration.md, when-to-use.md, optimization.md)
 
 2. [ ] **Update INTRODUCTION.md with correct file paths**
@@ -288,15 +288,15 @@ examples/projects/ (different from guides/10-examples/projects/)
 3. [ ] **Remove TODO/FIXME/TBD markers from production files**
    - `guides/02-agents/1-overview.md` - complete or remove TODO items
    - `guides/02-agents/2-built-in-agents.md` - complete or remove TODO items
-   - `guides/04-models/5-selection-guide.md` - complete or remove TODO items
-   - `guides/04-models/2-haiku.md` - complete or remove TODO items
+   - `guides/05-models/5-selection-guide.md` - complete or remove TODO items
+   - `guides/05-models/2-haiku.md` - complete or remove TODO items
    - `guides/01-mcp-servers/3-popular-servers.md` - complete or remove TODO items
 
 4. [ ] **Remove or update non-existent reference directory links**
-   - Update `reference/keywords.md` → `guides/07-keywords/1-overview.md`
-   - Update `reference/hooks.md` → `guides/07-keywords/3-automation-patterns.md`
-   - Update `reference/commands.md` → `guides/07-keywords/2-slash-commands.md`
-   - Update `optimization/` paths → `guides/09-optimization/` paths
+   - Update `reference/keywords.md` → `guides/09-keywords/1-overview.md`
+   - Update `reference/hooks.md` → `guides/09-keywords/3-automation-patterns.md`
+   - Update `reference/commands.md` → `guides/09-keywords/2-slash-commands.md`
+   - Update `optimization/` paths → `guides/11-optimization/` paths
    - Update or remove `examples/` references that don't exist
 
 5. [ ] **Add reading time estimates to files missing them**
@@ -318,9 +318,9 @@ examples/projects/ (different from guides/10-examples/projects/)
    - Update navigation accordingly
 
 8. [ ] **Verify cross-references in new workflow guides**
-   - Check all links in `guides/10-examples/workflows/5-documentation-writing.md`
-   - Check all links in `guides/10-examples/workflows/6-performance-optimization.md`
-   - Check all links in `guides/10-examples/workflows/7-testing.md`
+   - Check all links in `guides/12-examples/workflows/5-documentation-writing.md`
+   - Check all links in `guides/12-examples/workflows/6-performance-optimization.md`
+   - Check all links in `guides/12-examples/workflows/7-testing.md`
 
 9. [ ] **Add community section to TOC navigation**
    - Highlight contribution guide
@@ -393,16 +393,16 @@ examples/projects/ (different from guides/10-examples/projects/)
 2. `INTRODUCTION.md` (12+ broken links)
 3. `guides/02-agents/1-overview.md` (TODO markers)
 4. `guides/02-agents/2-built-in-agents.md` (TODO markers)
-5. `guides/04-models/5-selection-guide.md` (TODO markers)
-6. `guides/04-models/2-haiku.md` (TODO markers)
+5. `guides/05-models/5-selection-guide.md` (TODO markers)
+6. `guides/05-models/2-haiku.md` (TODO markers)
 7. `guides/01-mcp-servers/3-popular-servers.md` (TODO markers)
 8. 9 files missing reading time estimates (to be identified)
 
 ### Files with Important Issues
 
-1. `guides/10-examples/workflows/5-documentation-writing.md` (verify cross-refs)
-2. `guides/10-examples/workflows/6-performance-optimization.md` (verify cross-refs)
-3. `guides/10-examples/workflows/7-testing.md` (verify cross-refs)
+1. `guides/12-examples/workflows/5-documentation-writing.md` (verify cross-refs)
+2. `guides/12-examples/workflows/6-performance-optimization.md` (verify cross-refs)
+3. `guides/12-examples/workflows/7-testing.md` (verify cross-refs)
 4. `DOCUMENTATION_PLAN.md` (accuracy check needed)
 
 ### Files with Minor Issues
@@ -462,34 +462,34 @@ examples/projects/ (different from guides/10-examples/projects/)
 - ✅ `4-model-assignment.md` - Clean
 - ✅ `5-advanced-patterns.md` - Clean
 
-### Models (guides/04-models/)
+### Models (guides/05-models/)
 - ✅ `1-overview.md` - Clean
 - ⚠️ `2-haiku.md` - Contains TODO markers (CRITICAL)
 - ✅ `3-sonnet.md` - Clean
 - ✅ `4-opus.md` - Clean
 - ⚠️ `5-selection-guide.md` - Contains TODO markers (CRITICAL)
 
-### Thinking Modes (guides/05-thinking/)
+### Thinking Modes (guides/07-thinking/)
 - ✅ `1-overview.md` - Clean
 - ✅ `2-keywords.md` - Clean
 - ✅ `3-output-modes.md` - Clean
 
-### Context Management (guides/06-context/)
+### Context Management (guides/08-context/)
 - ✅ `1-overview.md` - Clean
 - ✅ `2-claude-md.md` - Clean
 - ✅ `3-memory-hierarchy.md` - Clean
 
-### Keywords & Triggers (guides/07-keywords/)
+### Keywords & Triggers (guides/09-keywords/)
 - ✅ `1-overview.md` - Clean
 - ✅ `2-slash-commands.md` - Clean
 - ✅ `3-automation-patterns.md` - Clean
 
-### Optimization (guides/09-optimization/)
+### Optimization (guides/11-optimization/)
 - ✅ `1-cost-optimization.md` - Clean
 - ✅ `2-advanced-techniques.md` - Clean
 - ✅ `3-monitoring-budgeting.md` - Clean
 
-### Examples (guides/10-examples/)
+### Examples (guides/12-examples/)
 - ✅ `1-overview.md` - Clean
 - ✅ Projects: `1-react-typescript.md`, `2-nodejs-api.md` - Clean
 - ✅ Python Projects: `1-django.md`, `2-fastapi.md`, `3-flask.md` - Clean
@@ -497,7 +497,7 @@ examples/projects/ (different from guides/10-examples/projects/)
 - ✅ Workflows 1-4: All clean
 - ⚠️ Workflows 5-7: Verify cross-references
 
-### Reference (guides/11-reference/)
+### Reference (guides/13-reference/)
 - ✅ `1-api-reference.md` - Clean
 - ✅ `2-troubleshooting.md` - Clean
 - ✅ `3-faq.md` - Clean
@@ -506,12 +506,12 @@ examples/projects/ (different from guides/10-examples/projects/)
 - ✅ `6-optimization-checklist.md` - Clean
 - ✅ `7-glossary.md` - Clean
 
-### Security (guides/12-security/)
+### Security (guides/14-security/)
 - ✅ `1-security-compliance.md` - Clean
 - ✅ `2-testing-quality.md` - Clean
 - ✅ `3-performance-monitoring.md` - Clean
 
-### Community (guides/13-community/)
+### Community (guides/15-community/)
 - ✅ `1-resources.md` - Clean
 - ✅ `2-contribution-guide.md` - Clean
 - ✅ `3-best-practices-catalog.md` - Clean

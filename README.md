@@ -15,20 +15,21 @@ Complete documentation for [Claude Code](https://code.claude.com), covering MCP 
 Documentation is structured in logical order - each topic builds on previous ones:
 
 ```
-00. Plugin Overview     → Understand the 4 plugin types
 01. MCP Servers         → Foundation for extending capabilities
 02. Agents              → Specialized AI assistants
 03. Skills              → Reusable instruction sets
-04. Models              → Choosing Haiku/Sonnet/Opus
-05. Thinking Modes      → Controlling reasoning depth
-06. Context Management  → Memory and workflow control
-07. Keywords            → Slash commands (Plugin Type 3)
-08. Hooks               → Automation triggers (Plugin Type 4)
-09. Token Optimization  → Cost-efficient strategies
-10. Examples            → Real-world projects and workflows
-11. Reference           → API reference and quick lookup
-12. Security            → Production readiness
-13. Community           → Resources and contribution
+04. Commands            → Slash commands (quick shortcuts)
+05. Models              → Choosing Haiku/Sonnet/Opus
+06. Plugins             → Plugin ecosystem overview
+07. Thinking Modes      → Controlling reasoning depth
+08. Context Management  → Memory and workflow control
+09. Keywords            → Keywords & triggers
+10. Hooks               → Automation triggers
+11. Optimization        → Cost-efficient strategies
+12. Examples            → Real-world projects and workflows
+13. Reference           → API reference and quick lookup
+14. Security            → Production readiness
+15. Community           → Resources and contribution
 ```
 
 ## 🚀 Quick Start
@@ -44,21 +45,22 @@ Documentation is structured in logical order - each topic builds on previous one
 claudecode-docs/
 ├── INTRODUCTION.md           # Learning paths and getting started
 ├── TABLE_OF_CONTENTS.md      # Full navigation
-├── guides/                   # Topic guides (00-13)
-│   ├── 00-plugins-overview/  # Advance organizer - all 4 plugin types
-│   ├── 01-mcp-servers/       # Plugin Type 1: External tools
+├── guides/                   # Topic guides (01-15)
+│   ├── 01-mcp-servers/       # MCP servers - external tools
 │   ├── 02-agents/            # Specialized AI assistants
-│   ├── 03-skills/            # Plugin Type 2: Custom instructions
-│   ├── 04-models/            # Model selection
-│   ├── 05-thinking/          # Thinking modes
-│   ├── 06-context/           # Context management
-│   ├── 07-keywords/          # Plugin Type 3: Slash commands
-│   ├── 08-hooks/             # Plugin Type 4: Automation
-│   ├── 09-optimization/      # Token optimization
-│   ├── 10-examples/          # Projects and workflows
-│   ├── 11-reference/         # API reference, FAQ, cheat sheets
-│   ├── 12-security/          # Security, testing, monitoring
-│   └── 13-community/         # Resources and contribution
+│   ├── 03-skills/            # Custom workflow definitions
+│   ├── 04-commands/          # Slash commands
+│   ├── 05-models/            # Model selection
+│   ├── 06-plugins/           # Plugin ecosystem overview
+│   ├── 07-thinking/          # Thinking modes
+│   ├── 08-context/           # Context management
+│   ├── 09-keywords/          # Keywords & triggers
+│   ├── 10-hooks/             # Automation
+│   ├── 11-optimization/      # Token optimization
+│   ├── 12-examples/          # Projects and workflows
+│   ├── 13-reference/         # API reference, FAQ, cheat sheets
+│   ├── 14-security/          # Security, testing, monitoring
+│   └── 15-community/         # Resources and contribution
 └── .claude/skills/           # Active skills for this project
 ```
 

@@ -68,7 +68,7 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| **[Plugin Ecosystem Overview](guides/00-plugins-overview/1-overview.md)** | **20 min** | **4 plugin types, comparison, when to use each** |
+| **[Plugin Ecosystem Overview](guides/06-plugins/1-overview.md)** | **20 min** | **4 plugin types, comparison, when to use each** |
 
 **Total Time**: 20 minutes
 **Dependencies**: None
@@ -151,8 +151,8 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| [Model Overview](guides/04-models/1-overview.md) | 20 min | Haiku 4.5, Sonnet 4.5, Opus 4.5 capabilities |
-| [Selection Guide](guides/04-models/5-selection-guide.md) | 30 min | Decision matrix, when to use each model |
+| [Model Overview](guides/05-models/1-overview.md) | 20 min | Haiku 4.5, Sonnet 4.5, Opus 4.5 capabilities |
+| [Selection Guide](guides/05-models/5-selection-guide.md) | 30 min | Decision matrix, when to use each model |
 
 **Total Time**: ~50 minutes
 **Dependencies**: Agents and Skills (model assignment context)
@@ -168,8 +168,8 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| [Extended Thinking Overview](guides/05-thinking/1-overview.md) | 15 min | What it is, how it works |
-| [Keywords Reference](guides/05-thinking/2-keywords.md) | 10 min | "think", "think hard", "ultrathink" budgets |
+| [Extended Thinking Overview](guides/07-thinking/1-overview.md) | 15 min | What it is, how it works |
+| [Keywords Reference](guides/07-thinking/2-keywords.md) | 10 min | "think", "think hard", "ultrathink" budgets |
 
 **Total Time**: ~25 minutes
 **Dependencies**: Models (thinking affects token usage)
@@ -185,8 +185,8 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| [CLAUDE.md Files](guides/06-context/2-claude-md.md) | 30 min | System-level context, best practices |
-| [Memory Hierarchy](guides/06-context/3-memory-hierarchy.md) | 25 min | Hierarchy, precedence, organization |
+| [CLAUDE.md Files](guides/08-context/2-claude-md.md) | 30 min | System-level context, best practices |
+| [Memory Hierarchy](guides/08-context/3-memory-hierarchy.md) | 25 min | Hierarchy, precedence, organization |
 
 **Total Time**: ~55 minutes
 **Dependencies**: Understanding of entire system
@@ -202,9 +202,9 @@ graph TD
 
 | Reference | Time | Topics |
 |-----------|------|--------|
-| [Keywords Overview](guides/07-keywords/1-overview.md) | 15 min | All thinking keywords, effects |
-| [Automation Patterns](guides/07-keywords/3-automation-patterns.md) | 30 min | PreToolUse, PostToolUse, Notification, Stop |
-| [Slash Commands](guides/07-keywords/2-slash-commands.md) | 20 min | Slash commands, $ARGUMENTS, frontmatter |
+| [Keywords Overview](guides/09-keywords/1-overview.md) | 15 min | All thinking keywords, effects |
+| [Automation Patterns](guides/09-keywords/3-automation-patterns.md) | 30 min | PreToolUse, PostToolUse, Notification, Stop |
+| [Slash Commands](guides/09-keywords/2-slash-commands.md) | 20 min | Slash commands, $ARGUMENTS, frontmatter |
 
 **Total Time**: ~1 hour
 **Dependencies**: Context Management
@@ -220,7 +220,7 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| **[Hooks Overview](guides/08-hooks/1-overview.md)** | **25 min** | **Hook types, configuration, automation patterns** |
+| **[Hooks Overview](guides/10-hooks/1-overview.md)** | **25 min** | **Hook types, configuration, automation patterns** |
 
 **Total Time**: 25 minutes
 **Dependencies**: Understanding of tools and workflows
@@ -238,9 +238,9 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| [Monitoring & Budgeting](guides/09-optimization/3-monitoring-budgeting.md) | 30 min | Tracking, estimation, monitoring |
-| [Cost Optimization](guides/09-optimization/1-cost-optimization.md) | 30 min | Haiku vs. Sonnet vs. Opus economics |
-| [Advanced Techniques](guides/09-optimization/2-advanced-techniques.md) | 35 min | 4 strategies, 60%+ savings potential |
+| [Monitoring & Budgeting](guides/11-optimization/3-monitoring-budgeting.md) | 30 min | Tracking, estimation, monitoring |
+| [Cost Optimization](guides/11-optimization/1-cost-optimization.md) | 30 min | Haiku vs. Sonnet vs. Opus economics |
+| [Advanced Techniques](guides/11-optimization/2-advanced-techniques.md) | 35 min | 4 strategies, 60%+ savings potential |
 
 **Total Time**: ~1.5 hours
 **Dependencies**: All topics (applies everything learned)
@@ -256,23 +256,23 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| [Examples Overview](guides/10-examples/1-overview.md) | 10 min | How to use templates and examples |
+| [Examples Overview](guides/12-examples/1-overview.md) | 10 min | How to use templates and examples |
 | **Projects** |||
-| [React + TypeScript Project](guides/10-examples/projects/1-react-typescript.md) | 45 min | Complete frontend project setup |
-| [Node.js API Service](guides/10-examples/projects/2-nodejs-api.md) | 40 min | Backend API configuration |
-| **[Python/Django Project](guides/10-examples/projects/python/1-django.md)** | **45 min** | **Django with custom skills and workflows** |
-| **[Python/FastAPI Project](guides/10-examples/projects/python/2-fastapi.md)** | **40 min** | **Modern async Python API** |
-| **[Python/Flask Project](guides/10-examples/projects/python/3-flask.md)** | **30 min** | **Lightweight Flask web framework** |
+| [React + TypeScript Project](guides/12-examples/projects/1-react-typescript.md) | 45 min | Complete frontend project setup |
+| [Node.js API Service](guides/12-examples/projects/2-nodejs-api.md) | 40 min | Backend API configuration |
+| **[Python/Django Project](guides/12-examples/projects/python/1-django.md)** | **45 min** | **Django with custom skills and workflows** |
+| **[Python/FastAPI Project](guides/12-examples/projects/python/2-fastapi.md)** | **40 min** | **Modern async Python API** |
+| **[Python/Flask Project](guides/12-examples/projects/python/3-flask.md)** | **30 min** | **Lightweight Flask web framework** |
 | **Workflows** |||
-| [Feature Development Workflow](guides/10-examples/workflows/1-feature-development.md) | 30 min | 6-phase development process |
-| **[Bug Fixing Workflow](guides/10-examples/workflows/2-bug-fixing.md)** | **30 min** | **Systematic debugging with TDD approach** |
-| **[Code Review Workflow](guides/10-examples/workflows/3-code-review.md)** | **25 min** | **AI-assisted PR reviews with security checks** |
-| **[Refactoring Workflow](guides/10-examples/workflows/4-refactoring.md)** | **35 min** | **Safe refactoring with Plan agent and tests** |
-| **[Documentation Writing Workflow](guides/10-examples/workflows/5-documentation-writing.md)** | **25 min** | **API docs, tutorials, testing examples, ROI analysis** |
-| **[Performance Optimization Workflow](guides/10-examples/workflows/6-performance-optimization.md)** | **30 min** | **Profile, analyze, optimize, validate with real examples** |
-| **[Testing Workflow](guides/10-examples/workflows/7-testing.md)** | **35 min** | **TDD, unit tests, integration, E2E with comprehensive examples** |
+| [Feature Development Workflow](guides/12-examples/workflows/1-feature-development.md) | 30 min | 6-phase development process |
+| **[Bug Fixing Workflow](guides/12-examples/workflows/2-bug-fixing.md)** | **30 min** | **Systematic debugging with TDD approach** |
+| **[Code Review Workflow](guides/12-examples/workflows/3-code-review.md)** | **25 min** | **AI-assisted PR reviews with security checks** |
+| **[Refactoring Workflow](guides/12-examples/workflows/4-refactoring.md)** | **35 min** | **Safe refactoring with Plan agent and tests** |
+| **[Documentation Writing Workflow](guides/12-examples/workflows/5-documentation-writing.md)** | **25 min** | **API docs, tutorials, testing examples, ROI analysis** |
+| **[Performance Optimization Workflow](guides/12-examples/workflows/6-performance-optimization.md)** | **30 min** | **Profile, analyze, optimize, validate with real examples** |
+| **[Testing Workflow](guides/12-examples/workflows/7-testing.md)** | **35 min** | **TDD, unit tests, integration, E2E with comprehensive examples** |
 | **Teams** |||
-| [Solo Developer Setup](guides/10-examples/teams/1-solo-developer.md) | 25 min | Optimized individual configuration |
+| [Solo Developer Setup](guides/12-examples/teams/1-solo-developer.md) | 25 min | Optimized individual configuration |
 
 **Total Time**: ~6 hours
 **Dependencies**: Understanding of core concepts
@@ -288,10 +288,10 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| **[Complete API Reference](guides/11-reference/1-api-reference.md)** | **45 min** | **AGENT.md, SKILL.md, config.json schemas** |
-| **[Troubleshooting Guide](guides/11-reference/2-troubleshooting.md)** | **35 min** | **Common issues and solutions** |
-| **[FAQ](guides/11-reference/3-faq.md)** | **40 min** | **50+ frequently asked questions** |
-| **[Quick Reference Cheat Sheet](guides/11-reference/4-cheat-sheet.md)** | **10 min** | **One-page printable reference** |
+| **[Complete API Reference](guides/13-reference/1-api-reference.md)** | **45 min** | **AGENT.md, SKILL.md, config.json schemas** |
+| **[Troubleshooting Guide](guides/13-reference/2-troubleshooting.md)** | **35 min** | **Common issues and solutions** |
+| **[FAQ](guides/13-reference/3-faq.md)** | **40 min** | **50+ frequently asked questions** |
+| **[Quick Reference Cheat Sheet](guides/13-reference/4-cheat-sheet.md)** | **10 min** | **One-page printable reference** |
 
 **Total Time**: ~2 hours (reference as needed)
 **Dependencies**: None
@@ -307,9 +307,9 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| **[Security & Compliance](guides/12-security/1-security-compliance.md)** | **45 min** | **Secrets management, OWASP Top 10, GDPR/SOC 2/HIPAA, AI safety** |
-| **[Testing & Quality](guides/12-security/2-testing-quality.md)** | **50 min** | **MCP/skill/agent testing, TDD/BDD, quality gates, CI/CD** |
-| **[Performance & Monitoring](guides/12-security/3-performance-monitoring.md)** | **40 min** | **Benchmarks, token tracking, cost monitoring, optimization** |
+| **[Security & Compliance](guides/14-security/1-security-compliance.md)** | **45 min** | **Secrets management, OWASP Top 10, GDPR/SOC 2/HIPAA, AI safety** |
+| **[Testing & Quality](guides/14-security/2-testing-quality.md)** | **50 min** | **MCP/skill/agent testing, TDD/BDD, quality gates, CI/CD** |
+| **[Performance & Monitoring](guides/14-security/3-performance-monitoring.md)** | **40 min** | **Benchmarks, token tracking, cost monitoring, optimization** |
 
 **Total Time**: ~2 hours
 **Dependencies**: Core concepts, project experience
@@ -325,9 +325,9 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| **[Community Resources](guides/13-community/1-resources.md)** | **20 min** | **Official docs, forums, learning materials** |
-| **[Contribution Guide](guides/13-community/2-contribution-guide.md)** | **25 min** | **How to contribute skills, MCP servers, documentation** |
-| **[Best Practices Catalog](guides/13-community/3-best-practices-catalog.md)** | **30 min** | **Production patterns from real-world use (73% cost reduction examples)** |
+| **[Community Resources](guides/15-community/1-resources.md)** | **20 min** | **Official docs, forums, learning materials** |
+| **[Contribution Guide](guides/15-community/2-contribution-guide.md)** | **25 min** | **How to contribute skills, MCP servers, documentation** |
+| **[Best Practices Catalog](guides/15-community/3-best-practices-catalog.md)** | **30 min** | **Production patterns from real-world use (73% cost reduction examples)** |
 
 **Total Time**: ~1.5 hours
 **Dependencies**: None
@@ -421,10 +421,10 @@ Keywords & Triggers (deep) → Custom Agents → Custom Skills
 **Approach**: Use reference sections and examples
 
 **Key Resources**:
-- [Keywords Overview](guides/07-keywords/1-overview.md) - All keywords and effects
-- [Automation Patterns](guides/07-keywords/3-automation-patterns.md) - Hook configuration
-- [Slash Commands](guides/07-keywords/2-slash-commands.md) - Slash command syntax
-- [Examples](guides/10-examples/1-overview.md) - Copy-paste ready templates
+- [Keywords Overview](guides/09-keywords/1-overview.md) - All keywords and effects
+- [Automation Patterns](guides/09-keywords/3-automation-patterns.md) - Hook configuration
+- [Slash Commands](guides/09-keywords/2-slash-commands.md) - Slash command syntax
+- [Examples](guides/12-examples/1-overview.md) - Copy-paste ready templates
 
 ---
 
@@ -490,23 +490,23 @@ Practical, copy-paste ready examples:
 
 ### Skills Examples
 - [Documentation Professor](.claude/skills/documentation-professor/) - Pedagogical documentation writer (active skill)
-- [More workflow examples](guides/10-examples/workflows/) - Complete workflow guides including TDD, code review, and more
+- [More workflow examples](guides/12-examples/workflows/) - Complete workflow guides including TDD, code review, and more
 
 ### Project Templates
-- [React + TypeScript](guides/10-examples/projects/1-react-typescript.md) - Complete frontend project setup
-- [Node.js API Service](guides/10-examples/projects/2-nodejs-api.md) - Backend API configuration
-- [Python/Django](guides/10-examples/projects/python/1-django.md) - Django with custom skills
-- [Python/FastAPI](guides/10-examples/projects/python/2-fastapi.md) - Modern async Python API
-- [Python/Flask](guides/10-examples/projects/python/3-flask.md) - Lightweight Flask web framework
+- [React + TypeScript](guides/12-examples/projects/1-react-typescript.md) - Complete frontend project setup
+- [Node.js API Service](guides/12-examples/projects/2-nodejs-api.md) - Backend API configuration
+- [Python/Django](guides/12-examples/projects/python/1-django.md) - Django with custom skills
+- [Python/FastAPI](guides/12-examples/projects/python/2-fastapi.md) - Modern async Python API
+- [Python/Flask](guides/12-examples/projects/python/3-flask.md) - Lightweight Flask web framework
 
 ### Workflow Guides
-- [Feature Development](guides/10-examples/workflows/1-feature-development.md) - 6-phase development process
-- [Bug Fixing](guides/10-examples/workflows/2-bug-fixing.md) - Systematic debugging with TDD
-- [Code Review](guides/10-examples/workflows/3-code-review.md) - AI-assisted PR reviews
-- [Refactoring](guides/10-examples/workflows/4-refactoring.md) - Safe refactoring with tests
-- [Documentation Writing](guides/10-examples/workflows/5-documentation-writing.md) - API docs and tutorials
-- [Performance Optimization](guides/10-examples/workflows/6-performance-optimization.md) - Profile, analyze, optimize
-- [Testing](guides/10-examples/workflows/7-testing.md) - TDD, unit, integration, E2E
+- [Feature Development](guides/12-examples/workflows/1-feature-development.md) - 6-phase development process
+- [Bug Fixing](guides/12-examples/workflows/2-bug-fixing.md) - Systematic debugging with TDD
+- [Code Review](guides/12-examples/workflows/3-code-review.md) - AI-assisted PR reviews
+- [Refactoring](guides/12-examples/workflows/4-refactoring.md) - Safe refactoring with tests
+- [Documentation Writing](guides/12-examples/workflows/5-documentation-writing.md) - API docs and tutorials
+- [Performance Optimization](guides/12-examples/workflows/6-performance-optimization.md) - Profile, analyze, optimize
+- [Testing](guides/12-examples/workflows/7-testing.md) - TDD, unit, integration, E2E
 
 ---
 
@@ -630,9 +630,9 @@ After completing each section, you should be able to:
 ## 📖 Additional Resources
 
 ### Quick References
-- [Keywords Overview](guides/07-keywords/1-overview.md) - All keywords at a glance
-- [Model Overview](guides/04-models/1-overview.md) - Quick model selection
-- [Slash Commands](guides/07-keywords/2-slash-commands.md) - Frequently used commands
+- [Keywords Overview](guides/09-keywords/1-overview.md) - All keywords at a glance
+- [Model Overview](guides/05-models/1-overview.md) - Quick model selection
+- [Slash Commands](guides/09-keywords/2-slash-commands.md) - Frequently used commands
 
 ### External Links
 - [Official Claude Code Docs](https://code.claude.com/docs)
@@ -642,8 +642,8 @@ After completing each section, you should be able to:
 - [Community Skills](https://github.com/obra/superpowers)
 
 ### Getting Help
-- [Troubleshooting Guide](guides/11-reference/2-troubleshooting.md) - Common issues and solutions
-- [FAQ](guides/11-reference/3-faq.md) - Frequently asked questions
+- [Troubleshooting Guide](guides/13-reference/2-troubleshooting.md) - Common issues and solutions
+- [FAQ](guides/13-reference/3-faq.md) - Frequently asked questions
 - [GitHub Issues](https://github.com/anthropics/claude-code/issues) - Report bugs
 
 ---
@@ -653,9 +653,9 @@ After completing each section, you should be able to:
 Choose your path:
 
 **→ [New to Claude Code? Start with INTRODUCTION.md](INTRODUCTION.md)**
-**→ [Want quick optimization? Jump to Token Optimization](guides/09-optimization/2-advanced-techniques.md)**
-**→ [Need a specific answer? Use the search or references](guides/11-reference/)**
-**→ [Want to see examples? Browse templates](guides/10-examples/1-overview.md)**
+**→ [Want quick optimization? Jump to Token Optimization](guides/11-optimization/2-advanced-techniques.md)**
+**→ [Need a specific answer? Use the search or references](guides/13-reference/)**
+**→ [Want to see examples? Browse templates](guides/12-examples/1-overview.md)**
 
 ---
 

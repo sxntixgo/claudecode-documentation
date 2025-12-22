@@ -607,9 +607,9 @@ Now that you understand model assignment for agents, you're ready to:
 Learn to build specialized agents with custom capabilities and model assignments.
 
 **Also Explore**:
-- [Model Selection Deep Dive](../04-models/1-overview.md) - Complete guide to Haiku, Sonnet, and Opus
-- [Token Optimization Strategies](../09-optimization/1-cost-optimization.md) - Advanced techniques for 70%+ savings
-- [Context Management](../06-context/1-overview.md) - Control what agents see and remember
+- [Model Selection Deep Dive](../05-models/1-overview.md) - Complete guide to Haiku, Sonnet, and Opus
+- [Token Optimization Strategies](../11-optimization/1-cost-optimization.md) - Advanced techniques for 70%+ savings
+- [Context Management](../08-context/1-overview.md) - Control what agents see and remember
 
 ---
 
@@ -625,7 +625,7 @@ Learn to build specialized agents with custom capabilities and model assignments
 - [Model Performance Benchmarks](https://github.com/anthropics/claude-benchmarks)
 
 ### Related Topics
-- [Thinking Modes](../05-thinking/) - Control reasoning depth for better cost/quality trade-offs
+- [Thinking Modes](../07-thinking/) - Control reasoning depth for better cost/quality trade-offs
 - [Skills Model Assignment](../03-skills/4-model-assignment.md) - Similar techniques for skills
 
 ---

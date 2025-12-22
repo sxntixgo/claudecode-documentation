@@ -2,7 +2,7 @@
 
 **Date**: December 22, 2025
 **Reviewer**: Claude Sonnet 4.5 (documentation-reviewer skill)
-**Scope**: New Plugin Ecosystem Documentation (`guides/00-plugins-overview/1-overview.md`)
+**Scope**: New Plugin Ecosystem Documentation (`guides/06-plugins/1-overview.md`)
 
 ---
 
@@ -54,7 +54,7 @@ All internal links are valid. No broken cross-references. No security issues in 
 ## Important Issues (Should Fix)
 
 ### Issue 1: Placeholder YouTube Video URLs
-- **File**: `guides/00-plugins-overview/1-overview.md`
+- **File**: `guides/06-plugins/1-overview.md`
 - **Lines**: 1480-1482
 - **Category**: Invalid External Links
 - **Description**: Three fake YouTube URLs using "example1", "example2", "example3" placeholders:
@@ -64,7 +64,7 @@ All internal links are valid. No broken cross-references. No security issues in 
 - **Impact**: Users clicking these links will get 404 errors
 
 ### Issue 2: Placeholder Article URLs
-- **File**: `guides/00-plugins-overview/1-overview.md`
+- **File**: `guides/06-plugins/1-overview.md`
 - **Lines**: 1486-1487
 - **Category**: Invalid External Links
 - **Description**: Two fake article URLs using "example.com":
@@ -73,7 +73,7 @@ All internal links are valid. No broken cross-references. No security issues in 
 - **Impact**: Users clicking these links will reach example.com placeholder
 
 ### Issue 3: Placeholder Academic Paper URLs
-- **File**: `guides/00-plugins-overview/1-overview.md`
+- **File**: `guides/06-plugins/1-overview.md`
 - **Lines**: 1507-1508
 - **Category**: Invalid External Links
 - **Description**: Two fake arXiv URLs:
@@ -82,21 +82,21 @@ All internal links are valid. No broken cross-references. No security issues in 
 - **Impact**: Users clicking these links will get 404 errors
 
 ### Issue 4: Unverified Reddit Subreddit
-- **File**: `guides/00-plugins-overview/1-overview.md`
+- **File**: `guides/06-plugins/1-overview.md`
 - **Line**: 1498
 - **Category**: Potentially Invalid External Link
 - **Description**: Reference to `https://reddit.com/r/claudecode` - this subreddit may not exist
 - **Impact**: Could lead to non-existent community resource
 
 ### Issue 5: Unverified GitHub Repository
-- **File**: `guides/00-plugins-overview/1-overview.md`
+- **File**: `guides/06-plugins/1-overview.md`
 - **Line**: 1504
 - **Category**: Potentially Invalid External Link
 - **Description**: Reference to `https://github.com/awesome-lists/claude-code-plugins` - this repo may not exist
 - **Impact**: Could lead to 404 error
 
 ### Issue 6: Unverified Anthropic Skills Repository
-- **File**: `guides/00-plugins-overview/1-overview.md`
+- **File**: `guides/06-plugins/1-overview.md`
 - **Line**: 1363
 - **Category**: Potentially Invalid External Link
 - **Description**: Reference to `https://github.com/anthropics/skills` - may not be a real repository
@@ -105,7 +105,7 @@ All internal links are valid. No broken cross-references. No security issues in 
 ### Issue 7: New Section Not in TABLE_OF_CONTENTS.md
 - **File**: `TABLE_OF_CONTENTS.md`
 - **Category**: Missing Navigation
-- **Description**: The new `guides/00-plugins-overview/` section is not yet added to the main table of contents
+- **Description**: The new `guides/06-plugins/` section is not yet added to the main table of contents
 - **Impact**: Users won't discover this content through standard navigation
 
 ---
@@ -113,28 +113,28 @@ All internal links are valid. No broken cross-references. No security issues in 
 ## Minor Issues (Nice to Fix)
 
 ### Issue 1: Code Blocks Without Language Tags
-- **File**: `guides/00-plugins-overview/1-overview.md`
+- **File**: `guides/06-plugins/1-overview.md`
 - **Lines**: 17, 117, 155, 308, 708 (and others)
 - **Category**: Formatting
 - **Description**: Several code blocks (ASCII diagrams, output examples) lack explicit language tags. These are acceptable for diagrams but could use `text` or `plaintext` for consistency.
 - **Impact**: Minor - doesn't affect functionality
 
 ### Issue 2: Anthropic Blog URL Unverified
-- **File**: `guides/00-plugins-overview/1-overview.md`
+- **File**: `guides/06-plugins/1-overview.md`
 - **Line**: 1485
 - **Category**: Potentially Invalid External Link
 - **Description**: `https://www.anthropic.com/engineering/mcp-launch` - exact URL path may differ
 - **Impact**: Minor - could be 404 if path is wrong
 
 ### Issue 3: Example API URLs in Code
-- **File**: `guides/00-plugins-overview/1-overview.md`
+- **File**: `guides/06-plugins/1-overview.md`
 - **Lines**: 464-512
 - **Category**: Documentation Style
 - **Description**: Uses `api.example.com` in code examples which is appropriate, but could add a note clarifying these are placeholder URLs
 - **Impact**: Minor - users understand this is example code
 
 ### Issue 4: Long Document Could Benefit from Sub-pages
-- **File**: `guides/00-plugins-overview/1-overview.md`
+- **File**: `guides/06-plugins/1-overview.md`
 - **Category**: Structure Suggestion
 - **Description**: At 1547 lines, the document is comprehensive but long. Could be split into:
   - `1-overview.md` (intro + comparison)
@@ -145,7 +145,7 @@ All internal links are valid. No broken cross-references. No security issues in 
 - **Impact**: Minor - current structure works, split would improve navigation
 
 ### Issue 5: Deep Dive Section Time Estimate
-- **File**: `guides/00-plugins-overview/1-overview.md`
+- **File**: `guides/06-plugins/1-overview.md`
 - **Line**: 803
 - **Category**: Consistency
 - **Description**: Deep dive section says "20 minutes" but the overall guide says "45 minutes". Should clarify if 20 min is included in or additional to 45 min.
@@ -225,7 +225,7 @@ All internal links are valid. No broken cross-references. No security issues in 
 - **Total files reviewed**: 1
 - **Files with issues**: 1
 - **Issue breakdown**:
-  - `guides/00-plugins-overview/1-overview.md`: 7 important, 5 minor
+  - `guides/06-plugins/1-overview.md`: 7 important, 5 minor
 
 ### File Statistics
 

@@ -164,7 +164,7 @@ The documentation follows this progression:
 ### Proposed New Structure
 
 **Section 0: Plugin Ecosystem Overview**
-- **File**: `guides/00-plugins-overview/1-overview.md` (NEW - condensed version)
+- **File**: `guides/06-plugins/1-overview.md` (NEW - condensed version)
 - **Time**: 20 minutes
 - **Content**:
   - Brief introduction to Claude Code extensibility
@@ -180,7 +180,7 @@ The documentation follows this progression:
 - Section 7: Keywords & Triggers
 
 **Section 7.5: Hooks & Automation** (NEW)
-- **File**: `guides/08-hooks/1-overview.md`
+- **File**: `guides/10-hooks/1-overview.md`
 - **Time**: 25 minutes
 - **Content**: Extract hooks content from current plugin ecosystem guide
   - What are hooks
@@ -190,7 +190,7 @@ The documentation follows this progression:
   - Testing hooks
 
 **Section 13: Plugin Ecosystem - Deep Dive** (KEEP but REFRAME)
-- **File**: `guides/00-plugins-overview/1-overview.md` (current file)
+- **File**: `guides/06-plugins/1-overview.md` (current file)
 - **Time**: 45 minutes (keep current content)
 - **Framing**: "Complete Reference: All Plugin Types in One Place"
 - **Add note at top**: "This is a comprehensive reference. For learning, see Section 0 overview and individual sections (MCP: Section 1, Skills: Section 3, Hooks: Section 7.5, Commands: Section 7)"
@@ -201,18 +201,18 @@ The documentation follows this progression:
 
 ### Immediate Actions (Critical for Pedagogical Coherence)
 
-1. [ ] **Create** `guides/00-plugins-overview/1-overview.md` (20-min condensed version)
+1. [ ] **Create** `guides/06-plugins/1-overview.md` (20-min condensed version)
    - 4 plugin types introduction
    - Comparison table only
    - Single architecture diagram
    - Links to detailed sections
 
-2. [ ] **Create** `guides/08-hooks/` directory and `1-overview.md`
+2. [ ] **Create** `guides/10-hooks/` directory and `1-overview.md`
    - Extract hooks content from current plugin ecosystem guide
    - Deep dive on hooks specifically
    - Configuration, testing, examples
 
-3. [ ] **Update** `guides/00-plugins-overview/1-overview.md`
+3. [ ] **Update** `guides/06-plugins/1-overview.md`
    - Add prominent note at top about prerequisite sections
    - Reframe as "comprehensive reference" not "introduction"
    - Add cross-references to individual sections
@@ -234,7 +234,7 @@ The documentation follows this progression:
 7. [ ] **Update** `guides/03-skills/1-overview.md`
    - Add note: "Skills are plugin type 2 of 4. See Plugin Ecosystem overview for comparison."
 
-8. [ ] **Update** `guides/07-keywords/1-overview.md`
+8. [ ] **Update** `guides/09-keywords/1-overview.md`
    - Add note about slash commands being plugin type 3
    - Link to Section 7.5 for hooks (plugin type 4)
 

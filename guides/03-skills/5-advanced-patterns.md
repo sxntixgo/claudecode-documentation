@@ -841,9 +841,9 @@ return results;
 Congratulations! You've mastered advanced skill patterns.
 
 **Ready for Phase 2?** Explore:
-- [Model Selection Deep Dive](../04-models/1-overview.md) - Understanding Haiku, Sonnet, and Opus
-- [Thinking Modes](../05-thinking/1-overview.md) - Control reasoning depth
-- [Context Management](../06-context/1-overview.md) - Advanced context control
+- [Model Selection Deep Dive](../05-models/1-overview.md) - Understanding Haiku, Sonnet, and Opus
+- [Thinking Modes](../07-thinking/1-overview.md) - Control reasoning depth
+- [Context Management](../08-context/1-overview.md) - Advanced context control
 
 **Want to Contribute?**
 - [Share Your Skills](https://github.com/anthropics/skills) - Contribute to the marketplace

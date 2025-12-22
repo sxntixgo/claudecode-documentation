@@ -955,9 +955,9 @@ Congratulations! You now know how to create custom agents with specialized capab
 Learn about skills - reusable instruction sets that leverage agents for specific workflows.
 
 **Also Explore**:
-- [Model Selection](../04-models/1-overview.md) - Deep dive into Haiku, Sonnet, and Opus
-- [Context Management](../06-context/1-overview.md) - Control what agents see and remember
-- [Token Optimization](../09-optimization/1-cost-optimization.md) - Advanced cost-saving strategies
+- [Model Selection](../05-models/1-overview.md) - Deep dive into Haiku, Sonnet, and Opus
+- [Context Management](../08-context/1-overview.md) - Control what agents see and remember
+- [Token Optimization](../11-optimization/1-cost-optimization.md) - Advanced cost-saving strategies
 
 ---
 
@@ -974,7 +974,7 @@ Learn about skills - reusable instruction sets that leverage agents for specific
 
 ### Related Topics
 - [Creating Custom Skills](../03-skills/3-creating-skills.md) - Build on agents with reusable skills
-- [Slash Commands](../07-keywords/3-slash-commands.md) - Trigger agents with custom commands
+- [Slash Commands](../09-keywords/3-slash-commands.md) - Trigger agents with custom commands
 
 ---
 
