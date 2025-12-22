@@ -185,12 +185,12 @@ We've designed four different paths through this documentation based on your goa
 **Your Journey**:
 1. Start with [MCP Servers](guides/1-mcp-servers/2-installation.md)
 2. Progress through [Agents](guides/2-agents/1-overview.md)
-3. Learn [Skills](guides/skills/overview.md)
-4. Master [Model Selection](guides/models/model-comparison.md)
-5. Understand [Thinking Modes](guides/thinking/extended-thinking.md)
-6. Deep dive into [Context Management](guides/context/claude-md-files.md)
-7. Explore [Keywords & Triggers](reference/keywords.md)
-8. Apply everything in [Token Optimization](optimization/strategies.md)
+3. Learn [Skills](guides/3-skills/1-overview.md)
+4. Master [Model Selection](guides/4-models/1-overview.md)
+5. Understand [Thinking Modes](guides/5-thinking/1-overview.md)
+6. Deep dive into [Context Management](guides/6-context/2-claude-md.md)
+7. Explore [Keywords & Triggers](guides/7-keywords/1-overview.md)
+8. Apply everything in [Token Optimization](guides/8-optimization/2-advanced-techniques.md)
 
 **Why this path?**
 - Builds solid foundation
@@ -209,9 +209,9 @@ We've designed four different paths through this documentation based on your goa
 **Your Journey**:
 1. **Quick overview**: [MCP Servers](guides/1-mcp-servers/1-overview.md) (15 min)
 2. **Quick overview**: [Agents](guides/2-agents/1-overview.md) (15 min)
-3. **Deep dive**: [Model Selection](guides/models/selection-guide.md) (30 min)
-4. **Deep dive**: [Thinking Modes](guides/thinking/when-to-use.md) (25 min)
-5. **Deep dive**: [Token Optimization](optimization/strategies.md) (60 min)
+3. **Deep dive**: [Model Selection](guides/4-models/5-selection-guide.md) (30 min)
+4. **Deep dive**: [Thinking Modes](guides/5-thinking/1-overview.md) (25 min)
+5. **Deep dive**: [Token Optimization](guides/8-optimization/2-advanced-techniques.md) (60 min)
 6. **Reference**: Other topics as needed
 
 **Why this path?**
@@ -229,11 +229,11 @@ We've designed four different paths through this documentation based on your goa
 **Approach**: Skip basics, focus on customization and advanced patterns
 
 **Your Journey**:
-1. **Deep dive**: [Creating Custom Skills](guides/skills/creating-skills.md) (60 min)
-2. **Deep dive**: [CLAUDE.md Best Practices](guides/context/claude-md-files.md) (30 min)
-3. **Deep dive**: [Hooks and Commands](reference/hooks.md) (45 min)
-4. **Deep dive**: [Advanced Context Patterns](guides/context/optimization.md) (35 min)
-5. **Practice**: [Example Skills](examples/skills/) for inspiration
+1. **Deep dive**: [Creating Custom Skills](guides/3-skills/3-creating-skills.md) (60 min)
+2. **Deep dive**: [CLAUDE.md Best Practices](guides/6-context/2-claude-md.md) (30 min)
+3. **Deep dive**: [Hooks and Commands](guides/7-keywords/3-automation-patterns.md) (45 min)
+4. **Deep dive**: [Advanced Context Patterns](guides/6-context/1-overview.md) (35 min)
+5. **Practice**: [Example Skills](guides/9-examples/1-overview.md) for inspiration
 
 **Why this path?**
 - Customize Claude Code to your workflow
@@ -250,11 +250,11 @@ We've designed four different paths through this documentation based on your goa
 **Approach**: Use references and examples as needed
 
 **Your Resources**:
-- [Keywords Cheat Sheet](reference/keywords.md) - All keywords at a glance
-- [Model Comparison Table](guides/models/model-comparison.md) - Quick model selection
-- [Common Commands](reference/commands.md) - Frequently used commands
-- [CLAUDE.md Templates](examples/claude-md-templates/) - Copy-paste ready
-- [Example Skills](examples/skills/) - Real-world implementations
+- [Keywords Overview](guides/7-keywords/1-overview.md) - All keywords at a glance
+- [Model Overview](guides/4-models/1-overview.md) - Quick model selection
+- [Slash Commands](guides/7-keywords/2-slash-commands.md) - Frequently used commands
+- [Project Templates](guides/9-examples/1-overview.md) - Copy-paste ready
+- [Example Workflows](guides/9-examples/1-overview.md) - Real-world implementations
 
 **Why this path?**
 - Get answers immediately
@@ -340,7 +340,7 @@ This documentation serves three primary audiences:
 **You are**: Familiar with basics, want to optimize and expand
 **You need**: Real-world examples, optimization strategies
 **Your path**: Optimization Focused (Path 2) or skip around as needed
-**Start here**: [Model Selection Guide](guides/models/selection-guide.md)
+**Start here**: [Model Selection Guide](guides/4-models/5-selection-guide.md)
 
 **We've got you covered with**:
 - Practical optimization strategies
@@ -355,7 +355,7 @@ This documentation serves three primary audiences:
 **You are**: Power user, team lead, looking to customize
 **You need**: Reference docs, advanced patterns, edge cases
 **Your path**: Advanced Customization (Path 3) or Quick Reference (Path 4)
-**Start here**: [Custom Skills](guides/skills/creating-skills.md) or [References](reference/)
+**Start here**: [Custom Skills](guides/3-skills/3-creating-skills.md) or [References](guides/10-reference/)
 
 **We've got you covered with**:
 - Advanced customization techniques
@@ -437,8 +437,8 @@ You'll know this documentation succeeded if you can:
 ### While Learning
 
 **Questions about concepts?**
-- Check the [FAQ](reference/faq.md)
-- Review [Troubleshooting Guide](reference/troubleshooting.md)
+- Check the [FAQ](guides/10-reference/3-faq.md)
+- Review [Troubleshooting Guide](guides/10-reference/2-troubleshooting.md)
 - Search the [Table of Contents](TABLE_OF_CONTENTS.md)
 
 **Code not working?**
@@ -473,13 +473,13 @@ Congratulations! You now understand:
 **Choose your next step:**
 
 **→ [New to Claude Code? Start with MCP Servers](guides/1-mcp-servers/1-overview.md)**
-**→ [Want cost savings? Jump to Optimization](optimization/strategies.md)**
-**→ [Need quick answers? Use the References](reference/)**
-**→ [Want examples? Browse Templates](examples/)**
+**→ [Want cost savings? Jump to Optimization](guides/8-optimization/2-advanced-techniques.md)**
+**→ [Need quick answers? Use the References](guides/10-reference/)**
+**→ [Want examples? Browse Templates](guides/9-examples/1-overview.md)**
 
 ---
 
-**Have questions before diving in?** Check out our [FAQ](reference/faq.md) or review the [TABLE_OF_CONTENTS.md](TABLE_OF_CONTENTS.md) for a complete navigation map.
+**Have questions before diving in?** Check out our [FAQ](guides/10-reference/3-faq.md) or review the [TABLE_OF_CONTENTS.md](TABLE_OF_CONTENTS.md) for a complete navigation map.
 
 **Already know what you need?** Use the search function or jump directly to any topic in the [Table of Contents](TABLE_OF_CONTENTS.md).
 

@@ -1,5 +1,9 @@
 # Node.js API Service Template
 
+**Reading Time**: 5 minutes
+**Skill Level**: Intermediate
+**Prerequisites**: Understanding of Claude Code basics
+
 **Project Type**: Backend REST API
 **Tech Stack**: Node.js, Express, TypeScript, PostgreSQL, Prisma
 **Team Size**: 1-10 developers
