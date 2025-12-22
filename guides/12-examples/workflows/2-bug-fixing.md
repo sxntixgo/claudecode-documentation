@@ -904,8 +904,8 @@ For production incidents:
 ### Related Topics
 
 - [Explore Agent](../../02-agents/2-built-in-agents.md#explore-agent) - Read-only search
-- [Cost Optimization](../../8-token-optimization/1-cost-optimization.md) - Save on debugging
-- [Thinking Modes](../../5-thinking-modes/2-keywords.md) - When to use "think"
+- [Cost Optimization](../../11-optimization/1-cost-optimization.md) - Save on debugging
+- [Thinking Modes](../../07-thinking/2-keywords.md) - When to use "think"
 - [Test-Driven Development](../../12-examples/workflows/7-testing.md#tdd-workflow) - TDD with Claude
 
 ---

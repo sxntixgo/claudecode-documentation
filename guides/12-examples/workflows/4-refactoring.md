@@ -1486,8 +1486,8 @@ Best refactoring: remove code
 ### Related Topics
 
 - [Model Selection](../../05-models/5-selection-guide.md) - When to use Opus
-- [Thinking Modes](../../5-thinking-modes/2-keywords.md) - "think harder" for architecture
-- [Cost Optimization](../../8-token-optimization/1-cost-optimization.md) - Optimize refactoring costs
+- [Thinking Modes](../../07-thinking/2-keywords.md) - "think harder" for architecture
+- [Cost Optimization](../../11-optimization/1-cost-optimization.md) - Optimize refactoring costs
 
 ---
 

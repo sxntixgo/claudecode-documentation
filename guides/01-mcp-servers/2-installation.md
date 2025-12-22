@@ -976,9 +976,9 @@ Great! You've successfully installed MCP servers. You're ready to:
 
 **→ [Explore Popular MCP Servers](3-popular-servers.md)** - Discover GitHub, Perplexity, Context7, and 200+ more
 
-**→ [Learn About Agents](../02-agents/overview.md)** - Understand how agents use MCP tools
+**→ [Learn About Agents](../02-agents/1-overview.md)** - Understand how agents use MCP tools
 
-**→ [Create Custom MCP Servers](creating-custom-servers.md)** - Build your own (advanced)
+**→ [Create Custom MCP Servers](4-creating-custom-servers.md)** - Build your own (advanced)
 
 ---
 

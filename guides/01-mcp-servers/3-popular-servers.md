@@ -1135,11 +1135,11 @@ Excellent! You now know:
 
 **Ready to explore further?**
 
-**→ [Create Custom MCP Servers](creating-custom-servers.md)** - Build your own for internal tools
+**→ [Create Custom MCP Servers](4-creating-custom-servers.md)** - Build your own for internal tools
 
-**→ [Learn About Agents](../02-agents/overview.md)** - Understand how agents use these MCP tools
+**→ [Learn About Agents](../02-agents/1-overview.md)** - Understand how agents use these MCP tools
 
-**→ [MCP Best Practices](best-practices.md)** - Security, performance, error handling
+**→ [MCP Best Practices](5-best-practices.md)** - Security, performance, error handling
 
 ---
 
@@ -1169,8 +1169,8 @@ Want to explore more? Here are excellent resources:
 
 - [MCP Overview](1-overview.md) - Conceptual foundation
 - [Installation Guide](2-installation.md) - Setup instructions
-- [Agents Overview](../02-agents/overview.md) - How agents use MCP servers
-- [Creating Custom Servers](creating-custom-servers.md) - Build your own
+- [Agents Overview](../02-agents/1-overview.md) - How agents use MCP servers
+- [Creating Custom Servers](4-creating-custom-servers.md) - Build your own
 
 ### 💬 Community & Support
 
@@ -1186,4 +1186,4 @@ Want to explore more? Here are excellent resources:
 
 ---
 
-**Ready to dive into agents?** Continue to [Agents Overview](../02-agents/overview.md) to learn how Claude uses these MCP tools effectively!
+**Ready to dive into agents?** Continue to [Agents Overview](../02-agents/1-overview.md) to learn how Claude uses these MCP tools effectively!

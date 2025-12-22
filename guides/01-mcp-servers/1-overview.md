@@ -573,8 +573,8 @@ Want to dive deeper? Here are some excellent resources:
 
 ### 🔗 Related Topics
 - [Installing MCP Servers](2-installation.md) - Hands-on setup next
-- [Agents Overview](../02-agents/overview.md) - How agents use MCP tools
-- [Skills Overview](../03-skills/overview.md) - Skills that leverage MCP capabilities
+- [Agents Overview](../02-agents/1-overview.md) - How agents use MCP tools
+- [Skills Overview](../03-skills/1-overview.md) - Skills that leverage MCP capabilities
 
 ### 💬 Community & Support
 - [MCP GitHub Discussions](https://github.com/modelcontextprotocol/specification/discussions) - Ask questions

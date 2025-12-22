@@ -17,21 +17,23 @@ Foundation → Building Blocks → Advanced → Mastery
 
 ```mermaid
 graph TD
-    Z[00. Plugin Overview] --> A[01. MCP Servers]
-    A --> B[02. Agents]
+    A[01. MCP Servers] --> B[02. Agents]
     B --> C[03. Skills]
-    C --> D[04. Models]
-    D --> E[05. Thinking Modes]
-    E --> F[06. Context Management]
-    F --> G[07. Keywords]
-    G --> H[08. Hooks]
-    H --> I[09. Optimization]
+    C --> CMD[04. Commands]
+    CMD --> D[05. Models]
+    D --> P[06. Plugins Overview]
+    P --> E[07. Thinking Modes]
+    E --> F[08. Context Management]
+    F --> G[09. Keywords]
+    G --> H[10. Hooks]
+    H --> I[11. Optimization]
 
-    style Z fill:#90EE90
     style A fill:#87CEEB
     style B fill:#87CEEB
     style C fill:#87CEEB
+    style CMD fill:#87CEEB
     style D fill:#90EE90
+    style P fill:#90EE90
     style E fill:#90EE90
     style F fill:#FFD700
     style G fill:#FFD700
@@ -60,7 +62,7 @@ graph TD
 
 ---
 
-### 0️⃣ Plugin Ecosystem (Big Picture)
+### 0️⃣6️⃣ Plugin Ecosystem (Big Picture)
 
 **Level**: 🟦 Beginner
 **Prerequisites**: None - start here for the overview!
@@ -143,7 +145,25 @@ graph TD
 
 ---
 
-### 4️⃣ Model Selection (Understanding the Engine)
+### 0️⃣4️⃣ Commands (Quick Shortcuts)
+
+**Level**: 🟦 Beginner → 🟢 Intermediate
+**Prerequisites**: Basic Claude Code usage
+**What You'll Master**: Creating and using slash commands for quick shortcuts
+
+| Guide | Time | Topics |
+|-------|------|--------|
+| **[Commands Overview](guides/04-commands/1-overview.md)** | **25 min** | **Creating slash commands, arguments, team workflows** |
+
+**Total Time**: ~25 minutes
+**Dependencies**: Basic Claude Code usage
+**Next**: Models (choose the right engine for each task)
+
+**🔨 Creation Guide Included**: Learn to build custom slash commands for your team
+
+---
+
+### 0️⃣5️⃣ Model Selection (Understanding the Engine)
 
 **Level**: 🟢 Intermediate
 **Prerequisites**: Basic understanding of Agents and Skills
@@ -160,7 +180,7 @@ graph TD
 
 ---
 
-### 5️⃣ Thinking Modes (Optimizing Reasoning)
+### 0️⃣7️⃣ Thinking Modes (Optimizing Reasoning)
 
 **Level**: 🟢 Intermediate → 🟡 Advanced
 **Prerequisites**: Model Selection
@@ -177,7 +197,7 @@ graph TD
 
 ---
 
-### 6️⃣ Context Management (Advanced Control)
+### 0️⃣8️⃣ Context Management (Advanced Control)
 
 **Level**: 🟡 Advanced
 **Prerequisites**: All previous topics
@@ -194,7 +214,7 @@ graph TD
 
 ---
 
-### 7️⃣ Keywords & Triggers (Power User Features)
+### 0️⃣9️⃣ Keywords & Triggers (Power User Features)
 
 **Level**: 🟡 Advanced
 **Prerequisites**: Context Management
@@ -212,7 +232,7 @@ graph TD
 
 ---
 
-### 0️⃣8️⃣ Hooks & Automation (Plugin Type 4)
+### 1️⃣0️⃣ Hooks & Automation (Plugin Type 4)
 
 **Level**: 🟡 Advanced
 **Prerequisites**: Keywords & Triggers, Plugin Ecosystem Overview
@@ -230,7 +250,7 @@ graph TD
 
 ---
 
-### 0️⃣9️⃣ Token Optimization (Synthesis)
+### 1️⃣1️⃣ Token Optimization (Synthesis)
 
 **Level**: 🔴 Mastery
 **Prerequisites**: All previous topics
@@ -248,7 +268,7 @@ graph TD
 
 ---
 
-### 1️⃣0️⃣ Examples & Templates (Practical Application)
+### 1️⃣2️⃣ Examples & Templates (Practical Application)
 
 **Level**: 🟢 Intermediate
 **Prerequisites**: Basic understanding of Claude Code
@@ -280,7 +300,7 @@ graph TD
 
 ---
 
-### 1️⃣1️⃣ Reference Documentation (Quick Lookup)
+### 1️⃣3️⃣ Reference Documentation (Quick Lookup)
 
 **Level**: All levels
 **Prerequisites**: None for quick reference, intermediate for deep understanding
@@ -299,7 +319,7 @@ graph TD
 
 ---
 
-### 1️⃣2️⃣ Security & Compliance (Production Readiness)
+### 1️⃣4️⃣ Security & Compliance (Production Readiness)
 
 **Level**: 🔴 Advanced
 **Prerequisites**: Understanding of core concepts, project experience
@@ -317,7 +337,7 @@ graph TD
 
 ---
 
-### 1️⃣3️⃣ Community & Contribution
+### 1️⃣5️⃣ Community & Contribution
 
 **Level**: All levels
 **Prerequisites**: None

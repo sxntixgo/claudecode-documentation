@@ -10,7 +10,7 @@
 
 Before diving into this guide, make sure you've read:
 - ✅ [Agents Overview](1-overview.md) - Basic understanding of agent types
-- ✅ [MCP Servers Overview](../01-mcp-servers/overview.md) - Agents use MCP tools
+- ✅ [MCP Servers Overview](../01-mcp-servers/1-overview.md) - Agents use MCP tools
 
 **New to agents?** Start with the [Overview](1-overview.md) first—this guide goes much deeper.
 
@@ -1083,7 +1083,7 @@ Excellent! You now understand:
 
 **→ [Custom Agents](custom-agents.md)** - Create specialized agents for your workflows (advanced)
 
-**→ [Skills Overview](../03-skills/overview.md)** - Learn how skills leverage agent capabilities
+**→ [Skills Overview](../03-skills/1-overview.md)** - Learn how skills leverage agent capabilities
 
 ---
 
@@ -1111,8 +1111,8 @@ Excellent! You now understand:
 
 - [Agents Overview](1-overview.md) - Conceptual foundation
 - [Model Assignment](model-assignment.md) - Assign models to agents for cost optimization
-- [MCP Servers](../01-mcp-servers/overview.md) - Tools that agents use
-- [Skills Overview](../03-skills/overview.md) - Skills that leverage agents
+- [MCP Servers](../01-mcp-servers/1-overview.md) - Tools that agents use
+- [Skills Overview](../03-skills/1-overview.md) - Skills that leverage agents
 
 ### 💬 Community & Support
 
