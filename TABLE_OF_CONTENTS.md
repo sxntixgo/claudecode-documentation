@@ -228,6 +228,9 @@ graph TD
 | **[Bug Fixing Workflow](guides/9-examples/workflows/2-bug-fixing.md)** | **30 min** | **Systematic debugging with TDD approach** |
 | **[Code Review Workflow](guides/9-examples/workflows/3-code-review.md)** | **25 min** | **AI-assisted PR reviews with security checks** |
 | **[Refactoring Workflow](guides/9-examples/workflows/4-refactoring.md)** | **35 min** | **Safe refactoring with Plan agent and tests** |
+| **[Documentation Writing Workflow](guides/9-examples/workflows/5-documentation-writing.md)** | **25 min** | **API docs, tutorials, testing examples, ROI analysis** |
+| **[Performance Optimization Workflow](guides/9-examples/workflows/6-performance-optimization.md)** | **30 min** | **Profile, analyze, optimize, validate with real examples** |
+| **[Testing Workflow](guides/9-examples/workflows/7-testing.md)** | **35 min** | **TDD, unit tests, integration, E2E with comprehensive examples** |
 | **Teams** |||
 | [Solo Developer Setup](guides/9-examples/teams/1-solo-developer.md) | 25 min | Optimized individual configuration |
 
@@ -256,7 +259,7 @@ graph TD
 
 ---
 
-### 🔒 Security & Compliance (Production Readiness)
+### 1️⃣1️⃣ Security & Compliance (Production Readiness)
 
 **Level**: 🔴 Advanced
 **Prerequisites**: Understanding of core concepts, project experience
@@ -274,7 +277,7 @@ graph TD
 
 ---
 
-### ⚡ Quick Reference (Power User Tools)
+### 1️⃣2️⃣ Quick Reference (Power User Tools)
 
 **Level**: All levels
 **Prerequisites**: None
@@ -285,11 +288,28 @@ graph TD
 | **[Model Selection Decision Tree](guides/10-reference/5-model-selection-tree.md)** | **15 min** | **Haiku/Sonnet/Opus decision flowchart, cost calculator** |
 | **[Optimization Checklist](guides/10-reference/6-optimization-checklist.md)** | **20 min** | **Pre-implementation, configuration, runtime, monitoring** |
 | **[Glossary](guides/10-reference/7-glossary.md)** | **25 min** | **Complete terminology reference (80+ terms)** |
-| **[Community Resources](guides/12-community/1-resources.md)** | **20 min** | **Official docs, community channels, learning materials** |
 
-**Total Time**: ~1.5 hours (use as needed)
+**Total Time**: ~1 hour (use as needed)
 **Dependencies**: None
 **Use For**: Quick decisions, daily optimization, learning resources
+
+---
+
+### 1️⃣3️⃣ Community & Contribution
+
+**Level**: All levels
+**Prerequisites**: None
+**What You'll Master**: Contributing to Claude Code ecosystem, learning from community
+
+| Guide | Time | Topics |
+|-------|------|--------|
+| **[Community Resources](guides/12-community/1-resources.md)** | **20 min** | **Official docs, forums, learning materials** |
+| **[Contribution Guide](guides/12-community/2-contribution-guide.md)** | **25 min** | **How to contribute skills, MCP servers, documentation** |
+| **[Best Practices Catalog](guides/12-community/3-best-practices-catalog.md)** | **30 min** | **Production patterns from real-world use (73% cost reduction examples)** |
+
+**Total Time**: ~1.5 hours
+**Dependencies**: None
+**Use For**: Contributing back, learning from community, sharing expertise
 
 ---
 
@@ -496,6 +516,21 @@ Power user features like hooks and custom commands require understanding the ent
 **8. Optimization Synthesizes All**
 Token optimization applies everything you've learned - model selection, thinking budgets, context management, and strategic agent/skill usage.
 
+**9. Examples Provide Templates**
+Real-world project configurations and workflows show how to apply all concepts in production environments. Templates accelerate setup and demonstrate best practices.
+
+**10. Reference Enables Quick Lookup**
+API references, troubleshooting guides, and FAQs support ongoing development work without requiring re-reading full guides.
+
+**11. Security Ensures Production Quality**
+Security, testing, and performance guides ensure deployments are production-ready, maintainable, and meet compliance requirements.
+
+**12. Quick Reference Accelerates Daily Work**
+Decision trees, checklists, and quick lookups optimize your daily workflow once you understand the fundamentals.
+
+**13. Community Enables Contribution**
+Contribution guides and best practices allow you to give back, learn from others' experiences, and participate in the ecosystem.
+
 ---
 
 ## 🎓 Learning Checkpoints
@@ -549,6 +584,24 @@ After completing each section, you should be able to:
 - Save 50-60%+ on token costs
 - Monitor and measure usage effectively
 - Make data-driven model choices
+
+✅ **After Examples & Templates**:
+- Apply project configurations to your codebase
+- Use workflow guides for common development tasks
+- Adapt templates to your specific needs
+- Follow production-ready patterns
+
+✅ **After Security & Compliance**:
+- Implement security best practices in code
+- Set up comprehensive testing pipelines
+- Monitor performance and costs effectively
+- Deploy confidently to production
+
+✅ **After Community Engagement**:
+- Contribute skills and MCP servers back
+- Share best practices with community
+- Learn from others' production experiences
+- Help newcomers get started
 
 ---
 
