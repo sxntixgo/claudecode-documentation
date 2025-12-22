@@ -129,11 +129,10 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| [Model Comparison](guides/models/model-comparison.md) | 20 min | Haiku 4.5, Sonnet 4.5, Opus 4.5 capabilities |
-| [Selection Guide](guides/models/selection-guide.md) | 30 min | Decision matrix, when to use each model |
-| [Configuration](guides/models/configuration.md) | 25 min | CLI flags, agent config, skill frontmatter |
+| [Model Overview](guides/4-models/1-overview.md) | 20 min | Haiku 4.5, Sonnet 4.5, Opus 4.5 capabilities |
+| [Selection Guide](guides/4-models/5-selection-guide.md) | 30 min | Decision matrix, when to use each model |
 
-**Total Time**: ~1.5 hours
+**Total Time**: ~50 minutes
 **Dependencies**: Agents and Skills (model assignment context)
 **Next**: Thinking Modes (control reasoning depth)
 
@@ -147,11 +146,10 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| [Extended Thinking Overview](guides/thinking/extended-thinking.md) | 15 min | What it is, how it works |
-| [Keywords Reference](guides/thinking/keywords-reference.md) | 10 min | "think", "think hard", "ultrathink" budgets |
-| [When to Use](guides/thinking/when-to-use.md) | 20 min | Use cases, cost considerations |
+| [Extended Thinking Overview](guides/5-thinking/1-overview.md) | 15 min | What it is, how it works |
+| [Keywords Reference](guides/5-thinking/2-keywords.md) | 10 min | "think", "think hard", "ultrathink" budgets |
 
-**Total Time**: ~45 minutes
+**Total Time**: ~25 minutes
 **Dependencies**: Models (thinking affects token usage)
 **Next**: Context Management (advanced control)
 
@@ -165,11 +163,10 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| [CLAUDE.md Files](guides/context/claude-md-files.md) | 30 min | System-level context, best practices |
-| [Memory Management](guides/context/memory-management.md) | 25 min | Hierarchy, precedence, organization |
-| [Optimization](guides/context/optimization.md) | 35 min | Context clearing, strategies, anti-patterns |
+| [CLAUDE.md Files](guides/6-context/2-claude-md.md) | 30 min | System-level context, best practices |
+| [Memory Hierarchy](guides/6-context/3-memory-hierarchy.md) | 25 min | Hierarchy, precedence, organization |
 
-**Total Time**: ~1.5 hours
+**Total Time**: ~55 minutes
 **Dependencies**: Understanding of entire system
 **Next**: Keywords & Triggers (customize behavior)
 
@@ -183,9 +180,9 @@ graph TD
 
 | Reference | Time | Topics |
 |-----------|------|--------|
-| [Keywords Reference](reference/keywords.md) | 15 min | All thinking keywords, effects |
-| [Hooks Reference](reference/hooks.md) | 30 min | PreToolUse, PostToolUse, Notification, Stop |
-| [Commands Reference](reference/commands.md) | 20 min | Slash commands, $ARGUMENTS, frontmatter |
+| [Keywords Overview](guides/7-keywords/1-overview.md) | 15 min | All thinking keywords, effects |
+| [Automation Patterns](guides/7-keywords/3-automation-patterns.md) | 30 min | PreToolUse, PostToolUse, Notification, Stop |
+| [Slash Commands](guides/7-keywords/2-slash-commands.md) | 20 min | Slash commands, $ARGUMENTS, frontmatter |
 
 **Total Time**: ~1 hour
 **Dependencies**: Context Management
@@ -201,9 +198,9 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| [Token Usage Guide](optimization/token-usage.md) | 30 min | Tracking, estimation, monitoring |
-| [Cost Comparison](optimization/cost-comparison.md) | 20 min | Haiku vs. Sonnet vs. Opus economics |
-| [Optimization Strategies](optimization/strategies.md) | 45 min | 4 strategies, 60%+ savings potential |
+| [Monitoring & Budgeting](guides/8-optimization/3-monitoring-budgeting.md) | 30 min | Tracking, estimation, monitoring |
+| [Cost Optimization](guides/8-optimization/1-cost-optimization.md) | 30 min | Haiku vs. Sonnet vs. Opus economics |
+| [Advanced Techniques](guides/8-optimization/2-advanced-techniques.md) | 35 min | 4 strategies, 60%+ savings potential |
 
 **Total Time**: ~1.5 hours
 **Dependencies**: All topics (applies everything learned)
@@ -231,6 +228,9 @@ graph TD
 | **[Bug Fixing Workflow](guides/9-examples/workflows/2-bug-fixing.md)** | **30 min** | **Systematic debugging with TDD approach** |
 | **[Code Review Workflow](guides/9-examples/workflows/3-code-review.md)** | **25 min** | **AI-assisted PR reviews with security checks** |
 | **[Refactoring Workflow](guides/9-examples/workflows/4-refactoring.md)** | **35 min** | **Safe refactoring with Plan agent and tests** |
+| **[Documentation Writing Workflow](guides/9-examples/workflows/5-documentation-writing.md)** | **25 min** | **API docs, tutorials, testing examples, ROI analysis** |
+| **[Performance Optimization Workflow](guides/9-examples/workflows/6-performance-optimization.md)** | **30 min** | **Profile, analyze, optimize, validate with real examples** |
+| **[Testing Workflow](guides/9-examples/workflows/7-testing.md)** | **35 min** | **TDD, unit tests, integration, E2E with comprehensive examples** |
 | **Teams** |||
 | [Solo Developer Setup](guides/9-examples/teams/1-solo-developer.md) | 25 min | Optimized individual configuration |
 
@@ -259,7 +259,7 @@ graph TD
 
 ---
 
-### 🔒 Security & Compliance (Production Readiness)
+### 1️⃣1️⃣ Security & Compliance (Production Readiness)
 
 **Level**: 🔴 Advanced
 **Prerequisites**: Understanding of core concepts, project experience
@@ -277,7 +277,7 @@ graph TD
 
 ---
 
-### ⚡ Quick Reference (Power User Tools)
+### 1️⃣2️⃣ Quick Reference (Power User Tools)
 
 **Level**: All levels
 **Prerequisites**: None
@@ -285,14 +285,31 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| **[Model Selection Decision Tree](guides/12-quick-reference/1-model-selection-tree.md)** | **15 min** | **Haiku/Sonnet/Opus decision flowchart, cost calculator** |
-| **[Optimization Checklist](guides/12-quick-reference/2-optimization-checklist.md)** | **20 min** | **Pre-implementation, configuration, runtime, monitoring** |
-| **[Glossary](guides/12-quick-reference/3-glossary.md)** | **25 min** | **Complete terminology reference (80+ terms)** |
-| **[Community Resources](guides/12-quick-reference/4-community-resources.md)** | **20 min** | **Official docs, community channels, learning materials** |
+| **[Model Selection Decision Tree](guides/10-reference/5-model-selection-tree.md)** | **15 min** | **Haiku/Sonnet/Opus decision flowchart, cost calculator** |
+| **[Optimization Checklist](guides/10-reference/6-optimization-checklist.md)** | **20 min** | **Pre-implementation, configuration, runtime, monitoring** |
+| **[Glossary](guides/10-reference/7-glossary.md)** | **25 min** | **Complete terminology reference (80+ terms)** |
 
-**Total Time**: ~1.5 hours (use as needed)
+**Total Time**: ~1 hour (use as needed)
 **Dependencies**: None
 **Use For**: Quick decisions, daily optimization, learning resources
+
+---
+
+### 1️⃣3️⃣ Community & Contribution
+
+**Level**: All levels
+**Prerequisites**: None
+**What You'll Master**: Contributing to Claude Code ecosystem, learning from community
+
+| Guide | Time | Topics |
+|-------|------|--------|
+| **[Community Resources](guides/12-community/1-resources.md)** | **20 min** | **Official docs, forums, learning materials** |
+| **[Contribution Guide](guides/12-community/2-contribution-guide.md)** | **25 min** | **How to contribute skills, MCP servers, documentation** |
+| **[Best Practices Catalog](guides/12-community/3-best-practices-catalog.md)** | **30 min** | **Production patterns from real-world use (73% cost reduction examples)** |
+
+**Total Time**: ~1.5 hours
+**Dependencies**: None
+**Use For**: Contributing back, learning from community, sharing expertise
 
 ---
 
@@ -382,10 +399,10 @@ Keywords & Triggers (deep) → Custom Agents → Custom Skills
 **Approach**: Use reference sections and examples
 
 **Key Resources**:
-- [Keywords Reference](reference/keywords.md) - All keywords and effects
-- [Hooks Reference](reference/hooks.md) - Hook configuration
-- [Commands Reference](reference/commands.md) - Slash command syntax
-- [Examples](examples/) - Copy-paste ready templates
+- [Keywords Overview](guides/7-keywords/1-overview.md) - All keywords and effects
+- [Automation Patterns](guides/7-keywords/3-automation-patterns.md) - Hook configuration
+- [Slash Commands](guides/7-keywords/2-slash-commands.md) - Slash command syntax
+- [Examples](guides/9-examples/1-overview.md) - Copy-paste ready templates
 
 ---
 
@@ -451,27 +468,23 @@ Practical, copy-paste ready examples:
 
 ### Skills Examples
 - [Documentation Professor](examples/skills/documentation-professor/) - Pedagogical documentation writer
-- [TDD Workflow](examples/skills/tdd-workflow/) - Test-driven development
-- [API Documentation](examples/skills/api-documentation/) - Generate API docs from code
-- [Code Review](examples/skills/code-review/) - Automated code reviews
+- [More workflow examples](guides/9-examples/workflows/) - Complete workflow guides including TDD, code review, and more
 
-### Agent Configurations
-- [Quick Search Agent](examples/agents/quick-search.json) - Fast codebase exploration (Haiku)
-- [Feature Implementer](examples/agents/feature-implementer.json) - Standard development (Sonnet)
-- [Architecture Reviewer](examples/agents/architecture-reviewer.json) - Deep analysis (Opus)
+### Project Templates
+- [React + TypeScript](guides/9-examples/projects/1-react-typescript.md) - Complete frontend project setup
+- [Node.js API Service](guides/9-examples/projects/2-nodejs-api.md) - Backend API configuration
+- [Python/Django](guides/9-examples/projects/python/1-django.md) - Django with custom skills
+- [Python/FastAPI](guides/9-examples/projects/python/2-fastapi.md) - Modern async Python API
+- [Python/Flask](guides/9-examples/projects/python/3-flask.md) - Lightweight Flask web framework
 
-### CLAUDE.md Templates
-- [Web Application](examples/claude-md-templates/web-application-CLAUDE.md) - React/Vue/Angular
-- [API Service](examples/claude-md-templates/api-service-CLAUDE.md) - Backend services
-- [Library/Package](examples/claude-md-templates/library-package-CLAUDE.md) - Open source
-- [Monorepo](examples/claude-md-templates/monorepo-CLAUDE.md) - Multi-package projects
-- [Documentation](examples/claude-md-templates/documentation-project-CLAUDE.md) - Doc sites
-- [Machine Learning](examples/claude-md-templates/machine-learning-CLAUDE.md) - ML projects
-
-### Complete Projects
-- [Web App Setup](examples/projects/web-app-setup.md) - Full web application configuration
-- [API Service](examples/projects/api-service.md) - Backend service with database
-- [Monorepo](examples/projects/monorepo.md) - Multi-package repository
+### Workflow Guides
+- [Feature Development](guides/9-examples/workflows/1-feature-development.md) - 6-phase development process
+- [Bug Fixing](guides/9-examples/workflows/2-bug-fixing.md) - Systematic debugging with TDD
+- [Code Review](guides/9-examples/workflows/3-code-review.md) - AI-assisted PR reviews
+- [Refactoring](guides/9-examples/workflows/4-refactoring.md) - Safe refactoring with tests
+- [Documentation Writing](guides/9-examples/workflows/5-documentation-writing.md) - API docs and tutorials
+- [Performance Optimization](guides/9-examples/workflows/6-performance-optimization.md) - Profile, analyze, optimize
+- [Testing](guides/9-examples/workflows/7-testing.md) - TDD, unit, integration, E2E
 
 ---
 
@@ -502,6 +515,21 @@ Power user features like hooks and custom commands require understanding the ent
 
 **8. Optimization Synthesizes All**
 Token optimization applies everything you've learned - model selection, thinking budgets, context management, and strategic agent/skill usage.
+
+**9. Examples Provide Templates**
+Real-world project configurations and workflows show how to apply all concepts in production environments. Templates accelerate setup and demonstrate best practices.
+
+**10. Reference Enables Quick Lookup**
+API references, troubleshooting guides, and FAQs support ongoing development work without requiring re-reading full guides.
+
+**11. Security Ensures Production Quality**
+Security, testing, and performance guides ensure deployments are production-ready, maintainable, and meet compliance requirements.
+
+**12. Quick Reference Accelerates Daily Work**
+Decision trees, checklists, and quick lookups optimize your daily workflow once you understand the fundamentals.
+
+**13. Community Enables Contribution**
+Contribution guides and best practices allow you to give back, learn from others' experiences, and participate in the ecosystem.
 
 ---
 
@@ -557,14 +585,32 @@ After completing each section, you should be able to:
 - Monitor and measure usage effectively
 - Make data-driven model choices
 
+✅ **After Examples & Templates**:
+- Apply project configurations to your codebase
+- Use workflow guides for common development tasks
+- Adapt templates to your specific needs
+- Follow production-ready patterns
+
+✅ **After Security & Compliance**:
+- Implement security best practices in code
+- Set up comprehensive testing pipelines
+- Monitor performance and costs effectively
+- Deploy confidently to production
+
+✅ **After Community Engagement**:
+- Contribute skills and MCP servers back
+- Share best practices with community
+- Learn from others' production experiences
+- Help newcomers get started
+
 ---
 
 ## 📖 Additional Resources
 
 ### Quick References
-- [Keywords Cheat Sheet](reference/keywords.md#cheat-sheet) - All keywords at a glance
-- [Model Comparison Table](guides/models/model-comparison.md#comparison-table) - Quick model selection
-- [Common Commands](reference/commands.md#common-commands) - Frequently used commands
+- [Keywords Overview](guides/7-keywords/1-overview.md) - All keywords at a glance
+- [Model Overview](guides/4-models/1-overview.md) - Quick model selection
+- [Slash Commands](guides/7-keywords/2-slash-commands.md) - Frequently used commands
 
 ### External Links
 - [Official Claude Code Docs](https://code.claude.com/docs)
@@ -574,8 +620,8 @@ After completing each section, you should be able to:
 - [Community Skills](https://github.com/obra/superpowers)
 
 ### Getting Help
-- [Troubleshooting Guide](reference/troubleshooting.md) - Common issues and solutions
-- [FAQ](reference/faq.md) - Frequently asked questions
+- [Troubleshooting Guide](guides/10-reference/2-troubleshooting.md) - Common issues and solutions
+- [FAQ](guides/10-reference/3-faq.md) - Frequently asked questions
 - [GitHub Issues](https://github.com/anthropics/claude-code/issues) - Report bugs
 
 ---
@@ -585,9 +631,9 @@ After completing each section, you should be able to:
 Choose your path:
 
 **→ [New to Claude Code? Start with INTRODUCTION.md](INTRODUCTION.md)**
-**→ [Want quick optimization? Jump to Token Optimization](optimization/strategies.md)**
-**→ [Need a specific answer? Use the search or references](reference/)**
-**→ [Want to see examples? Browse templates](examples/)**
+**→ [Want quick optimization? Jump to Token Optimization](guides/8-optimization/2-advanced-techniques.md)**
+**→ [Need a specific answer? Use the search or references](guides/10-reference/)**
+**→ [Want to see examples? Browse templates](guides/9-examples/1-overview.md)**
 
 ---
 
