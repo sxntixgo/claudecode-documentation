@@ -17,6 +17,27 @@ Quick answers to the most common questions about Claude Code. Use Ctrl+F/Cmd+F t
 
 ---
 
+## 🔍 Quick Find by Keyword
+
+**Can't find your answer? Try these common searches (Ctrl+F / Cmd+F):**
+
+| If you're searching for... | Jump to... |
+|----------------------------|------------|
+| **"offline"** / **"internet"** | [Can I use Claude Code offline?](#can-i-use-claude-code-offline) |
+| **"cost"** / **"pricing"** / **"expensive"** | [Model Questions](#model-questions) |
+| **"slow"** / **"performance"** / **"faster"** | [Optimization Questions](#optimization-questions) |
+| **"error"** / **"bug"** / **"broken"** | [Troubleshooting Guide](2-troubleshooting.md) |
+| **"install"** / **"setup"** / **"requirements"** | [What are the system requirements?](#what-are-the-system-requirements) |
+| **"github"** / **"git"** / **"pr"** | [MCP Server Questions](#mcp-server-questions) |
+| **"security"** / **"safe"** / **"private"** | [Security Guide](../14-security/1-security-compliance.md) |
+| **"token"** / **"context"** / **"memory"** | [Context Management Questions](#context-management-questions) |
+| **"custom"** / **"create"** / **"build"** | [Customization Questions](#customization-questions) |
+| **"agent"** / **"skill"** / **"mcp"** | Use section links below |
+| **"haiku"** / **"sonnet"** / **"opus"** | [Model Questions](#model-questions) |
+| **"update"** / **"upgrade"** / **"version"** | [How do I update Claude Code?](#how-do-i-update-claude-code) |
+
+---
+
 ## Table of Contents
 
 1. [General Questions](#general-questions)
