@@ -1152,9 +1152,9 @@ Want to explore more? Here are excellent resources:
 - [MCP Server Registry](https://github.com/modelcontextprotocol/servers) - Complete list of official servers
 - [MCP Specification](https://modelcontextprotocol.io) - Protocol documentation
 - [Docker MCP Toolkit](https://hub.docker.com/r/anthropic/mcp-toolkit) - Container image and usage
-- [Best MCP Servers for Web Development](https://anthropic.com/blog/mcp-web-dev) - Curated recommendations
-- [MCP Server Performance Benchmarks](https://anthropic.com/engineering/mcp-benchmarks) - Latency and throughput data
-- [Building Production Workflows with MCP](https://vercel.com/blog/mcp-production) - Real-world case studies
+- [Building Efficient MCP Servers](https://vercel.com/blog/building-efficient-mcp-servers) - Performance and optimization guide
+- [Code Execution with MCP](https://www.anthropic.com/engineering/code-execution-with-mcp) - Efficiency and best practices
+- [Introducing Vercel MCP](https://vercel.com/blog/introducing-vercel-mcp-connect-vercel-to-your-ai-tools) - Production integration guide
 - [Building the Future of AI Coding with MCP](https://www.anthropic.com/webinars/future-of-ai-coding-mcp-vs-code) - Webinar with live demos
 
 ### 🔗 Related Topics

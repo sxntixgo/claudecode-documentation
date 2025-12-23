@@ -1094,9 +1094,9 @@ Excellent! You now understand:
 - [Task Tool Documentation](https://code.claude.com/docs/en/task-tool) - How agents are spawned
 - [Agent Configuration](https://code.claude.com/docs/en/agent-config) - Customizing agent behavior
 - [Tool Reference](https://code.claude.com/docs/en/tools) - Complete tool documentation
-- [Agent Performance Benchmarks](https://anthropic.com/engineering/agent-benchmarks) - Speed and token comparisons
-- [When to Use Plan vs General-Purpose](https://anthropic.com/blog/plan-agent-guide) - Decision framework
-- [Agent Cost Optimization](https://anthropic.com/engineering/agent-cost) - Real savings data
+- [Enabling Claude Code Autonomy](https://www.anthropic.com/news/enabling-claude-code-to-work-more-autonomously) - Subagents and checkpoints
+- [Agent API Capabilities](https://www.anthropic.com/news/agent-capabilities-api) - Code execution and MCP connector
+- [Claude Code Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices) - Tips for effective agentic coding
 - [Practical Guide to Main Agent and Sub-agents](https://jewelhuq.medium.com/practical-guide-to-mastering-claude-codes-main-agent-and-sub-agents-fd52952dcf00) - Community tutorial
 
 ### 🔗 Related Topics
