@@ -486,6 +486,299 @@ When multiple hooks match, they execute in order:
 
 ---
 
+## Hook Conflicts and Resolution
+
+### What Happens When Multiple Hooks Match?
+
+When multiple hooks have the same trigger and match the same tool or file pattern, they **execute sequentially in the order defined** in your configuration.
+
+**Example - Two formatting hooks:**
+```json
+{
+  "hooks": {
+    "postToolUse": [
+      {
+        "name": "prettier-format",
+        "tool": "Write",
+        "filter": "*.ts",
+        "command": "prettier --write {{file}}"
+      },
+      {
+        "name": "eslint-fix",
+        "tool": "Write",
+        "filter": "*.ts",
+        "command": "eslint --fix {{file}}"
+      }
+    ]
+  }
+}
+```
+
+**Execution flow**:
+1. Claude writes a `.ts` file
+2. `prettier-format` runs first
+3. `eslint-fix` runs second
+4. Both modify the same file → **Potential conflict!**
+
+### Types of Hook Conflicts
+
+#### 1. Formatting Conflicts
+
+**Problem**: Multiple formatters modifying the same file can undo each other's changes.
+
+```json
+// ❌ CONFLICT: Prettier and ESLint both modify formatting
+{
+  "hooks": {
+    "postToolUse": [
+      {"name": "prettier", "tool": "Write", "filter": "*.ts", "command": "prettier --write {{file}}"},
+      {"name": "eslint", "tool": "Write", "filter": "*.ts", "command": "eslint --fix {{file}}"}
+    ]
+  }
+}
+```
+
+**Solution**: Combine into a single hook:
+```json
+// ✅ BETTER: Single formatting pipeline
+{
+  "hooks": {
+    "postToolUse": [
+      {
+        "name": "format-and-lint",
+        "tool": "Write",
+        "filter": "*.ts",
+        "command": "prettier --write {{file}} && eslint --fix {{file}}"
+      }
+    ]
+  }
+}
+```
+
+#### 2. Validation Conflicts
+
+**Problem**: Multiple validation hooks with different `onError` behaviors.
+
+```json
+// ❌ CONFLICT: First hook stops, second never runs
+{
+  "hooks": {
+    "preToolUse": [
+      {"name": "lint", "tool": "Bash", "filter": "git commit", "command": "npm run lint", "onError": "stop"},
+      {"name": "test", "tool": "Bash", "filter": "git commit", "command": "npm test", "onError": "stop"}
+    ]
+  }
+}
+```
+
+**Solution**: Combine checks:
+```json
+// ✅ BETTER: Combined validation
+{
+  "hooks": {
+    "preToolUse": [
+      {
+        "name": "pre-commit-checks",
+        "tool": "Bash",
+        "filter": "git commit",
+        "command": "npm run lint && npm test",
+        "onError": "stop"
+      }
+    ]
+  }
+}
+```
+
+#### 3. File Path Conflicts
+
+**Problem**: Overlapping file filters causing unintended hook execution.
+
+```json
+// ❌ CONFLICT: Both hooks match components/Button.tsx
+{
+  "hooks": {
+    "postToolUse": [
+      {"name": "component-test", "tool": "Write", "filter": "src/components/*.tsx", "command": "npm test"},
+      {"name": "button-test", "tool": "Write", "filter": "*/Button.tsx", "command": "npm test -- Button"}
+    ]
+  }
+}
+```
+
+**Solution**: Make filters mutually exclusive:
+```json
+// ✅ BETTER: Non-overlapping filters
+{
+  "hooks": {
+    "postToolUse": [
+      {
+        "name": "button-test",
+        "tool": "Write",
+        "filter": "*/Button.tsx",
+        "command": "npm test -- Button"
+      },
+      {
+        "name": "other-components-test",
+        "tool": "Write",
+        "filter": "src/components/*.tsx",
+        "exclude": "*/Button.tsx",  // Exclude Button.tsx
+        "command": "npm test"
+      }
+    ]
+  }
+}
+```
+
+### Detecting Hook Conflicts
+
+Use these techniques to identify conflicts before they cause issues:
+
+#### 1. Enable Hook Debugging
+```bash
+export CLAUDE_DEBUG_HOOKS=true
+claude <your-command>
+```
+
+**Output shows**:
+- Which hooks matched
+- Execution order
+- Hook results
+
+#### 2. Test Hook Execution
+```bash
+# Simulate hook trigger
+claude hook test postToolUse --tool=Write --file=src/test.ts
+
+# Expected output:
+# ✅ Hook 'prettier-format' matched
+# ✅ Hook 'eslint-fix' matched
+# ⚠️ Multiple hooks will execute for this pattern
+```
+
+#### 3. Validate Configuration
+```bash
+# Check for overlapping patterns
+claude config validate --check-conflicts
+
+# Reports potential conflicts:
+# ⚠️ Hooks 'prettier-format' and 'eslint-fix' both match '*.ts'
+# ⚠️ Consider combining into single hook
+```
+
+### Best Practices for Avoiding Conflicts
+
+#### ✅ 1. Use Specific Filters
+
+```json
+// Good: Specific filters minimize conflicts
+{
+  "hooks": {
+    "postToolUse": [
+      {"name": "ts-format", "tool": "Write", "filter": "*.ts", "command": "..."},
+      {"name": "css-format", "tool": "Write", "filter": "*.css", "command": "..."},
+      {"name": "json-format", "tool": "Write", "filter": "*.json", "command": "..."}
+    ]
+  }
+}
+```
+
+#### ✅ 2. Combine Related Hooks
+
+```json
+// Better: Combine related operations
+{
+  "hooks": {
+    "postToolUse": [
+      {
+        "name": "format-code",
+        "tool": "Write",
+        "filter": "*.{ts,tsx,js,jsx}",
+        "command": "prettier --write {{file}} && eslint --fix {{file}}"
+      }
+    ]
+  }
+}
+```
+
+#### ✅ 3. Document Hook Dependencies
+
+```json
+{
+  "hooks": {
+    "preToolUse": [
+      {
+        "name": "pre-commit-pipeline",
+        "description": "Runs lint, then test, then build (must execute in order)",
+        "tool": "Bash",
+        "filter": "git commit",
+        "command": "npm run lint && npm test && npm run build"
+      }
+    ]
+  }
+}
+```
+
+#### ✅ 4. Use Hook Priority (if available)
+
+```json
+{
+  "hooks": {
+    "postToolUse": [
+      {
+        "name": "format-first",
+        "priority": 1,  // Runs first
+        "tool": "Write",
+        "command": "prettier --write {{file}}"
+      },
+      {
+        "name": "lint-second",
+        "priority": 2,  // Runs after formatting
+        "tool": "Write",
+        "command": "eslint --fix {{file}}"
+      }
+    ]
+  }
+}
+```
+
+### Real-World Conflict Example
+
+**Scenario**: Team wants both code formatting and license header injection.
+
+**❌ Conflicting approach:**
+```json
+{
+  "hooks": {
+    "postToolUse": [
+      {"name": "add-license", "tool": "Write", "filter": "*.ts", "command": "prepend-license {{file}}"},
+      {"name": "format", "tool": "Write", "filter": "*.ts", "command": "prettier --write {{file}}"}
+    ]
+  }
+}
+```
+
+**Problem**: Prettier might reformat the license header added by the first hook.
+
+**✅ Solution - Correct order:**
+```json
+{
+  "hooks": {
+    "postToolUse": [
+      {
+        "name": "format-then-license",
+        "tool": "Write",
+        "filter": "*.ts",
+        "command": "prettier --write {{file}} && prepend-license {{file}}"
+      }
+    ]
+  }
+}
+```
+
+**Why it works**: Format first, then add license header. License script is aware of Prettier's formatting.
+
+---
+
 ## Success Criteria
 
 ✅ **You're ready to use hooks when you can**:
@@ -495,6 +788,7 @@ When multiple hooks match, they execute in order:
 - [ ] Use filters to target specific files/commands
 - [ ] Test hook configuration before relying on it
 - [ ] Debug hook failures
+- [ ] Identify and resolve hook conflicts
 
 ---
 
