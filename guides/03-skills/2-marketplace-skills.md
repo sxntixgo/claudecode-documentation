@@ -846,6 +846,161 @@ claude skills install \
 
 ---
 
+## Troubleshooting Skill Issues
+
+### Issue 1: Skill Not Found or Won't Load
+
+**Symptom**: "Skill not found" or skill doesn't execute
+
+**Common Causes**:
+- Skill not installed correctly
+- Wrong skill name
+- Skill file in wrong directory
+- Syntax error in SKILL.md
+
+**Solutions**:
+```bash
+# List installed skills
+claude skill list
+
+# Check skill location
+ls .claude/skills/
+
+# Reinstall skill from marketplace
+claude skill install <skill-name>
+
+# Validate skill syntax
+claude skill validate .claude/skills/my-skill/SKILL.md
+```
+
+---
+
+### Issue 2: Skill Produces Incorrect Results
+
+**Symptom**: Skill runs but output doesn't match expectations
+
+**Common Causes**:
+- Wrong model assigned (too simple for task)
+- Incomplete skill instructions
+- Skill designed for different context
+
+**Solutions**:
+```yaml
+# Check skill's model assignment
+---
+name: my-skill
+model: sonnet  # Try upgrading to opus for better quality
+---
+
+# Use model override when invoking
+claude --skill=my-skill --model=opus "Complex task"
+
+# Review skill instructions for clarity
+# Skills should have specific, actionable steps
+```
+
+---
+
+### Issue 3: Skill Too Expensive
+
+**Symptom**: Skill uses more tokens/costs more than expected
+
+**Common Causes**:
+- Skill using Opus when Haiku sufficient
+- No progressive disclosure
+- Reading too many files
+
+**Solutions**:
+```yaml
+# Assign cheaper model for simple tasks
+---
+name: my-skill
+model: haiku  # Use haiku instead of sonnet
+modelOverrides:
+  deep: sonnet  # Only use sonnet for --deep flag
+---
+```
+
+**Optimize skill structure:**
+```markdown
+# Core instructions (always loaded)
+Quick steps for simple use case
+
+<details>
+<summary>Advanced Options (loaded only when needed)</summary>
+
+Detailed instructions for complex scenarios
+
+</details>
+```
+
+---
+
+### Issue 4: Skill Conflicts with Another Skill
+
+**Symptom**: Multiple skills triggering or interference
+
+**Common Causes**:
+- Similar auto-trigger patterns
+- Skills modifying same files
+- Namespace collisions
+
+**Solutions**:
+```yaml
+# Make auto-trigger patterns more specific
+---
+autoTrigger:
+  - pattern: "review.*security"  # Specific
+  # NOT: pattern: "review"       # Too broad
+---
+
+# Disable conflicting skill temporarily
+claude skill disable <other-skill-name>
+
+# Manually specify which skill to use
+claude --skill=security-review "Review my code"
+```
+
+---
+
+### Issue 5: Skill Dependencies Not Met
+
+**Symptom**: "Missing dependency" or skill fails to run
+
+**Common Causes**:
+- Required skill not installed
+- Required MCP server not configured
+- Required tools not available
+
+**Solutions**:
+```yaml
+# Check skill dependencies in frontmatter
+---
+dependencies:
+  - code-review  # Must install this skill first
+  - github-mcp   # Must configure GitHub MCP
+---
+
+# Install missing dependencies
+claude skill install code-review
+claude mcp add github
+
+# Verify all dependencies
+claude skill check-deps my-skill
+```
+
+---
+
+### Still Having Issues?
+
+1. **Check skill documentation**: Each marketplace skill should have detailed README
+2. **Test with simple example**: Try skill on minimal test case first
+3. **Review skill source**: Open `.claude/skills/<skill-name>/SKILL.md` to understand behavior
+4. **Ask community**: [Skills Discussion Forum](https://github.com/anthropics/skills/discussions)
+5. **Report bugs**: [Open an issue](https://github.com/anthropics/skills/issues) for marketplace skills
+
+---
+
 ## Next Steps
 
 Now that you know how to discover and use marketplace skills, you're ready to:

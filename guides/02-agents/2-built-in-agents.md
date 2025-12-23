@@ -1087,6 +1087,147 @@ Excellent! You now understand:
 
 ---
 
+## Troubleshooting Common Agent Issues
+
+### Issue 1: Agent Selection Not Working as Expected
+
+**Symptom**: Wrong agent being used for a task or agent not auto-selected
+
+**Common Causes**:
+- Ambiguous task description
+- Agent configuration conflicts
+- Manual agent override interfering
+
+**Solutions**:
+```bash
+# Be explicit in your request
+"Use the Explore agent to search for React components"
+
+# Check agent configuration
+cat .claude/config.json | grep -A 10 "agents"
+
+# Manually specify agent
+claude --agent=Explore "Find all TypeScript files"
+
+# Reset to default agent selection
+claude --reset-agents
+```
+
+---
+
+### Issue 2: Agent Timeout Errors
+
+**Symptom**: "Agent timeout" or "Task took too long" errors
+
+**Common Causes**:
+- Task too complex for time limit
+- Network latency
+- Large codebase scan
+- Agent stuck in loop
+
+**Solutions**:
+```json
+// Increase timeout in .claude/config.json
+{
+  "agents": {
+    "general-purpose": {
+      "timeout": 300000  // 5 minutes (default: 120000)
+    }
+  }
+}
+```
+
+**Or break task into smaller pieces:**
+```bash
+# Instead of:
+"Analyze entire codebase for performance issues"
+
+# Use:
+"Analyze src/api/ for performance issues"
+"Analyze src/components/ for performance issues"
+```
+
+---
+
+### Issue 3: Agent Running Out of Context
+
+**Symptom**: "Context window full" or incomplete responses
+
+**Common Causes**:
+- Large files being read
+- Too many files in scope
+- Inefficient agent usage
+
+**Solutions**:
+```bash
+# Use Explore agent first to narrow scope
+claude --agent=Explore "Find authentication files"
+
+# Then use General-Purpose agent on specific files
+claude --agent=general-purpose "Refactor auth.ts"
+
+# Reduce CLAUDE.md size
+# Keep it under 500 lines for better context management
+```
+
+---
+
+### Issue 4: Agent Cost Higher Than Expected
+
+**Symptom**: High token usage or unexpected costs
+
+**Common Causes**:
+- Using wrong model for task
+- Agent reading unnecessary files
+- No cost optimization configured
+
+**Solutions**:
+```json
+// Assign appropriate models in .claude/config.json
+{
+  "agents": {
+    "Explore": { "model": "haiku" },      // Cheap for searches
+    "general-purpose": { "model": "sonnet" }  // Balanced
+  }
+}
+```
+
+**See**: [Agent Model Assignment](3-model-assignment.md) for detailed cost optimization
+
+---
+
+### Issue 5: Plan Agent Not Creating Plans
+
+**Symptom**: Plan agent starts implementation without planning
+
+**Common Causes**:
+- Task too simple (doesn't need planning)
+- User approved plan too quickly
+- Agent misclassified task complexity
+
+**Solutions**:
+```bash
+# Explicitly request planning
+"Create a detailed implementation plan for adding user authentication"
+
+# Use EnterPlanMode explicitly
+claude --plan "Implement dark mode across the application"
+
+# Wait for plan before approving
+# Review plan carefully before saying "proceed"
+```
+
+---
+
+### Still Having Issues?
+
+1. **Check logs**: `claude agent logs` to see what agents are doing
+2. **Verify configuration**: `claude agent validate` to check config syntax
+3. **Review guide**: [Agent Troubleshooting](../13-reference/2-troubleshooting.md#agent-issues)
+4. **Ask community**: [Discord #agents channel](https://discord.gg/anthropic)
+
+---
+
 ## References & Further Reading
 
 ### 📚 Official Documentation

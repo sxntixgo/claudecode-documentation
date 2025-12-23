@@ -1168,6 +1168,129 @@ Add to Power User:
 
 ---
 
+## Troubleshooting Common Issues
+
+### Issue 1: MCP Server Not Connecting
+
+**Symptom**: "Failed to connect to MCP server" or server appears offline
+
+**Common Causes**:
+- Server not installed correctly
+- Missing API credentials
+- Port conflicts
+- Server process crashed
+
+**Solutions**:
+```bash
+# Check if server is installed
+claude mcp list
+
+# Restart the server
+claude mcp restart <server-name>
+
+# Check server logs
+claude mcp logs <server-name>
+
+# Reinstall the server
+claude mcp remove <server-name>
+claude mcp add <server-name>
+```
+
+---
+
+### Issue 2: API Key Errors
+
+**Symptom**: "Invalid API key" or "Unauthorized" errors
+
+**Common Causes**:
+- API key not set in environment variables
+- Expired or revoked API key
+- Wrong environment variable name
+
+**Solutions**:
+```bash
+# Check if API key is set
+echo $GITHUB_TOKEN
+echo $PERPLEXITY_API_KEY
+
+# Set the API key (add to ~/.bashrc or ~/.zshrc for persistence)
+export GITHUB_TOKEN="your_token_here"
+
+# Verify the server can access the key
+claude mcp test <server-name>
+```
+
+---
+
+### Issue 3: Server Performance Issues
+
+**Symptom**: Slow responses or timeouts from MCP server
+
+**Common Causes**:
+- Network latency
+- Rate limiting from external API
+- Large data payloads
+- Server resource constraints
+
+**Solutions**:
+```bash
+# Check server resource usage
+claude mcp status <server-name>
+
+# Reduce concurrent requests
+# Add to .claude/config.json:
+{
+  "mcp": {
+    "servers": {
+      "<server-name>": {
+        "maxConcurrentRequests": 5,
+        "timeout": 30000
+      }
+    }
+  }
+}
+
+# Use caching for frequently accessed data
+# (configure in server-specific settings)
+```
+
+---
+
+### Issue 4: Docker MCP Toolkit Problems
+
+**Symptom**: Docker container won't start or can't access servers
+
+**Common Causes**:
+- Docker not running
+- Port mapping conflicts
+- Volume mount permissions
+
+**Solutions**:
+```bash
+# Check Docker is running
+docker ps
+
+# Pull latest MCP toolkit image
+docker pull modelcontextprotocol/mcp-toolkit:latest
+
+# Run with proper port mapping
+docker run -p 8080:8080 modelcontextprotocol/mcp-toolkit
+
+# Check container logs
+docker logs <container-id>
+```
+
+---
+
+### Still Having Issues?
+
+1. **Check the official troubleshooting guide**: See [Troubleshooting MCP Servers](../13-reference/2-troubleshooting.md)
+2. **Search existing issues**: Check [GitHub Issues](https://github.com/modelcontextprotocol/specification/issues)
+3. **Ask the community**: Join [MCP Discord](https://discord.gg/anthropic) for help
+4. **Report bugs**: Open an issue at [MCP GitHub](https://github.com/modelcontextprotocol/specification/issues/new)
+
+---
+
 ## Next Steps
 
 Excellent! You now know:
