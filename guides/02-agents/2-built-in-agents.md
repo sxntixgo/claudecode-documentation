@@ -1097,6 +1097,7 @@ Excellent! You now understand:
 - [Agent Performance Benchmarks](https://anthropic.com/engineering/agent-benchmarks) - Speed and token comparisons
 - [When to Use Plan vs General-Purpose](https://anthropic.com/blog/plan-agent-guide) - Decision framework
 - [Agent Cost Optimization](https://anthropic.com/engineering/agent-cost) - Real savings data
+- [Practical Guide to Main Agent and Sub-agents](https://jewelhuq.medium.com/practical-guide-to-mastering-claude-codes-main-agent-and-sub-agents-fd52952dcf00) - Community tutorial
 
 ### 🔗 Related Topics
 

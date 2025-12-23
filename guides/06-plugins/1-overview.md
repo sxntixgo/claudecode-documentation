@@ -389,6 +389,12 @@ Great job! Now you're ready for:
 - [Plugin API Reference](https://code.claude.com/docs/en/api) - Technical reference
 - [MCP Server Templates](https://github.com/anthropics/mcp-servers) - Starter templates
 
+### 🎓 Learning Resources
+- [Claude Code Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices) - Official best practices guide
+- [Complete Guide to Claude Code](https://www.siddharthbharath.com/claude-code-the-complete-guide/) - Comprehensive tutorial by Sid Bharath
+- [DataCamp Claude Code Tutorial](https://www.datacamp.com/tutorial/claude-code) - Refactor, document, and debug guide
+- [Awesome Claude Code](https://github.com/hesreallyhim/awesome-claude-code) - Curated community resources
+
 ### 🔗 Related Topics
 - [MCP Servers Deep Dive](../01-mcp-servers/1-overview.md) - Build custom integrations
 - [Skills Development Guide](../03-skills/3-creating-skills.md) - Advanced skill patterns

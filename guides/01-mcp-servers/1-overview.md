@@ -564,6 +564,8 @@ Want to dive deeper? Here are some excellent resources:
 - [Claude Code MCP Guide](https://code.claude.com/docs/en/mcp) - Official Claude Code integration docs
 - [Introducing MCP](https://anthropic.com/news/model-context-protocol) - Anthropic's announcement
 - [Building with MCP](https://anthropic.com/engineering/mcp-servers) - Architecture and design patterns
+- [Introduction to MCP Course](https://anthropic.skilljar.com/introduction-to-model-context-protocol) - Official Anthropic course
+- [Build an MCP Server Tutorial](https://modelcontextprotocol.io/docs/develop/build-server) - Step-by-step guide
 
 ### 🔗 Related Topics
 - [Installing MCP Servers](2-installation.md) - Hands-on setup next

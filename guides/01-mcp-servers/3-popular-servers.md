@@ -1155,6 +1155,7 @@ Want to explore more? Here are excellent resources:
 - [Best MCP Servers for Web Development](https://anthropic.com/blog/mcp-web-dev) - Curated recommendations
 - [MCP Server Performance Benchmarks](https://anthropic.com/engineering/mcp-benchmarks) - Latency and throughput data
 - [Building Production Workflows with MCP](https://vercel.com/blog/mcp-production) - Real-world case studies
+- [Building the Future of AI Coding with MCP](https://www.anthropic.com/webinars/future-of-ai-coding-mcp-vs-code) - Webinar with live demos
 
 ### 🔗 Related Topics
 
