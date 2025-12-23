@@ -1,6 +1,6 @@
 # What Are Skills?
 
-**Reading Time**: 20 minutes
+**Reading Time**: 15-25 minutes (varies by experience)
 **Skill Level**: Intermediate
 **Prerequisites**: [Plugin Ecosystem Overview](../06-plugins/1-overview.md), [What Are Agents?](../02-agents/1-overview.md), [Built-in Agent Types](../02-agents/2-built-in-agents.md)
 

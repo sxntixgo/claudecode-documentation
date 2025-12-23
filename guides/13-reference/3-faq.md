@@ -1,6 +1,6 @@
 # Frequently Asked Questions (FAQ)
 
-**Reading Time**: 40 minutes
+**Reading Time**: 30-50 minutes (varies by topic interest)
 **Skill Level**: All levels
 **Last Updated**: 2025-01-15
 

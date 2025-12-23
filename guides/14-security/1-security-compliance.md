@@ -1,6 +1,6 @@
 # Security & Compliance Guide
 
-**Reading Time**: 35 minutes
+**Reading Time**: 30-40 minutes (varies by experience)
 **Skill Level**: Intermediate to Advanced
 **Prerequisites**: [Understanding Agents](../02-agents/1-overview.md), [Skills Basics](../03-skills/1-overview.md)
 

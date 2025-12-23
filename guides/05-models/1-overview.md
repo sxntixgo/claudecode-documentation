@@ -1,6 +1,6 @@
 # Model Overview
 
-**Reading Time**: 25 minutes
+**Reading Time**: 20-30 minutes (varies by experience)
 **Skill Level**: Beginner to Intermediate
 **Prerequisites**: Basic understanding of Claude Code
 
