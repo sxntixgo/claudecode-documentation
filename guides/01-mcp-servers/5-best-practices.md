@@ -240,6 +240,28 @@ try {
 
 ---
 
+### Security Framework Reference
+
+The MCP security practices above align with industry-standard security frameworks:
+
+| MCP Security Practice | OWASP Top 10 | Priority |
+|----------------------|--------------|----------|
+| **Authentication & Authorization** (§1) | A01: Broken Access Control | 🔴 Critical |
+| **Input Validation** (§2) | A03: Injection | 🔴 Critical |
+| **Parameterized Queries** (§2) | A03: Injection | 🔴 Critical |
+| **Environment Variables for Secrets** (§1) | A05: Security Misconfiguration | 🟡 High |
+| **Safe Error Messages** (§5) | A04: Insecure Design | 🟡 High |
+| **Rate Limiting** (§3) | A04: Insecure Design | 🟢 Medium |
+
+**Additional Security Resources**:
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/) - Web application security risks
+- [OWASP API Security Top 10](https://owasp.org/www-project-api-security/) - API-specific security risks
+- [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework) - Enterprise security standards
+
+> 💡 **MCP-Specific Risk**: Prompt injection via tool parameters. Always validate and sanitize tool inputs, even from trusted sources.
+
+---
+
 ## Performance Best Practices
 
 ### 6. ✅ Connection Pooling

@@ -175,7 +175,7 @@ EOF
 ### Official Sources
 
 **MCP Servers**:
-- [Anthropic MCP Registry](https://github.com/anthropics/mcp-servers) - Official MCP servers
+- [Model Context Protocol Servers](https://github.com/modelcontextprotocol/servers) - Official MCP server registry
 - [Model Context Protocol](https://modelcontextprotocol.io) - MCP specification
 
 **Skills**:
@@ -387,7 +387,7 @@ Great job! Now you're ready for:
 - [Claude Code Plugins](https://code.claude.com/docs/en/plugins) - Official plugin documentation
 - [Model Context Protocol](https://modelcontextprotocol.io) - MCP specification
 - [Plugin API Reference](https://code.claude.com/docs/en/api) - Technical reference
-- [MCP Server Templates](https://github.com/anthropics/mcp-servers) - Starter templates
+- [MCP Server Templates](https://github.com/modelcontextprotocol/servers) - Starter templates and examples
 
 ### 🎓 Learning Resources
 - [Claude Code Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices) - Official best practices guide
@@ -403,7 +403,7 @@ Great job! Now you're ready for:
 ### 💬 Community & Support
 - [Claude Code Discord](https://discord.gg/anthropic) - Get help from community
 - [GitHub Discussions](https://github.com/anthropics/claude-code/discussions) - Share plugins
-- [Plugin Registry](https://github.com/anthropics/mcp-servers) - Browse official plugins
+- [MCP Server Registry](https://github.com/modelcontextprotocol/servers) - Browse official servers
 
 ---
 
