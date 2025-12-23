@@ -18,6 +18,128 @@ By the end of this guide, you'll know:
 
 ---
 
+## Understanding Claude API Pricing Tiers
+
+Before optimizing costs, understand your pricing options.
+
+### Free Trial & Evaluation
+
+**Anthropic API Free Trial** (as of January 2025):
+- **$5 credit** for new accounts
+- Valid for **1 month** from account creation
+- Full API access to all models (Haiku, Sonnet, Opus)
+- No credit card required to start
+- Perfect for evaluation and small projects
+
+> 💡 **Check current offer**: [anthropic.com/pricing](https://www.anthropic.com/pricing)
+
+**What you can do with $5**:
+```
+Haiku (cheapest):
+  $5 ÷ $0.001/1K = ~5,000,000 tokens
+  ≈ 500-1,000 typical coding requests
+
+Sonnet (balanced):
+  $5 ÷ $0.003/1K = ~1,666,666 tokens
+  ≈ 150-300 typical coding requests
+
+Opus (premium):
+  $5 ÷ $0.015/1K = ~333,333 tokens
+  ≈ 30-60 complex requests
+```
+
+### Pay-As-You-Go Pricing
+
+**Standard pricing structure**:
+
+| Model | Input | Output | Use Case |
+|-------|--------|--------|----------|
+| **Haiku 4.5** | $1/M tokens | $5/M tokens | Searches, formatting, simple tasks |
+| **Sonnet 4.5** | $3/M tokens | $15/M tokens | Coding, reviews, general development |
+| **Opus 4.5** | Premium* | Premium* | Architecture, complex analysis |
+
+> ⚠️ **Pricing subject to change**. Verify at [anthropic.com/pricing](https://www.anthropic.com/pricing)
+
+### When to Upgrade from Free Trial
+
+**Upgrade when**:
+- ✅ Free trial credit exhausted
+- ✅ Need more than 1 month evaluation
+- ✅ Production deployment planned
+- ✅ Team collaboration required
+
+**Stay on free trial when**:
+- ⏸️ Still evaluating Claude Code
+- ⏸️ Small personal projects
+- ⏸️ Learning and experimentation
+
+### Billing and Budget Management
+
+**Set up billing alerts**:
+```json
+{
+  "billing": {
+    "monthlyBudget": 100,  // $100/month
+    "alerts": {
+      "threshold50": "email@example.com",
+      "threshold80": "email@example.com",
+      "threshold100": "email@example.com"
+    }
+  }
+}
+```
+
+**Track spending**:
+```bash
+# Check current month usage
+claude billing status
+
+# Expected output:
+# Current month: $23.45 / $100.00 (23%)
+# Days remaining: 18
+# Projected: $41.20
+```
+
+### Free Tier Optimization Strategy
+
+**Maximize free trial value**:
+
+1. **Start with Haiku** for everything to extend credit
+2. **Batch learning** - group similar requests
+3. **Use documentation** before asking Claude
+4. **Test configurations** on small files first
+5. **Enable cost tracking** from day 1
+
+**Example - Maximizing $5 credit:**
+```
+Week 1: Learning (Haiku only)
+- Read docs, small experiments
+- Cost: $0.50
+
+Week 2-3: Building (Haiku + occasional Sonnet)
+- Active development with strategic model use
+- Cost: $3.00
+
+Week 4: Polish (All models strategically)
+- Final optimizations, Opus for architecture review
+- Cost: $1.50
+
+Total: $5.00 → Got full evaluation experience!
+```
+
+### Enterprise & Team Pricing
+
+For teams and enterprises, contact Anthropic for:
+- **Volume discounts** (> $1,000/month)
+- **Custom rate limits**
+- **Dedicated support**
+- **SLA guarantees**
+- **Private deployment options**
+
+**Contact**: sales@anthropic.com
+
+---
+
 ## The Cost Optimization Formula
 
 ```
@@ -577,8 +699,10 @@ Total time: 20s, Cost: $0.30
 - [Cost Optimization Guide](https://code.claude.com/docs/optimization)
 
 ### Tools
-- [Claude Cost Calculator](https://claude-calculator.anthropic.com)
-- [Token Counter](https://platform.openai.com/tokenizer)
+- **Pricing Calculator**: Use [Anthropic Pricing Page](https://www.anthropic.com/pricing) for current rates
+- **Token Estimation**: Count ~4 characters = 1 token (rough estimate)
+- **Alternative Tokenizer** (Note: Uses GPT tokenization, Claude may differ): [OpenAI Tokenizer](https://platform.openai.com/tokenizer)
+- **Cost Tracking**: Use `.claude/cost-log.json` (enable in config)
 
 ---
 

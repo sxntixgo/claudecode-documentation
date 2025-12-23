@@ -631,8 +631,9 @@ Learn to build specialized agents with custom capabilities and model assignments
 - [Cost Optimization Guide](https://code.claude.com/docs/optimization)
 
 ### Community Resources
-- [Claude Code Cost Calculator](https://claude-calculator.anthropic.com)
-- [Model Performance Benchmarks](https://github.com/anthropics/claude-benchmarks)
+- **Cost Estimation**: Use [Anthropic Pricing](https://www.anthropic.com/pricing) with formula: (input_tokens × input_rate + output_tokens × output_rate)
+- **Model Comparisons**: See [Anthropic Model Overview](https://www.anthropic.com/claude) for latest capabilities
+- **Community Discussions**: Search [GitHub Discussions](https://github.com/anthropics/claude-code/discussions) for real-world model performance experiences
 
 ### Related Topics
 - [Thinking Modes](../07-thinking/) - Control reasoning depth for better cost/quality trade-offs
