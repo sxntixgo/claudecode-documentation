@@ -672,9 +672,9 @@ Great! You now understand:
 
 **→ [Built-in Agents Deep Dive](2-built-in-agents.md)** - Detailed capabilities, limitations, and advanced usage
 
-**→ [Agent Model Assignment](model-assignment.md)** - Assign Haiku/Sonnet/Opus to different agents for cost optimization
+**→ [Agent Model Assignment](3-model-assignment.md)** - Assign Haiku/Sonnet/Opus to different agents for cost optimization
 
-**→ [Custom Agents](custom-agents.md)** - Create specialized agents for your workflows (advanced)
+**→ [Custom Agents](4-custom-agents.md)** - Create specialized agents for your workflows (advanced)
 
 ---
 
@@ -767,9 +767,9 @@ Want to dive deeper? Here are excellent resources:
 
 ### 📖 Advanced Topics
 
-- [Custom Agent Development](custom-agents.md) - Build specialized agents (advanced)
-- [Agent Performance Tuning](../optimization/agent-optimization.md) - Speed and cost optimization
-- [Multi-Agent Workflows](../optimization/multi-agent-patterns.md) - Orchestrating multiple agents
+- [Custom Agent Development](4-custom-agents.md) - Build specialized agents (advanced)
+- [Cost Optimization](../11-optimization/1-cost-optimization.md) - Speed and cost optimization
+- [Advanced Techniques](../11-optimization/2-advanced-techniques.md) - Advanced optimization patterns
 
 ---
 

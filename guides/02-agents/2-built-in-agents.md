@@ -1060,7 +1060,7 @@ If Plan prevents implementing the wrong approach that would cost 50,000+ tokens 
 **Optimize for cost**:
 - Use Explore (50-60% cheaper for searches)
 - Use Plan for complex tasks (prevents waste)
-- Assign Haiku to Explore (see [Model Assignment](model-assignment.md))
+- Assign Haiku to Explore (see [Model Assignment](3-model-assignment.md))
 
 **Optimize for quality**:
 - Use Plan for architectural decisions
@@ -1079,9 +1079,9 @@ Excellent! You now understand:
 
 **Ready to optimize costs?**
 
-**→ [Agent Model Assignment](model-assignment.md)** - Assign Haiku/Sonnet/Opus to different agents for 3x cost savings
+**→ [Agent Model Assignment](3-model-assignment.md)** - Assign Haiku/Sonnet/Opus to different agents for 3x cost savings
 
-**→ [Custom Agents](custom-agents.md)** - Create specialized agents for your workflows (advanced)
+**→ [Custom Agents](4-custom-agents.md)** - Create specialized agents for your workflows (advanced)
 
 **→ [Skills Overview](../03-skills/1-overview.md)** - Learn how skills leverage agent capabilities
 
@@ -1110,7 +1110,7 @@ Excellent! You now understand:
 ### 🔗 Related Topics
 
 - [Agents Overview](1-overview.md) - Conceptual foundation
-- [Model Assignment](model-assignment.md) - Assign models to agents for cost optimization
+- [Model Assignment](3-model-assignment.md) - Assign models to agents for cost optimization
 - [MCP Servers](../01-mcp-servers/1-overview.md) - Tools that agents use
 - [Skills Overview](../03-skills/1-overview.md) - Skills that leverage agents
 
@@ -1122,4 +1122,4 @@ Excellent! You now understand:
 
 ---
 
-**Ready to save costs by assigning models to agents?** Continue to [Agent Model Assignment](model-assignment.md)!
+**Ready to save costs by assigning models to agents?** Continue to [Agent Model Assignment](3-model-assignment.md)!

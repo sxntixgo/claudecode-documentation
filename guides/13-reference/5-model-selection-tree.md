@@ -474,9 +474,9 @@ modelOverrides:
 ## Next Steps
 
 **Learn More**:
-- [Full Model Comparison](../05-models/model-comparison.md) - Detailed capabilities
-- [Token Optimization](../11-optimization/strategies.md) - Cost strategies
-- [Cheat Sheet](2-optimization-checklist.md) - Quick reference
+- [Full Model Comparison](../05-models/5-selection-guide.md) - Detailed capabilities
+- [Token Optimization](../11-optimization/1-cost-optimization.md) - Cost strategies
+- [Optimization Checklist](6-optimization-checklist.md) - Quick reference
 
 **Action Items**:
 1. Bookmark this decision tree
