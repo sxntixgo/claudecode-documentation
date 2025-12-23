@@ -498,6 +498,181 @@ When multiple hooks match, they execute in order:
 
 ---
 
+## Troubleshooting Hook Issues
+
+### Issue 1: Hook Not Triggering
+
+**Symptom**: Hook defined but never executes
+
+**Common Causes**:
+- Matcher pattern doesn't match
+- Hook in wrong section of config.json
+- Syntax error in configuration
+
+**Solutions**:
+```bash
+# Test hook pattern matching
+claude hook test Stop
+
+# Validate config.json syntax
+claude config validate
+
+# Enable hook debugging
+export CLAUDE_DEBUG_HOOKS=true
+claude <your-command>
+```
+
+**Check matcher pattern:**
+```json
+// Too specific - won't match
+{
+  "matcher": "Write.*src/components/Button.tsx"  // Only matches exact file
+}
+
+// Better - matches category
+{
+  "matcher": "Write"  // Matches all Write tool uses
+}
+```
+
+---
+
+### Issue 2: Hook Failing Silently
+
+**Symptom**: Hook runs but command fails without visible error
+
+**Common Causes**:
+- Command returns non-zero exit code
+- Command not in PATH
+- Permission denied
+
+**Solutions**:
+```bash
+# Test hook command directly
+~/.claude/hooks/my-hook.sh
+
+# Check command exists
+which prettier
+which eslint
+
+# Add explicit error handling to hook
+#!/bin/bash
+set -e  # Exit on any error
+prettier --write "$FILE" || {
+  echo "Prettier failed on $FILE"
+  exit 1
+}
+```
+
+---
+
+### Issue 3: Hook Causing Performance Issues
+
+**Symptom**: Claude Code becomes slow after adding hooks
+
+**Common Causes**:
+- Hook runs synchronously and takes too long
+- Hook processes too many files
+- No timeout configured
+
+**Solutions**:
+```json
+{
+  "hooks": {
+    "PostToolUse": [{
+      "matcher": "Write",
+      "hooks": [{
+        "type": "command",
+        "command": "prettier --write $FILE",
+        "timeout": 5000  // Add 5-second timeout
+      }]
+    }]
+  }
+}
+```
+
+**Or make hook async:**
+```bash
+# Run hook in background (use with caution)
+prettier --write "$FILE" &
+```
+
+---
+
+### Issue 4: Stop Hook Blocking Workflow
+
+**Symptom**: Can't continue until fixing git issues
+
+**Common Causes**:
+- Stop hook returns non-zero exit code
+- Hook has strict validation
+
+**Solutions**:
+```bash
+# Temporarily disable Stop hooks
+export CLAUDE_SKIP_HOOKS=Stop
+
+# Or make hook non-blocking
+#!/bin/bash
+# Check for uncommitted changes but don't block
+if git diff --quiet; then
+  echo "✅ No uncommitted changes"
+else
+  echo "⚠️ Warning: Uncommitted changes found"
+fi
+exit 0  # Always succeed
+```
+
+---
+
+### Issue 5: Hook Environment Variables Not Available
+
+**Symptom**: Hook can't access $FILE, $TOOL, or custom variables
+
+**Common Causes**:
+- Variable not exported
+- Hook runs in different shell context
+- Variable name incorrect
+
+**Solutions**:
+```json
+{
+  "hooks": {
+    "PostToolUse": [{
+      "matcher": "Write",
+      "hooks": [{
+        "type": "command",
+        // Use exact variable names: $FILE, $TOOL, $OUTPUT
+        "command": "echo 'Modified: $FILE with $TOOL' >> /tmp/hooks.log"
+      }]
+    }]
+  }
+}
+```
+
+**Debug variables:**
+```bash
+#!/bin/bash
+# Debug hook script
+echo "TOOL: $TOOL" >> /tmp/hook-debug.log
+echo "FILE: $FILE" >> /tmp/hook-debug.log
+echo "STATUS: $STATUS" >> /tmp/hook-debug.log
+echo "OUTPUT: $OUTPUT" >> /tmp/hook-debug.log
+```
+
+---
+
+### Still Having Issues?
+
+1. **Enable debug mode**: `export CLAUDE_DEBUG_HOOKS=true`
+2. **Check hook logs**: `~/.claude/logs/hooks.log`
+3. **Validate configuration**: `claude config validate`
+4. **Test hooks in isolation**: Run hook script manually with test inputs
+5. **Review examples**: See [Hook Examples](../12-examples/workflows/3-code-review.md)
+6. **Ask community**: [Discord #hooks channel](https://discord.gg/anthropic)
+
+---
+
 ## What's Next?
 
 **Related Topics**:
