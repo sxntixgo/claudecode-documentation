@@ -1034,7 +1034,6 @@ export CONTEXT7_API_KEY="..."
 - [MCP Specification](https://modelcontextprotocol.io) - Complete protocol reference
 - [Claude Code MCP Guide](https://code.claude.com/docs/en/mcp) - Official installation docs
 - [MCP Server Registry](https://github.com/modelcontextprotocol/servers) - Official server list
-- [MCP Security Best Practices](https://anthropic.com/security/mcp) - Authentication and permissions guide
 - [Troubleshooting MCP Servers](https://code.claude.com/docs/en/mcp/troubleshooting) - Common issues and solutions
 - [GitHub Personal Access Tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) - Official GitHub guide
 - [Getting Started with Local MCP Servers](https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop) - Claude Desktop installation guide

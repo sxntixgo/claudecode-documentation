@@ -739,9 +739,9 @@ Want to dive deeper? Here are excellent resources:
 - [Claude Code Agent System](https://code.claude.com/docs/en/agents) - Official agent documentation
 - [Task Tool Reference](https://code.claude.com/docs/en/task-tool) - How agents are spawned internally
 - [MCP Integration with Agents](https://code.claude.com/docs/en/mcp-agents) - How agents use MCP tools
-- [Introducing Agent Specialization](https://anthropic.com/blog/claude-code-agents) - Why specialized agents matter
-- [Optimizing Agent Selection for Performance](https://anthropic.com/engineering/agent-optimization) - Speed and cost analysis
-- [Real-World Agent Workflows](https://vercel.com/blog/claude-agents) - Case studies from production use
+- [Enabling Claude Code Autonomy](https://www.anthropic.com/news/enabling-claude-code-to-work-more-autonomously) - Checkpoints and autonomous operation
+- [Agent API Capabilities](https://www.anthropic.com/news/agent-capabilities-api) - New capabilities for building agents
+- [Model Context Protocol Explained](https://vercel.com/blog/model-context-protocol-mcp-explained) - MCP FAQ and integration guide
 - [Building Agents with Claude Agent SDK](https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk) - Official SDK guide
 - [Claude Code in Action Course](https://anthropic.skilljar.com/claude-code-in-action) - Official course covering agents
 
