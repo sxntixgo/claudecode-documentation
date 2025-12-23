@@ -105,6 +105,83 @@ graph TD
 
 ---
 
+## How Agents and Skills Work Together
+
+Skills and agents are complementary - they work together to accomplish tasks efficiently.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Skill
+    participant Agent
+    participant MCP
+    participant Code
+
+    User->>Skill: "Review my code for security"
+    Note over Skill: code-review-skill<br/>SKILL.md has instructions
+
+    Skill->>Agent: Execute with<br/>specific instructions
+    Note over Skill,Agent: Skill provides the "HOW"<br/>Agent provides the "ACCESS"
+
+    Agent->>Code: Read files
+    Code-->>Agent: File contents
+
+    Agent->>MCP: Use GitHub MCP
+    MCP-->>Agent: PR context
+
+    Agent->>Agent: Apply skill<br/>instructions
+
+    Agent-->>Skill: Security issues<br/>found
+    Skill-->>User: Detailed security<br/>review report
+
+    style User fill:#e1f5ff
+    style Skill fill:#d4f4dd
+    style Agent fill:#fff9e6
+    style MCP fill:#f4d4ff
+    style Code fill:#ffebcd
+```
+
+### Key Insight
+
+**Skills tell agents HOW to work**
+- Provide step-by-step instructions
+- Define success criteria
+- Specify review checklists
+- Enforce workflows
+
+**Agents tell skills WHAT they can access**
+- File system permissions
+- Tool capabilities
+- External integrations
+- Security constraints
+
+**Together**: Skills + Agents + MCPs = Powerful, controlled automation
+
+### Real-World Example
+
+```
+User: "Review this PR for production readiness"
+
+1. code-review SKILL provides instructions:
+   - Check security (OWASP Top 10)
+   - Verify test coverage (>80%)
+   - Ensure documentation updated
+   - Validate error handling
+
+2. general-purpose AGENT provides capabilities:
+   - Read PR files
+   - Access GitHub via MCP
+   - Run test coverage tools
+   - Check for hardcoded secrets
+
+3. Result: Comprehensive review combining:
+   - Skill's best-practice checklist
+   - Agent's tool access
+   - MCP's external data
+```
+
+---
+
 ## The Progressive Disclosure Pattern
 
 ### What Is Progressive Disclosure?
