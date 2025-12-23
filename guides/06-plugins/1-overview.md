@@ -387,16 +387,7 @@ Great job! Now you're ready for:
 - [Claude Code Plugins](https://code.claude.com/docs/en/plugins) - Official plugin documentation
 - [Model Context Protocol](https://modelcontextprotocol.io) - MCP specification
 - [Plugin API Reference](https://code.claude.com/docs/en/api) - Technical reference
-
-### 🎥 Video Tutorials
-- [Getting Started with Plugins](https://youtube.com/placeholder) (15 min) - Install first plugin
-- [Building Custom MCP Servers](https://youtube.com/placeholder) (30 min) - Advanced MCP development
-- [Skill Development Masterclass](https://youtube.com/placeholder) (45 min) - Production-ready skills
-
-### 📝 Community Resources
-- [Awesome Claude Plugins](https://github.com/placeholder/awesome-claude-plugins) - Curated plugin list
 - [MCP Server Templates](https://github.com/anthropics/mcp-servers) - Starter templates
-- [Plugin Best Practices](https://blog.example.com/claude-plugins) - Real-world patterns
 
 ### 🔗 Related Topics
 - [MCP Servers Deep Dive](../01-mcp-servers/1-overview.md) - Build custom integrations

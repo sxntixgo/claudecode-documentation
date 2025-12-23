@@ -562,12 +562,6 @@ Want to dive deeper? Here are some excellent resources:
 ### 📚 Official Documentation
 - [Model Context Protocol Specification](https://modelcontextprotocol.io) - Complete protocol reference
 - [Claude Code MCP Guide](https://code.claude.com/docs/en/mcp) - Official Claude Code integration docs
-
-### 🎥 Video Tutorials
-- [Introduction to MCP](https://youtube.com/watch?v=example) (15 min) - Overview and first server setup
-- [MCP Deep Dive](https://youtube.com/watch?v=example) (30 min) - Advanced patterns and custom servers
-
-### 📝 Articles & Blog Posts
 - [Introducing MCP](https://anthropic.com/news/model-context-protocol) - Anthropic's announcement
 - [Building with MCP](https://anthropic.com/engineering/mcp-servers) - Architecture and design patterns
 
