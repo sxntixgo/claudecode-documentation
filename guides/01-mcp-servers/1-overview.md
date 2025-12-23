@@ -498,7 +498,7 @@ Great! Now you understand what MCP servers are and why they matter. You're ready
 
 **→ [Install Your First MCP Server](2-installation.md)** - Hands-on setup guide
 **→ [Explore Popular Servers](3-popular-servers.md)** - See what's available
-**→ [Create Custom Servers](creating-custom-servers.md)** - Build your own (advanced)
+**→ [Create Custom Servers](4-creating-custom-servers.md)** - Build your own (advanced)
 
 ---
 

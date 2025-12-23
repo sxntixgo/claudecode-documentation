@@ -2575,7 +2575,7 @@ time claude "complex prompt here"
 
 - [Cost Optimization](../../11-optimization/1-cost-optimization.md)
 - [Model Selection](../../05-models/5-selection-guide.md)
-- [Optimization Checklist](../../13-reference/2-optimization-checklist.md)
+- [Optimization Checklist](../../13-reference/6-optimization-checklist.md)
 - [Bug Fixing Workflow](../../12-examples/workflows/2-bug-fixing.md)
 
 ---

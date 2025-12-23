@@ -1051,7 +1051,7 @@ export CONTEXT7_API_KEY="..."
 
 - [MCP Servers Overview](1-overview.md) - Conceptual foundation
 - [Popular MCP Servers](3-popular-servers.md) - Discover available servers
-- [Creating Custom Servers](creating-custom-servers.md) - Build your own
+- [Creating Custom Servers](4-creating-custom-servers.md) - Build your own
 
 ### 💬 Community & Support
 
