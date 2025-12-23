@@ -11,10 +11,53 @@
 Now that you understand [what MCP servers are](1-overview.md) and [how to install them](2-installation.md), let's explore the most popular and useful servers available. Think of this as your shopping guide—we'll show you what's available, what each server does best, and help you choose the right ones for your workflow.
 
 **By the end of this guide**, you'll know:
+- ✅ Where to discover all available MCP servers
 - ✅ The top 5 must-have MCP servers and what they do
 - ✅ Specialized servers for databases, cloud services, and development tools
 - ✅ How to access 200+ pre-built servers via Docker
 - ✅ Which servers to install first based on your work
+
+---
+
+## 🔍 Discovering MCP Servers
+
+Before exploring specific servers, know where to find the complete catalog:
+
+### Official Registry
+
+**[Model Context Protocol Servers](https://github.com/modelcontextprotocol/servers)**
+- 50+ official pre-built servers
+- Community-maintained and tested
+- Official Anthropic support
+- Regular updates and improvements
+
+### Popular Discovery Methods
+
+**1. Browse the Official Registry**
+- Visit [github.com/modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)
+- Explore by category (Development, Cloud, Data, etc.)
+- Read detailed READMEs for each server
+
+**2. Search Package Managers**
+```bash
+# npm (JavaScript/TypeScript servers)
+npm search @modelcontextprotocol
+
+# PyPI (Python servers)
+pip search mcp-server
+```
+
+**3. Community Resources**
+- [MCP Documentation](https://modelcontextprotocol.io)
+- [GitHub Topics: mcp-server](https://github.com/topics/mcp-server)
+- [Anthropic MCP Registry](https://github.com/modelcontextprotocol)
+
+**4. Check Integration Marketplaces**
+- Look for "MCP-compatible" tools
+- Third-party server collections
+- Framework-specific integrations
+
+> 💡 **Tip**: The official registry is updated weekly. Star the repo to get notifications about new servers!
 
 ---
 

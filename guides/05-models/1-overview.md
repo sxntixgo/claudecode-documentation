@@ -42,6 +42,8 @@ graph LR
 
 ## Quick Comparison Table
 
+**Pricing as of January 2025** ([Verify current rates](https://www.anthropic.com/pricing))
+
 | Feature | Haiku 4.5 | Sonnet 4.5 | Opus 4.5 |
 |---------|-----------|------------|----------|
 | **Speed** | 🚀🚀🚀 Fastest | 🚀🚀 Fast | 🚀 Slower |
@@ -54,6 +56,8 @@ graph LR
 | **Claude Pro Impact** | ✅ Minimal | ⚠️ Moderate | ❌ High |
 
 *Premium pricing - approximately 2-3x Sonnet cost
+
+> ⚠️ **Note**: Pricing is subject to change. Always verify current rates at [anthropic.com/pricing](https://www.anthropic.com/pricing).
 
 ---
 
@@ -189,6 +193,8 @@ graph LR
 
 ## Pricing Deep Dive
 
+**Pricing as of January 2025** - [Verify current rates](https://www.anthropic.com/pricing)
+
 ### Cost Breakdown
 
 **Haiku 4.5:**
@@ -208,6 +214,8 @@ graph LR
 - Output: Premium (est. $30-45 per million)
 - Average operation: 25,000 tokens total
 - Cost: ~$0.70 per operation
+
+> 💡 **Cost estimates based on January 2025 pricing**. Actual costs may vary based on token usage patterns.
 
 ### Real-World Cost Comparison
 

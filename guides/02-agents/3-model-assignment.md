@@ -68,11 +68,15 @@ Let's say you perform 20 agent operations per day:
 
 ### Quick Comparison Table
 
+**Pricing as of January 2025** - [Verify current rates](https://www.anthropic.com/pricing)
+
 | Model | Input Cost | Output Cost | Speed | Best For | Agent Match |
 |-------|-----------|-------------|-------|----------|-------------|
 | **Haiku 4.5** | $1/M tokens | $5/M tokens | 🚀 Fastest | Search, simple tasks | Explore Agent |
 | **Sonnet 4.5** | $3/M tokens | $15/M tokens | 🏃 Fast | Standard coding, docs | General-Purpose, Plan |
 | **Opus 4.5** | Premium | Premium | 🚶 Slower | Complex architecture | General-Purpose (complex tasks) |
+
+> ⚠️ **Note**: Pricing is subject to change. Always verify current rates at [anthropic.com/pricing](https://www.anthropic.com/pricing).
 
 ### Model Capabilities Visualized
 
@@ -246,11 +250,13 @@ For power users who want fine-grained control:
 }
 ```
 
-**Results:**
+**Results (based on January 2025 pricing)**:
 - Searches: Haiku (30 calls/day × 66% cheaper) = $8/day → $2.70/day
 - Coding: Sonnet (20 calls/day) = $12/day
 - Planning: Sonnet (5 calls/day) = $3/day
 - **Total: $17.70/day vs. $30/day baseline = 41% savings** ✅
+
+> 💡 Verify current pricing at [anthropic.com/pricing](https://www.anthropic.com/pricing)
 
 ### Example 2: Backend API Service
 
@@ -278,11 +284,13 @@ For power users who want fine-grained control:
 }
 ```
 
-**Results:**
+**Results (based on January 2025 pricing)**:
 - Searches: Haiku (10 calls/day) = $0.90/day
 - Complex coding: Opus (15 calls/day) = $45/day
 - Architecture planning: Opus (5 calls/day) = $15/day
 - **Total: $60.90/day (higher cost, but justified for critical quality)**
+
+> 💡 Verify current pricing at [anthropic.com/pricing](https://www.anthropic.com/pricing)
 
 ### Example 3: Documentation Project (This Repo!)
 
@@ -311,11 +319,13 @@ For power users who want fine-grained control:
 }
 ```
 
-**Results:**
+**Results (based on January 2025 pricing)**:
 - File searches: Haiku (8 calls/day) = $0.70/day
 - Doc writing: Sonnet (10 calls/day) = $6/day
 - Planning: Sonnet (2 calls/day) = $1.20/day
 - **Total: $7.90/day vs. $13.50/day baseline = 41% savings** ✅
+
+> 💡 Verify current pricing at [anthropic.com/pricing](https://www.anthropic.com/pricing)
 
 ---
 
