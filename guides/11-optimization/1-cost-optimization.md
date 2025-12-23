@@ -1,6 +1,6 @@
 # Cost Optimization Strategies
 
-**Reading Time**: 30 minutes
+**Reading Time**: 25-35 minutes (varies by experience)
 **Skill Level**: Intermediate to Advanced
 **Prerequisites**: [Model Overview](../05-models/1-overview.md), [Agent Model Assignment](../02-agents/3-model-assignment.md)
 
