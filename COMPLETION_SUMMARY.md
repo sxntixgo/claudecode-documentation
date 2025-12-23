@@ -40,25 +40,25 @@
 
 ### Creation Guides (User's Primary Request)
 
-1. ✅ **Creating Custom MCP Servers** - `guides/1-mcp-servers/4-creating-custom-servers.md`
+1. ✅ **Creating Custom MCP Servers** - `guides/01-mcp-servers/4-creating-custom-servers.md`
    - Complete TypeScript implementation guide
    - Real-world examples (GitHub, Database, Slack)
    - Security and testing best practices
    - Publishing to npm/Docker
 
-2. ✅ **Creating Custom Agents** - `guides/2-agents/4-custom-agents.md`
+2. ✅ **Creating Custom Agents** - `guides/02-agents/4-custom-agents.md`
    - AGENT.md structure and schema
    - Real-world examples (frontend, backend, docs agents)
    - Multi-stage workflows
    - Testing and deployment
 
-3. ✅ **Creating Custom Skills** - `guides/3-skills/3-creating-skills.md`
+3. ✅ **Creating Custom Skills** - `guides/03-skills/3-creating-skills.md`
    - SKILL.md structure and frontmatter
    - Progressive disclosure patterns
    - Real-world examples (code review, TDD, API scaffold)
    - Testing and versioning
 
-4. ✅ **Creating Slash Commands** - `guides/7-keywords/2-slash-commands.md`
+4. ✅ **Creating Slash Commands** - `guides/09-keywords/2-slash-commands.md`
    - Complete command structure
    - Real-world examples (review, test, deploy)
    - Advanced features (chaining, interactive)
@@ -219,8 +219,8 @@ From original goals:
 ### Pedagogical Structure
 
 ✅ **Numbered files for clear progression**:
-- guides/1-mcp-servers/1-overview.md → 5-best-practices.md
-- guides/2-agents/1-overview.md → 4-custom-agents.md
+- guides/01-mcp-servers/1-overview.md → 5-best-practices.md
+- guides/02-agents/1-overview.md → 4-custom-agents.md
 - etc.
 
 ✅ **Foundation → Advanced → Expert**:
@@ -281,15 +281,15 @@ claudecode-documentation/
 ├── COMPLETION_SUMMARY.md            # This file
 │
 ├── guides/
-│   ├── 1-mcp-servers/              # 5 guides (Foundation)
-│   ├── 2-agents/                   # 4 guides (Foundation)
-│   ├── 3-skills/                   # 5 guides (Foundation)
-│   ├── 4-models/                   # 5 guides (Advanced Config)
-│   ├── 5-thinking/                 # 3 guides (Advanced Config)
-│   ├── 6-context/                  # 3 guides (Advanced Config)
-│   ├── 7-keywords/                 # 3 guides (Optimization)
-│   ├── 8-optimization/             # 3 guides (Optimization)
-│   └── 9-examples/                 # 5 guides (Practical)
+│   ├── 01-mcp-servers/              # 5 guides (Foundation)
+│   ├── 02-agents/                   # 4 guides (Foundation)
+│   ├── 03-skills/                   # 5 guides (Foundation)
+│   ├── 05-models/                   # 5 guides (Advanced Config)
+│   ├── 07-thinking/                 # 3 guides (Advanced Config)
+│   ├── 08-context/                  # 3 guides (Advanced Config)
+│   ├── 09-keywords/                 # 3 guides (Optimization)
+│   ├── 11-optimization/             # 3 guides (Optimization)
+│   └── 12-examples/                 # 5 guides (Practical)
 │
 └── .claude/
     └── skills/

@@ -37,10 +37,10 @@ This plan provides step-by-step instructions to fix all 47 issues identified in 
 **Find and Replace**:
 ```markdown
 OLD: guides/models/model-comparison.md
-NEW: guides/4-models/1-overview.md
+NEW: guides/05-models/1-overview.md
 
 OLD: guides/models/selection-guide.md
-NEW: guides/4-models/5-selection-guide.md
+NEW: guides/05-models/5-selection-guide.md
 
 OLD: guides/models/configuration.md
 ACTION: Remove reference (content integrated into other model guides)
@@ -50,11 +50,11 @@ ACTION: Remove reference (content integrated into other model guides)
 ```diff
 Line 132:
 - | [Model Comparison](guides/models/model-comparison.md) | 20 min | Haiku 4.5, Sonnet 4.5, Opus 4.5 capabilities |
-+ | [Model Overview](guides/4-models/1-overview.md) | 20 min | Haiku 4.5, Sonnet 4.5, Opus 4.5 capabilities |
++ | [Model Overview](guides/05-models/1-overview.md) | 20 min | Haiku 4.5, Sonnet 4.5, Opus 4.5 capabilities |
 
 Line 134:
 - | [Selection Guide](guides/models/selection-guide.md) | 30 min | Decision matrix, when to use each model |
-+ | [Selection Guide](guides/4-models/5-selection-guide.md) | 30 min | Decision matrix, when to use each model |
++ | [Selection Guide](guides/05-models/5-selection-guide.md) | 30 min | Decision matrix, when to use each model |
 
 Line 135:
 - | [Configuration](guides/models/configuration.md) | 25 min | CLI flags, agent config, skill frontmatter |
@@ -66,24 +66,24 @@ Line 135:
 **Find and Replace**:
 ```markdown
 OLD: guides/thinking/extended-thinking.md
-NEW: guides/5-thinking/1-overview.md
+NEW: guides/07-thinking/1-overview.md
 
 OLD: guides/thinking/keywords-reference.md
-NEW: guides/5-thinking/2-keywords.md
+NEW: guides/07-thinking/2-keywords.md
 
 OLD: guides/thinking/when-to-use.md
-ACTION: Remove or change to guides/5-thinking/1-overview.md
+ACTION: Remove or change to guides/07-thinking/1-overview.md
 ```
 
 **Specific Changes**:
 ```diff
 Line 150:
 - | [Extended Thinking Overview](guides/thinking/extended-thinking.md) | 15 min | What it is, how it works |
-+ | [Extended Thinking Overview](guides/5-thinking/1-overview.md) | 15 min | What it is, how it works |
++ | [Extended Thinking Overview](guides/07-thinking/1-overview.md) | 15 min | What it is, how it works |
 
 Line 151:
 - | [Keywords Reference](guides/thinking/keywords-reference.md) | 10 min | "think", "think hard", "ultrathink" budgets |
-+ | [Keywords Reference](guides/5-thinking/2-keywords.md) | 10 min | "think", "think hard", "ultrathink" budgets |
++ | [Keywords Reference](guides/07-thinking/2-keywords.md) | 10 min | "think", "think hard", "ultrathink" budgets |
 
 Line 152:
 - | [When to Use](guides/thinking/when-to-use.md) | 20 min | Use cases, cost considerations |
@@ -95,10 +95,10 @@ Line 152:
 **Find and Replace**:
 ```markdown
 OLD: guides/context/claude-md-files.md
-NEW: guides/6-context/2-claude-md.md
+NEW: guides/08-context/2-claude-md.md
 
 OLD: guides/context/memory-management.md
-NEW: guides/6-context/3-memory-hierarchy.md
+NEW: guides/08-context/3-memory-hierarchy.md
 
 OLD: guides/context/optimization.md
 ACTION: Remove (content in other context guides)
@@ -108,11 +108,11 @@ ACTION: Remove (content in other context guides)
 ```diff
 Line 168:
 - | [CLAUDE.md Files](guides/context/claude-md-files.md) | 30 min | System-level context, best practices |
-+ | [CLAUDE.md Files](guides/6-context/2-claude-md.md) | 30 min | System-level context, best practices |
++ | [CLAUDE.md Files](guides/08-context/2-claude-md.md) | 30 min | System-level context, best practices |
 
 Line 169:
 - | [Memory Management](guides/context/memory-management.md) | 25 min | Hierarchy, precedence, organization |
-+ | [Memory Hierarchy](guides/6-context/3-memory-hierarchy.md) | 25 min | Hierarchy, precedence, organization |
++ | [Memory Hierarchy](guides/08-context/3-memory-hierarchy.md) | 25 min | Hierarchy, precedence, organization |
 
 Line 170:
 - | [Optimization](guides/context/optimization.md) | 35 min | Context clearing, strategies, anti-patterns |
@@ -124,10 +124,10 @@ Line 170:
 **Find and Replace**:
 ```markdown
 OLD: guides/skills/overview.md
-NEW: guides/3-skills/1-overview.md
+NEW: guides/03-skills/1-overview.md
 
 OLD: guides/skills/creating-skills.md
-NEW: guides/3-skills/3-creating-skills.md
+NEW: guides/03-skills/3-creating-skills.md
 ```
 
 #### Step 5: Update Reference Section Links (Lines 184-189, 385-388)
@@ -135,28 +135,28 @@ NEW: guides/3-skills/3-creating-skills.md
 **Find and Replace**:
 ```markdown
 OLD: reference/keywords.md
-NEW: guides/7-keywords/1-overview.md
+NEW: guides/09-keywords/1-overview.md
 
 OLD: reference/hooks.md
-NEW: guides/7-keywords/3-automation-patterns.md
+NEW: guides/09-keywords/3-automation-patterns.md
 
 OLD: reference/commands.md
-NEW: guides/7-keywords/2-slash-commands.md
+NEW: guides/09-keywords/2-slash-commands.md
 ```
 
 **Specific Changes**:
 ```diff
 Line 186:
 - | [Keywords Reference](reference/keywords.md) | 15 min | All thinking keywords, effects |
-+ | [Keywords Overview](guides/7-keywords/1-overview.md) | 15 min | All thinking keywords, effects |
++ | [Keywords Overview](guides/09-keywords/1-overview.md) | 15 min | All thinking keywords, effects |
 
 Line 187:
 - | [Hooks Reference](reference/hooks.md) | 30 min | PreToolUse, PostToolUse, Notification, Stop |
-+ | [Automation Patterns](guides/7-keywords/3-automation-patterns.md) | 30 min | PreToolUse, PostToolUse, Notification, Stop |
++ | [Automation Patterns](guides/09-keywords/3-automation-patterns.md) | 30 min | PreToolUse, PostToolUse, Notification, Stop |
 
 Line 188:
 - | [Commands Reference](reference/commands.md) | 20 min | Slash commands, $ARGUMENTS, frontmatter |
-+ | [Slash Commands](guides/7-keywords/2-slash-commands.md) | 20 min | Slash commands, $ARGUMENTS, frontmatter |
++ | [Slash Commands](guides/09-keywords/2-slash-commands.md) | 20 min | Slash commands, $ARGUMENTS, frontmatter |
 ```
 
 #### Step 6: Update Optimization Section Links (Lines 204-207)
@@ -164,28 +164,28 @@ Line 188:
 **Find and Replace**:
 ```markdown
 OLD: optimization/token-usage.md
-NEW: guides/8-optimization/3-monitoring-budgeting.md
+NEW: guides/11-optimization/3-monitoring-budgeting.md
 
 OLD: optimization/cost-comparison.md
-NEW: guides/8-optimization/1-cost-optimization.md
+NEW: guides/11-optimization/1-cost-optimization.md
 
 OLD: optimization/strategies.md
-NEW: guides/8-optimization/2-advanced-techniques.md
+NEW: guides/11-optimization/2-advanced-techniques.md
 ```
 
 **Specific Changes**:
 ```diff
 Line 204:
 - | [Token Usage Guide](optimization/token-usage.md) | 30 min | Tracking, estimation, monitoring |
-+ | [Monitoring & Budgeting](guides/8-optimization/3-monitoring-budgeting.md) | 30 min | Tracking, estimation, monitoring |
++ | [Monitoring & Budgeting](guides/11-optimization/3-monitoring-budgeting.md) | 30 min | Tracking, estimation, monitoring |
 
 Line 205:
 - | [Cost Comparison](optimization/cost-comparison.md) | 20 min | Haiku vs. Sonnet vs. Opus economics |
-+ | [Cost Optimization](guides/8-optimization/1-cost-optimization.md) | 30 min | Haiku vs. Sonnet vs. Opus economics |
++ | [Cost Optimization](guides/11-optimization/1-cost-optimization.md) | 30 min | Haiku vs. Sonnet vs. Opus economics |
 
 Line 206:
 - | [Optimization Strategies](optimization/strategies.md) | 45 min | 4 strategies, 60%+ savings potential |
-+ | [Advanced Techniques](guides/8-optimization/2-advanced-techniques.md) | 35 min | 4 strategies, 60%+ savings potential |
++ | [Advanced Techniques](guides/11-optimization/2-advanced-techniques.md) | 35 min | 4 strategies, 60%+ savings potential |
 ```
 
 #### Step 7: Update Quick Reference Section (Lines 288-292)
@@ -193,35 +193,35 @@ Line 206:
 **Find and Replace**:
 ```markdown
 OLD: guides/12-quick-reference/1-model-selection-tree.md
-NEW: guides/10-reference/5-model-selection-tree.md
+NEW: guides/13-reference/5-model-selection-tree.md
 
 OLD: guides/12-quick-reference/2-optimization-checklist.md
-NEW: guides/10-reference/6-optimization-checklist.md
+NEW: guides/13-reference/6-optimization-checklist.md
 
 OLD: guides/12-quick-reference/3-glossary.md
-NEW: guides/10-reference/7-glossary.md
+NEW: guides/13-reference/7-glossary.md
 
 OLD: guides/12-quick-reference/4-community-resources.md
-NEW: guides/12-community/1-resources.md
+NEW: guides/15-community/1-resources.md
 ```
 
 **Specific Changes**:
 ```diff
 Line 288:
 - | **[Model Selection Decision Tree](guides/12-quick-reference/1-model-selection-tree.md)** | **15 min** | **Haiku/Sonnet/Opus decision flowchart, cost calculator** |
-+ | **[Model Selection Decision Tree](guides/10-reference/5-model-selection-tree.md)** | **15 min** | **Haiku/Sonnet/Opus decision flowchart, cost calculator** |
++ | **[Model Selection Decision Tree](guides/13-reference/5-model-selection-tree.md)** | **15 min** | **Haiku/Sonnet/Opus decision flowchart, cost calculator** |
 
 Line 290:
 - | **[Optimization Checklist](guides/12-quick-reference/2-optimization-checklist.md)** | **20 min** | **Pre-implementation, configuration, runtime, monitoring** |
-+ | **[Optimization Checklist](guides/10-reference/6-optimization-checklist.md)** | **20 min** | **Pre-implementation, configuration, runtime, monitoring** |
++ | **[Optimization Checklist](guides/13-reference/6-optimization-checklist.md)** | **20 min** | **Pre-implementation, configuration, runtime, monitoring** |
 
 Line 291:
 - | **[Glossary](guides/12-quick-reference/3-glossary.md)** | **25 min** | **Complete terminology reference (80+ terms)** |
-+ | **[Glossary](guides/10-reference/7-glossary.md)** | **25 min** | **Complete terminology reference (80+ terms)** |
++ | **[Glossary](guides/13-reference/7-glossary.md)** | **25 min** | **Complete terminology reference (80+ terms)** |
 
 Line 292:
 - | **[Community Resources](guides/12-quick-reference/4-community-resources.md)** | **20 min** | **Official docs, community channels, learning materials** |
-+ | **[Community Resources](guides/12-community/1-resources.md)** | **20 min** | **Official docs, community channels, learning materials** |
++ | **[Community Resources](guides/15-community/1-resources.md)** | **20 min** | **Official docs, community channels, learning materials** |
 ```
 
 #### Step 8: Update Additional Reference Links (Lines 565-567, 385-388)
@@ -252,10 +252,10 @@ done
 **Find and Replace** (multiple occurrences):
 ```markdown
 OLD: guides/models/model-comparison.md
-NEW: guides/4-models/1-overview.md
+NEW: guides/05-models/1-overview.md
 
 OLD: guides/models/selection-guide.md
-NEW: guides/4-models/5-selection-guide.md
+NEW: guides/05-models/5-selection-guide.md
 ```
 
 #### Step 2: Fix All Skills Links
@@ -263,10 +263,10 @@ NEW: guides/4-models/5-selection-guide.md
 **Find and Replace**:
 ```markdown
 OLD: guides/skills/overview.md
-NEW: guides/3-skills/1-overview.md
+NEW: guides/03-skills/1-overview.md
 
 OLD: guides/skills/creating-skills.md
-NEW: guides/3-skills/3-creating-skills.md
+NEW: guides/03-skills/3-creating-skills.md
 ```
 
 #### Step 3: Fix All Thinking Links
@@ -274,10 +274,10 @@ NEW: guides/3-skills/3-creating-skills.md
 **Find and Replace**:
 ```markdown
 OLD: guides/thinking/extended-thinking.md
-NEW: guides/5-thinking/1-overview.md
+NEW: guides/07-thinking/1-overview.md
 
 OLD: guides/thinking/when-to-use.md
-ACTION: Change to guides/5-thinking/1-overview.md or remove
+ACTION: Change to guides/07-thinking/1-overview.md or remove
 ```
 
 #### Step 4: Fix All Context Links
@@ -285,10 +285,10 @@ ACTION: Change to guides/5-thinking/1-overview.md or remove
 **Find and Replace**:
 ```markdown
 OLD: guides/context/claude-md-files.md
-NEW: guides/6-context/2-claude-md.md
+NEW: guides/08-context/2-claude-md.md
 
 OLD: guides/context/optimization.md
-ACTION: Change to guides/6-context/1-overview.md or remove
+ACTION: Change to guides/08-context/1-overview.md or remove
 ```
 
 **Validation**:
@@ -307,13 +307,13 @@ done
 
 **Time**: 45 minutes
 
-#### File 1: guides/2-agents/1-overview.md
+#### File 1: guides/02-agents/1-overview.md
 
 **Action**: Read file, find TODOs, complete or remove them
 
 ```bash
 # Find TODOs
-grep -n "TODO\|FIXME\|TBD" guides/2-agents/1-overview.md
+grep -n "TODO\|FIXME\|TBD" guides/02-agents/1-overview.md
 
 # For each TODO:
 # 1. If content can be completed quickly: Complete it
@@ -321,19 +321,19 @@ grep -n "TODO\|FIXME\|TBD" guides/2-agents/1-overview.md
 # 3. If it's important but time-consuming: Convert to GitHub issue and remove from doc
 ```
 
-#### File 2: guides/2-agents/2-built-in-agents.md
+#### File 2: guides/02-agents/2-built-in-agents.md
 
 Same process as above.
 
-#### File 3: guides/4-models/5-selection-guide.md
+#### File 3: guides/05-models/5-selection-guide.md
 
 Same process as above.
 
-#### File 4: guides/4-models/2-haiku.md
+#### File 4: guides/05-models/2-haiku.md
 
 Same process as above.
 
-#### File 5: guides/1-mcp-servers/3-popular-servers.md
+#### File 5: guides/01-mcp-servers/3-popular-servers.md
 
 Same process as above.
 
@@ -416,19 +416,19 @@ find guides -name "*.md" -exec grep -L "Reading Time\|reading time" {} \;
 - - [API Documentation](examples/skills/api-documentation/) - Generate API docs from code
 - - [Code Review](examples/skills/code-review/) - Automated code reviews
 + - [Documentation Professor](examples/skills/documentation-professor/) - Pedagogical documentation writer
-+ (Note: Additional skills examples available in guides/9-examples/workflows/)
++ (Note: Additional skills examples available in guides/12-examples/workflows/)
 
 ### Agent Configurations
 - - [Quick Search Agent](examples/agents/quick-search.json) - Fast codebase exploration (Haiku)
 - - [Feature Implementer](examples/agents/feature-implementer.json) - Standard development (Sonnet)
 - - [Architecture Reviewer](examples/agents/architecture-reviewer.json) - Deep analysis (Opus)
-+ (Examples integrated into guides/2-agents/ documentation)
++ (Examples integrated into guides/02-agents/ documentation)
 
 ### CLAUDE.md Templates
 - - [Web Application](examples/claude-md-templates/web-application-CLAUDE.md) - React/Vue/Angular
 - - [API Service](examples/claude-md-templates/api-service-CLAUDE.md) - Backend services
 - (etc...)
-+ (See project templates in guides/9-examples/projects/ for complete examples)
++ (See project templates in guides/12-examples/projects/ for complete examples)
 ```
 
 **Validation**:
@@ -457,23 +457,23 @@ done
 
 **Add These Lines**:
 ```markdown
-| **[Documentation Writing Workflow](guides/9-examples/workflows/5-documentation-writing.md)** | **25 min** | **API docs, tutorials, testing examples, ROI analysis** |
-| **[Performance Optimization Workflow](guides/9-examples/workflows/6-performance-optimization.md)** | **30 min** | **Profile, analyze, optimize, validate with real examples** |
-| **[Testing Workflow](guides/9-examples/workflows/7-testing.md)** | **35 min** | **TDD, unit tests, integration, E2E with comprehensive examples** |
+| **[Documentation Writing Workflow](guides/12-examples/workflows/5-documentation-writing.md)** | **25 min** | **API docs, tutorials, testing examples, ROI analysis** |
+| **[Performance Optimization Workflow](guides/12-examples/workflows/6-performance-optimization.md)** | **30 min** | **Profile, analyze, optimize, validate with real examples** |
+| **[Testing Workflow](guides/12-examples/workflows/7-testing.md)** | **35 min** | **TDD, unit tests, integration, E2E with comprehensive examples** |
 ```
 
 **Full Context** (lines 229-239):
 ```markdown
 | **Workflows** |||
-| [Feature Development Workflow](guides/9-examples/workflows/1-feature-development.md) | 30 min | 6-phase development process |
-| **[Bug Fixing Workflow](guides/9-examples/workflows/2-bug-fixing.md)** | **30 min** | **Systematic debugging with TDD approach** |
-| **[Code Review Workflow](guides/9-examples/workflows/3-code-review.md)** | **25 min** | **AI-assisted PR reviews with security checks** |
-| **[Refactoring Workflow](guides/9-examples/workflows/4-refactoring.md)** | **35 min** | **Safe refactoring with Plan agent and tests** |
-| **[Documentation Writing Workflow](guides/9-examples/workflows/5-documentation-writing.md)** | **25 min** | **API docs, tutorials, testing examples, ROI analysis** |
-| **[Performance Optimization Workflow](guides/9-examples/workflows/6-performance-optimization.md)** | **30 min** | **Profile, analyze, optimize, validate with real examples** |
-| **[Testing Workflow](guides/9-examples/workflows/7-testing.md)** | **35 min** | **TDD, unit tests, integration, E2E with comprehensive examples** |
+| [Feature Development Workflow](guides/12-examples/workflows/1-feature-development.md) | 30 min | 6-phase development process |
+| **[Bug Fixing Workflow](guides/12-examples/workflows/2-bug-fixing.md)** | **30 min** | **Systematic debugging with TDD approach** |
+| **[Code Review Workflow](guides/12-examples/workflows/3-code-review.md)** | **25 min** | **AI-assisted PR reviews with security checks** |
+| **[Refactoring Workflow](guides/12-examples/workflows/4-refactoring.md)** | **35 min** | **Safe refactoring with Plan agent and tests** |
+| **[Documentation Writing Workflow](guides/12-examples/workflows/5-documentation-writing.md)** | **25 min** | **API docs, tutorials, testing examples, ROI analysis** |
+| **[Performance Optimization Workflow](guides/12-examples/workflows/6-performance-optimization.md)** | **30 min** | **Profile, analyze, optimize, validate with real examples** |
+| **[Testing Workflow](guides/12-examples/workflows/7-testing.md)** | **35 min** | **TDD, unit tests, integration, E2E with comprehensive examples** |
 | **Teams** |||
-| [Solo Developer Setup](guides/9-examples/teams/1-solo-developer.md) | 25 min | Optimized individual configuration |
+| [Solo Developer Setup](guides/12-examples/teams/1-solo-developer.md) | 25 min | Optimized individual configuration |
 ```
 
 ---
@@ -498,7 +498,7 @@ done
 | Guide | Time | Topics |
 |-------|------|--------|
 - | **[Model Selection Decision Tree](guides/12-quick-reference/1-model-selection-tree.md)** | **15 min** | **Haiku/Sonnet/Opus decision flowchart, cost calculator** |
-+ | **[Model Selection Decision Tree](guides/10-reference/5-model-selection-tree.md)** | **15 min** | **Haiku/Sonnet/Opus decision flowchart, cost calculator** |
++ | **[Model Selection Decision Tree](guides/13-reference/5-model-selection-tree.md)** | **15 min** | **Haiku/Sonnet/Opus decision flowchart, cost calculator** |
 (etc. - already covered in Task 1.1)
 ```
 
@@ -522,9 +522,9 @@ done
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| **[Community Resources](guides/12-community/1-resources.md)** | **20 min** | **Official docs, forums, learning materials** |
-| **[Contribution Guide](guides/12-community/2-contribution-guide.md)** | **25 min** | **How to contribute skills, MCP servers, documentation** |
-| **[Best Practices Catalog](guides/12-community/3-best-practices-catalog.md)** | **30 min** | **Production patterns from real-world use** |
+| **[Community Resources](guides/15-community/1-resources.md)** | **20 min** | **Official docs, forums, learning materials** |
+| **[Contribution Guide](guides/15-community/2-contribution-guide.md)** | **25 min** | **How to contribute skills, MCP servers, documentation** |
+| **[Best Practices Catalog](guides/15-community/3-best-practices-catalog.md)** | **30 min** | **Production patterns from real-world use** |
 
 **Total Time**: ~1.5 hours
 **Dependencies**: None
@@ -593,7 +593,7 @@ Contribution guides and best practices allow you to give back and learn from oth
 
 ```bash
 # Automated check
-for file in guides/9-examples/workflows/{5,6,7}-*.md; do
+for file in guides/12-examples/workflows/{5,6,7}-*.md; do
     echo "Checking $file"
     grep -o '\](guides/[^)]*\.md)' "$file" | sed 's/](//;s/)//' | while read link; do
         if [ ! -f "$link" ]; then
@@ -818,8 +818,8 @@ done
 
 **Known broken link**:
 ```diff
-- - **Technical questions**: Check the [FAQ](guides/10-reference/3-faq.md)
-+ - **Technical questions**: Check the [FAQ](guides/10-reference/3-faq.md)
+- - **Technical questions**: Check the [FAQ](guides/13-reference/3-faq.md)
++ - **Technical questions**: Check the [FAQ](guides/13-reference/3-faq.md)
 (Already correct - verify it exists)
 ```
 
@@ -966,11 +966,11 @@ Use this checklist to track progress:
   - [x] Fix Context links
   - [x] Validate all changes
 - [x] Task 1.3: Remove TODO markers (45 min)
-  - [x] guides/2-agents/1-overview.md (verified as examples, not placeholders)
-  - [x] guides/2-agents/2-built-in-agents.md (verified as examples, not placeholders)
-  - [x] guides/4-models/5-selection-guide.md (verified as examples, not placeholders)
-  - [x] guides/4-models/2-haiku.md (verified as examples, not placeholders)
-  - [x] guides/1-mcp-servers/3-popular-servers.md (verified as examples, not placeholders)
+  - [x] guides/02-agents/1-overview.md (verified as examples, not placeholders)
+  - [x] guides/02-agents/2-built-in-agents.md (verified as examples, not placeholders)
+  - [x] guides/05-models/5-selection-guide.md (verified as examples, not placeholders)
+  - [x] guides/05-models/2-haiku.md (verified as examples, not placeholders)
+  - [x] guides/01-mcp-servers/3-popular-servers.md (verified as examples, not placeholders)
   - [x] Validate no TODOs remain
 - [x] Task 1.4: Add reading time estimates (30 min)
   - [x] Identify 9 files missing estimates (found 2 actual missing)
