@@ -622,14 +622,6 @@ Great job! Now you're ready for:
 - [Claude Code Commands Reference](https://code.claude.com/docs/en/commands) - Official command documentation
 - [Command Syntax Specification](https://code.claude.com/docs/en/commands/syntax) - Detailed syntax guide
 
-### 🎥 Video Tutorials
-- [Creating Custom Commands](https://youtube.com/placeholder) (12 min) - Step-by-step walkthrough
-- [Advanced Command Patterns](https://youtube.com/placeholder) (18 min) - Complex workflows
-
-### 📝 Community Examples
-- [Awesome Claude Commands](https://github.com/placeholder/commands) - Community command collection
-- [Production Command Patterns](https://blog.example.com/claude-commands) - Real-world examples
-
 ### 🔗 Related Topics
 - [MCP Servers](../01-mcp-servers/1-overview.md) - External tool integration
 - [Skills](../03-skills/1-overview.md) - Complex workflows with progressive disclosure
