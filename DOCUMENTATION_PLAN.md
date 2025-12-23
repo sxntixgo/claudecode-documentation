@@ -1369,7 +1369,7 @@ Annual (250 work days): $2,375 savings
 **Deliverables**:
 
 #### 5.1 Complete API Reference
-**File**: `guides/10-reference/1-api-reference.md`
+**File**: `guides/13-reference/1-api-reference.md`
 
 **Topics to Cover**:
 - **AGENT.md Schema**: Complete YAML/JSON schema for custom agents
@@ -1437,7 +1437,7 @@ Annual (250 work days): $2,375 savings
   - Custom environment variables
 
 #### 5.2 Troubleshooting Guide
-**File**: `guides/10-reference/2-troubleshooting.md`
+**File**: `guides/13-reference/2-troubleshooting.md`
 
 **Topics to Cover**:
 - **MCP Server Issues**
@@ -1495,7 +1495,7 @@ Each issue includes:
 - Related issues and cross-references
 
 #### 5.3 FAQ Section
-**File**: `guides/10-reference/3-faq.md`
+**File**: `guides/13-reference/3-faq.md`
 
 **Categories**:
 
@@ -1565,11 +1565,11 @@ Each issue includes:
 
 #### 5.4 Additional Project Templates
 **Files**:
-- `guides/9-examples/projects/3-python-flask.md`
-- `guides/9-examples/projects/4-python-django.md`
-- `guides/9-examples/projects/5-python-fastapi.md`
-- `guides/9-examples/projects/6-go-microservices.md`
-- `guides/9-examples/projects/7-rust-project.md`
+- `guides/12-examples/projects/3-python-flask.md`
+- `guides/12-examples/projects/4-python-django.md`
+- `guides/12-examples/projects/5-python-fastapi.md`
+- `guides/12-examples/projects/6-go-microservices.md`
+- `guides/12-examples/projects/7-rust-project.md`
 
 Each template includes:
 - Complete `.claude/` directory structure
@@ -1609,12 +1609,12 @@ Each template includes:
 
 #### 5.5 Complete Workflow Documentation
 **Files**:
-- `guides/9-examples/workflows/2-bug-fixing.md`
-- `guides/9-examples/workflows/3-code-review.md`
-- `guides/9-examples/workflows/4-refactoring.md`
-- `guides/9-examples/workflows/5-documentation-writing.md`
-- `guides/9-examples/workflows/6-performance-optimization.md`
-- `guides/9-examples/workflows/7-testing.md`
+- `guides/12-examples/workflows/2-bug-fixing.md`
+- `guides/12-examples/workflows/3-code-review.md`
+- `guides/12-examples/workflows/4-refactoring.md`
+- `guides/12-examples/workflows/5-documentation-writing.md`
+- `guides/12-examples/workflows/6-performance-optimization.md`
+- `guides/12-examples/workflows/7-testing.md`
 
 Each workflow includes:
 - Step-by-step process
@@ -1659,7 +1659,7 @@ Each workflow includes:
 - Cost: ~$1.00-$2.50
 
 #### 5.6 Security and Compliance Guide
-**File**: `guides/11-security/1-security-compliance.md`
+**File**: `guides/14-security/1-security-compliance.md`
 
 **Topics to Cover**:
 - **Secrets Management**
@@ -1698,7 +1698,7 @@ Each workflow includes:
   - Environment isolation
 
 #### 5.7 Testing and Quality Guide
-**File**: `guides/11-security/2-testing-quality.md`
+**File**: `guides/14-security/2-testing-quality.md`
 
 **Topics to Cover**:
 - **Testing MCP Servers**
@@ -1737,7 +1737,7 @@ Each workflow includes:
   - Load testing
 
 #### 5.8 Performance and Monitoring Guide
-**File**: `guides/11-security/3-performance-monitoring.md`
+**File**: `guides/14-security/3-performance-monitoring.md`
 
 **Topics to Cover**:
 - **Performance Benchmarks**
@@ -1777,10 +1777,10 @@ Each workflow includes:
 
 #### 5.9 Quick Reference Materials
 **Files**:
-- `guides/10-reference/4-cheat-sheet.md`
-- `guides/10-reference/5-model-selection-tree.md`
-- `guides/10-reference/6-optimization-checklist.md`
-- `guides/10-reference/7-glossary.md`
+- `guides/13-reference/4-cheat-sheet.md`
+- `guides/13-reference/5-model-selection-tree.md`
+- `guides/13-reference/6-optimization-checklist.md`
+- `guides/13-reference/7-glossary.md`
 
 **Quick Reference Cheat Sheet** (`4-cheat-sheet.md`):
 - All slash commands with syntax
@@ -1819,9 +1819,9 @@ Each workflow includes:
 #### 5.10 Community and Contribution
 **Files**:
 - `CONTRIBUTING.md`
-- `guides/12-community/1-resources.md`
-- `guides/12-community/2-contribution-guide.md`
-- `guides/12-community/3-best-practices-catalog.md`
+- `guides/15-community/1-resources.md`
+- `guides/15-community/2-contribution-guide.md`
+- `guides/15-community/3-best-practices-catalog.md`
 
 **Community Resources** (`1-resources.md`):
 - Official Anthropic resources
