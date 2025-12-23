@@ -621,6 +621,7 @@ Great job! Now you're ready for:
 ### 📚 Official Documentation
 - [Claude Code Commands Reference](https://code.claude.com/docs/en/commands) - Official command documentation
 - [Command Syntax Specification](https://code.claude.com/docs/en/commands/syntax) - Detailed syntax guide
+- [Build a YouTube Research Agent Tutorial](https://creatoreconomy.so/p/claude-code-tutorial-build-a-youtube-research-agent-in-15-min) - Hands-on slash commands tutorial
 
 ### 🔗 Related Topics
 - [MCP Servers](../01-mcp-servers/1-overview.md) - External tool integration

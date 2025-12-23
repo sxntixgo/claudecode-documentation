@@ -742,6 +742,8 @@ Want to dive deeper? Here are excellent resources:
 - [Introducing Agent Specialization](https://anthropic.com/blog/claude-code-agents) - Why specialized agents matter
 - [Optimizing Agent Selection for Performance](https://anthropic.com/engineering/agent-optimization) - Speed and cost analysis
 - [Real-World Agent Workflows](https://vercel.com/blog/claude-agents) - Case studies from production use
+- [Building Agents with Claude Agent SDK](https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk) - Official SDK guide
+- [Claude Code in Action Course](https://anthropic.skilljar.com/claude-code-in-action) - Official course covering agents
 
 ### 🔗 Related Topics
 
