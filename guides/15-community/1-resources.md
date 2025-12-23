@@ -16,10 +16,12 @@ This guide catalogs official resources, community contributions, and learning ma
 
 ### Claude Code Documentation
 
-- **Official Docs**: https://code.claude.com/docs
-- **GitHub Repository**: https://github.com/anthropics/claude-code
-- **Issue Tracker**: https://github.com/anthropics/claude-code/issues
-- **Release Notes**: https://github.com/anthropics/claude-code/releases
+- **GitHub Repository**: https://github.com/anthropics/claude-code - Primary documentation source
+- **README**: https://github.com/anthropics/claude-code#readme - Quick start guide
+- **Issue Tracker**: https://github.com/anthropics/claude-code/issues - Report bugs and request features
+- **Release Notes**: https://github.com/anthropics/claude-code/releases - Latest updates
+
+> 💡 **Note**: For the most current documentation, always check the [official GitHub repository](https://github.com/anthropics/claude-code).
 
 ### Claude API & Platform
 
