@@ -578,15 +578,11 @@ Track average and optimize low performers
 ### Optimization Process
 
 **Step 1: Measure Baseline**
-```bash
-# Review last week's usage
-claude-code stats --last-week
 
-# Note:
-# - Total cost
-# - Model breakdown
-# - Average cost per task type
-```
+Track your usage for one week. Record:
+- Total cost
+- Model breakdown (% Haiku vs Sonnet vs Opus)
+- Average cost per task type
 
 **Step 2: Identify High-Cost Patterns**
 ```
@@ -606,12 +602,10 @@ For each high-cost pattern:
 ```
 
 **Step 4: Measure Improvement**
-```bash
-# Compare to baseline
-claude-code stats --last-week --compare-to="2 weeks ago"
 
-# Target: 30-60% cost reduction
-```
+Compare this week's metrics to your baseline:
+- Target: 30-60% cost reduction
+- Track: Cost per task type, model usage distribution
 
 ---
 
@@ -619,29 +613,24 @@ claude-code stats --last-week --compare-to="2 weeks ago"
 
 ### Setting Team Budgets
 
-**Example team budget**:
+Create team guidelines for model selection and cost management:
 
-```yaml
-# .claude/config.yml
-cost_budget:
-  monthly_limit: $100
+| Task Type | Budget Target | Recommended Model |
+|-----------|---------------|-------------------|
+| **Exploration** | $0.05 max | Haiku |
+| **Code Review** | $0.15 max | Haiku → Sonnet |
+| **New Feature** | $0.50 max | Sonnet |
+| **Architecture** | $2.00 max | Sonnet → Opus |
 
-  per_user:
-    developer: $50/month
-    junior: $25/month
+**Team Budget Structure**:
+```markdown
+Monthly team limit: $100
+├── Senior developers: $50/month
+├── Junior developers: $25/month
+└── Reserve for complex tasks: $25/month
 
-  per_task_type:
-    exploration: $0.05 max (use Haiku)
-    code_review: $0.15 max
-    new_feature: $0.50 max
-    architecture: $2.00 max (Opus allowed)
-
-  alerts:
-    warning_threshold: 80%  # Alert at $80
-    model_restrictions:
-      if_budget_over_80:
-        disable: [opus]
-        force: haiku
+Warning threshold: 80% ($80)
+Action at threshold: Switch to Haiku for routine tasks
 ```
 
 ---
