@@ -31,6 +31,7 @@ Documentation is structured in logical order - each topic builds on previous one
 14. Reference           → API reference and quick lookup
 15. Security            → Production readiness
 16. Community           → Resources and contribution
+17. Advanced Prompting  → Production-grade prompt engineering
 ```
 
 ## 🚀 Quick Start
@@ -62,7 +63,8 @@ claudecode-docs/
 │   ├── 13-examples/          # Projects and workflows
 │   ├── 14-reference/         # API reference, FAQ, cheat sheets
 │   ├── 15-security/          # Security, testing, monitoring
-│   └── 16-community/         # Resources and contribution
+│   ├── 16-community/         # Resources and contribution
+│   └── 17-advanced-prompting/# Advanced prompt engineering
 └── .claude/skills/           # Active skills for this project
 ```
 
