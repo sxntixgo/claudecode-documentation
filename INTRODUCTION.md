@@ -19,6 +19,7 @@ Think of this as your personal university course on Claude Code—we've structur
 By working through this documentation, you'll learn:
 
 ✅ **Foundation Skills**
+- Master effective prompt engineering to save time and money from day one
 - Set up and configure MCP servers to extend Claude's capabilities
 - Understand how agents work and when to use each type
 - Create custom skills for repeatable tasks
@@ -41,11 +42,11 @@ By working through this documentation, you'll learn:
 This documentation isn't just a random collection of topics—it follows a **pedagogical progression** where each concept builds on the previous ones. Here's the journey we'll take together:
 
 ```
- Overview  → Foundation → Building Blocks → Advanced → Mastery
-  Plugins  →    MCP     →  Agents/Skills  → Context → Optimization
+ Overview  → Foundation  → Communication → Building Blocks → Advanced → Mastery
+  Plugins  →    MCP      →  Prompting    →  Agents/Skills  → Context → Optimization
 ```
 
-### The 9-Stage Learning Path
+### The 10-Stage Learning Path
 
 **0. Plugin Ecosystem Overview** (Big Picture - Start Here!)
 Before diving into specifics, understand the four plugin types (MCP Servers, Skills, Hooks, Slash Commands) and how they work together. This 20-minute overview gives you the mental framework to organize everything you'll learn. Think of it as seeing the map before exploring the territory.
@@ -53,28 +54,31 @@ Before diving into specifics, understand the four plugin types (MCP Servers, Ski
 **1. MCP Servers** (Foundation - Plugin Type 1)
 Think of MCP as the foundation of a house. You can't build anything solid without it. MCP servers extend Claude Code by connecting it to external tools—GitHub, databases, APIs, and more. Once you understand how to add capabilities to Claude, everything else makes sense.
 
-**2. Agents** (Building on MCP)
-Now that Claude has tools (via MCP), agents are the workers who use those tools intelligently. The Explore agent searches your codebase, the General-Purpose agent makes changes, and the Plan agent researches before implementation. Understanding agents helps you delegate work effectively.
+**2. Prompt Engineering Basics** (Essential Communication Skills)
+Before learning advanced features, master how to communicate effectively with Claude. The 4-part formula (Intent + Context + Constraints + Success) and 7 core patterns (CREATE, FIX, REFACTOR, etc.) save time and money from day one. Good prompting skills amplify everything else you'll learn. 45 minutes here pays dividends throughout your entire Claude Code journey.
 
-**3. Skills** (Leveraging Agents - Plugin Type 2)
+**3. Agents** (Building on MCP & Prompting)
+Now that Claude has tools (via MCP) and you know how to communicate well (prompting), agents are the workers who use those tools intelligently. The Explore agent searches your codebase, the General-Purpose agent makes changes, and the Plan agent researches before implementation. Understanding agents helps you delegate work effectively.
+
+**4. Skills** (Leveraging Agents - Plugin Type 2)
 Skills are like training manuals that agents follow. Once you know how agents work, you can write instructions (skills) that make them experts at specific tasks—TDD workflows, API documentation, code reviews. Skills turn generic agents into specialists.
 
-**4. Model Selection** (Understanding the Engine)
+**5. Model Selection** (Understanding the Engine)
 Not every task needs the most powerful model. Haiku 4.5 is 3x cheaper than Sonnet and perfect for searches. Opus 4.5 excels at complex architecture but costs more. Knowing which model to use is crucial for balancing quality and cost.
 
-**5. Thinking Modes** (Optimizing Reasoning)
+**6. Thinking Modes** (Optimizing Reasoning)
 Sometimes you need Claude to think deeply about a problem; other times, a quick answer is fine. Thinking modes let you control how much reasoning Claude does, which directly impacts token usage and quality.
 
-**6. Context Management** (Advanced Control)
+**7. Context Management** (Advanced Control)
 As you work on larger projects, managing what Claude "remembers" becomes important. CLAUDE.md files, memory hierarchies, and context clearing strategies keep your workflows efficient.
 
-**7. Keywords & Triggers** (Power User Features - Slash Commands = Plugin Type 3)
+**8. Keywords & Triggers** (Power User Features - Slash Commands = Plugin Type 3)
 Custom slash commands and behavioral keywords let you customize Claude Code to match your workflow. This builds on everything you've learned about how Claude Code operates.
 
-**7.5. Hooks** (Automation - Plugin Type 4)
+**8.5. Hooks** (Automation - Plugin Type 4)
 Hooks automate workflows by running commands at specific trigger points (before/after tool use, on prompts). Set up automated testing, code formatting, and validation that happens without manual intervention.
 
-**8. Token Optimization** (Synthesis)
+**9. Token Optimization** (Synthesis)
 Finally, you'll apply everything—model selection, thinking budgets, context management, strategic agent/skill usage—to dramatically reduce costs while maintaining quality.
 
 ### Why Not Jump Ahead?
@@ -83,6 +87,7 @@ You might be tempted to skip straight to "Token Optimization" or "Advanced Techn
 
 **❌ Without Plugin Overview**: You won't understand how MCP, Skills, Hooks, and Commands fit together
 **❌ Without MCP knowledge**: You won't understand what agents are actually doing
+**❌ Without Prompting skills**: You'll waste time with vague prompts and higher costs
 **❌ Without Agent knowledge**: Skills won't make sense (they're instructions for agents)
 **❌ Without Model knowledge**: You can't optimize costs effectively
 **❌ Without Context knowledge**: Advanced customization will seem confusing
@@ -193,16 +198,16 @@ We've designed four different paths through this documentation based on your goa
 **Approach**: Sequential learning from MCP Servers → Token Optimization
 
 **Your Journey**:
-1. **Start with**: [Plugin Ecosystem Overview](guides/06-plugins/1-overview.md) (20 min) - See the big picture first!
+1. **Start with**: [Plugin Ecosystem Overview](guides/07-plugins/1-overview.md) (20 min) - See the big picture first!
 2. **Deep dive**: [MCP Servers](guides/01-mcp-servers/2-installation.md) (Plugin Type 1)
-3. Progress through [Agents](guides/02-agents/1-overview.md)
-4. Learn [Skills](guides/03-skills/1-overview.md) (Plugin Type 2)
-5. Master [Model Selection](guides/05-models/1-overview.md)
-6. Understand [Thinking Modes](guides/07-thinking/1-overview.md)
-7. Deep dive into [Context Management](guides/08-context/2-claude-md.md)
-8. Explore [Keywords & Triggers](guides/09-keywords/1-overview.md) (Slash Commands = Plugin Type 3)
-9. Learn [Hooks & Automation](guides/10-hooks/1-overview.md) (Plugin Type 4)
-10. Apply everything in [Token Optimization](guides/11-optimization/2-advanced-techniques.md)
+3. Progress through [Agents](guides/03-agents/1-overview.md)
+4. Learn [Skills](guides/04-skills/1-overview.md) (Plugin Type 2)
+5. Master [Model Selection](guides/06-models/1-overview.md)
+6. Understand [Thinking Modes](guides/08-thinking/1-overview.md)
+7. Deep dive into [Context Management](guides/09-context/2-claude-md.md)
+8. Explore [Keywords & Triggers](guides/10-keywords/1-overview.md) (Slash Commands = Plugin Type 3)
+9. Learn [Hooks & Automation](guides/11-hooks/1-overview.md) (Plugin Type 4)
+10. Apply everything in [Token Optimization](guides/12-optimization/2-advanced-techniques.md)
 
 **Why this path?**
 - Builds solid foundation
@@ -219,12 +224,12 @@ We've designed four different paths through this documentation based on your goa
 **Approach**: Cover fundamentals quickly, deep dive into cost optimization
 
 **Your Journey**:
-1. **Quick overview**: [Plugin Ecosystem](guides/06-plugins/1-overview.md) (20 min) - Understand the 4 plugin types
+1. **Quick overview**: [Plugin Ecosystem](guides/07-plugins/1-overview.md) (20 min) - Understand the 4 plugin types
 2. **Quick overview**: [MCP Servers](guides/01-mcp-servers/1-overview.md) (15 min)
-3. **Quick overview**: [Agents](guides/02-agents/1-overview.md) (15 min)
-4. **Deep dive**: [Model Selection](guides/05-models/5-selection-guide.md) (30 min)
-5. **Deep dive**: [Thinking Modes](guides/07-thinking/1-overview.md) (25 min)
-6. **Deep dive**: [Token Optimization](guides/11-optimization/2-advanced-techniques.md) (60 min)
+3. **Quick overview**: [Agents](guides/03-agents/1-overview.md) (15 min)
+4. **Deep dive**: [Model Selection](guides/06-models/5-selection-guide.md) (30 min)
+5. **Deep dive**: [Thinking Modes](guides/08-thinking/1-overview.md) (25 min)
+6. **Deep dive**: [Token Optimization](guides/12-optimization/2-advanced-techniques.md) (60 min)
 7. **Reference**: Other topics as needed
 
 **Why this path?**
@@ -242,11 +247,11 @@ We've designed four different paths through this documentation based on your goa
 **Approach**: Skip basics, focus on customization and advanced patterns
 
 **Your Journey**:
-1. **Deep dive**: [Creating Custom Skills](guides/03-skills/3-creating-skills.md) (60 min)
-2. **Deep dive**: [CLAUDE.md Best Practices](guides/08-context/2-claude-md.md) (30 min)
-3. **Deep dive**: [Hooks and Commands](guides/09-keywords/3-automation-patterns.md) (45 min)
-4. **Deep dive**: [Advanced Context Patterns](guides/08-context/1-overview.md) (35 min)
-5. **Practice**: [Example Skills](guides/12-examples/1-overview.md) for inspiration
+1. **Deep dive**: [Creating Custom Skills](guides/04-skills/3-creating-skills.md) (60 min)
+2. **Deep dive**: [CLAUDE.md Best Practices](guides/09-context/2-claude-md.md) (30 min)
+3. **Deep dive**: [Hooks and Commands](guides/10-keywords/3-automation-patterns.md) (45 min)
+4. **Deep dive**: [Advanced Context Patterns](guides/09-context/1-overview.md) (35 min)
+5. **Practice**: [Example Skills](guides/13-examples/1-overview.md) for inspiration
 
 **Why this path?**
 - Customize Claude Code to your workflow
@@ -263,11 +268,11 @@ We've designed four different paths through this documentation based on your goa
 **Approach**: Use references and examples as needed
 
 **Your Resources**:
-- [Keywords Overview](guides/09-keywords/1-overview.md) - All keywords at a glance
-- [Model Overview](guides/05-models/1-overview.md) - Quick model selection
-- [Slash Commands](guides/09-keywords/2-slash-commands.md) - Frequently used commands
-- [Project Templates](guides/12-examples/1-overview.md) - Copy-paste ready
-- [Example Workflows](guides/12-examples/1-overview.md) - Real-world implementations
+- [Keywords Overview](guides/10-keywords/1-overview.md) - All keywords at a glance
+- [Model Overview](guides/06-models/1-overview.md) - Quick model selection
+- [Slash Commands](guides/10-keywords/2-slash-commands.md) - Frequently used commands
+- [Project Templates](guides/13-examples/1-overview.md) - Copy-paste ready
+- [Example Workflows](guides/13-examples/1-overview.md) - Real-world implementations
 
 **Why this path?**
 - Get answers immediately
@@ -353,7 +358,7 @@ This documentation serves three primary audiences:
 **You are**: Familiar with basics, want to optimize and expand
 **You need**: Real-world examples, optimization strategies
 **Your path**: Optimization Focused (Path 2) or skip around as needed
-**Start here**: [Model Selection Guide](guides/05-models/5-selection-guide.md)
+**Start here**: [Model Selection Guide](guides/06-models/5-selection-guide.md)
 
 **We've got you covered with**:
 - Practical optimization strategies
@@ -368,7 +373,7 @@ This documentation serves three primary audiences:
 **You are**: Power user, team lead, looking to customize
 **You need**: Reference docs, advanced patterns, edge cases
 **Your path**: Advanced Customization (Path 3) or Quick Reference (Path 4)
-**Start here**: [Custom Skills](guides/03-skills/3-creating-skills.md) or [References](guides/13-reference/)
+**Start here**: [Custom Skills](guides/04-skills/3-creating-skills.md) or [References](guides/14-reference/)
 
 **We've got you covered with**:
 - Advanced customization techniques
@@ -450,8 +455,8 @@ You'll know this documentation succeeded if you can:
 ### While Learning
 
 **Questions about concepts?**
-- Check the [FAQ](guides/13-reference/3-faq.md)
-- Review [Troubleshooting Guide](guides/13-reference/2-troubleshooting.md)
+- Check the [FAQ](guides/14-reference/3-faq.md)
+- Review [Troubleshooting Guide](guides/14-reference/2-troubleshooting.md)
 - Search the [Table of Contents](TABLE_OF_CONTENTS.md)
 
 **Code not working?**
@@ -486,13 +491,13 @@ Congratulations! You now understand:
 **Choose your next step:**
 
 **→ [New to Claude Code? Start with MCP Servers](guides/01-mcp-servers/1-overview.md)**
-**→ [Want cost savings? Jump to Optimization](guides/11-optimization/2-advanced-techniques.md)**
-**→ [Need quick answers? Use the References](guides/13-reference/)**
-**→ [Want examples? Browse Templates](guides/12-examples/1-overview.md)**
+**→ [Want cost savings? Jump to Optimization](guides/12-optimization/2-advanced-techniques.md)**
+**→ [Need quick answers? Use the References](guides/14-reference/)**
+**→ [Want examples? Browse Templates](guides/13-examples/1-overview.md)**
 
 ---
 
-**Have questions before diving in?** Check out our [FAQ](guides/13-reference/3-faq.md) or review the [TABLE_OF_CONTENTS.md](TABLE_OF_CONTENTS.md) for a complete navigation map.
+**Have questions before diving in?** Check out our [FAQ](guides/14-reference/3-faq.md) or review the [TABLE_OF_CONTENTS.md](TABLE_OF_CONTENTS.md) for a complete navigation map.
 
 **Already know what you need?** Use the search function or jump directly to any topic in the [Table of Contents](TABLE_OF_CONTENTS.md).
 

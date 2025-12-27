@@ -899,14 +899,14 @@ You: "Actually, ignore that. Let me be more specific: Fix the null pointer excep
 ### Link to Existing Guides
 
 **From prompt engineering guides, link to**:
-- guides/07-thinking/ - When to use thinking modes in prompts
-- guides/08-context/ - CLAUDE.md file management
-- guides/02-agents/ - How different agents respond to prompts
-- guides/11-optimization/ - Cost implications of prompt verbosity
+- guides/08-thinking/ - When to use thinking modes in prompts
+- guides/09-context/ - CLAUDE.md file management
+- guides/03-agents/ - How different agents respond to prompts
+- guides/12-optimization/ - Cost implications of prompt verbosity
 
 **From existing guides, link to prompt engineering**:
-- guides/08-context/1-overview.md - Add section "See also: Prompt Engineering"
-- guides/07-thinking/1-overview.md - Link to prompt patterns
+- guides/09-context/1-overview.md - Add section "See also: Prompt Engineering"
+- guides/08-thinking/1-overview.md - Link to prompt patterns
 - TABLE_OF_CONTENTS.md - Add new section
 
 ---
