@@ -113,9 +113,9 @@ graph TD
 | Guide | Time | Topics |
 |-------|------|--------|
 | [Why Prompting Matters](guides/02-prompt-basics/1-overview.md) | 20 min | 4-part formula, cost/time savings, common mistakes |
-| [Core Prompt Patterns](guides/02-prompt-basics/2-core-patterns.md) | 25 min | 7 essential patterns (CREATE, FIX, REFACTOR, REVIEW, EXPLAIN, TEST, OPTIMIZE) |
+| [Core Prompt Patterns](guides/02-prompt-basics/2-core-patterns.md) | 35 min | 7 essential patterns (CREATE, FIX, REFACTOR, REVIEW, EXPLAIN, TEST, OPTIMIZE) |
 
-**Total Time**: ~45 minutes
+**Total Time**: ~55 minutes
 **Dependencies**: None
 **Next**: Agents (apply prompting skills to specialized agents)
 
@@ -440,7 +440,7 @@ Thinking (deep) → Optimization (deep) → Context (reference)
 ```
 
 **Focus Areas**:
-1. Prompt Basics (45 min deep dive)
+1. Prompt Basics (55 min deep dive)
 2. Model Selection (30 min deep dive)
 3. Thinking Modes (25 min deep dive)
 4. Token Optimization (1 hour deep dive)

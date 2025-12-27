@@ -6,7 +6,7 @@
 
 ---
 
-## Why Prompting Matters 🎯
+## Why Prompting Matters
 
 The difference between a vague prompt and a good prompt can mean:
 
@@ -56,7 +56,7 @@ Be specific about the action:
 
 Provide relevant information:
 
-```bash
+```
 # ❌ Missing context
 "Add validation"
 
@@ -69,7 +69,7 @@ using the validator library we're already using"
 
 Define how it should be done:
 
-```bash
+```
 # ❌ No constraints
 "Add a database"
 
@@ -82,7 +82,7 @@ store credentials in .env file, don't commit .env to git"
 
 State what "done" looks like:
 
-```bash
+```
 # ❌ No success criteria
 "Optimize the code"
 
@@ -190,7 +190,7 @@ specifically the TTL (time-to-live) logic and when cached data is invalidated"
 
 Let's build a complete prompt using all four components:
 
-```bash
+```
 # Task: Add a feature to export data
 
 ❌ VAGUE PROMPT:

@@ -1,6 +1,6 @@
 # Core Prompt Patterns
 
-**Reading Time**: 20-25 minutes
+**Reading Time**: 30-35 minutes
 **Skill Level**: Beginner
 **Prerequisites**: [Prompt Basics Overview](1-overview.md)
 

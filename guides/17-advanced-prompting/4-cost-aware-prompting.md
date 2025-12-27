@@ -15,12 +15,12 @@ Cost-aware prompting is designing prompts to **maximize value per dollar** while
 ### The Cost Reality
 
 ```
-Haiku 4.5:   $0.25 / 1M input tokens,  $1.25 / 1M output tokens
+Haiku 4.5:   $1.00 / 1M input tokens,  $5.00 / 1M output tokens
 Sonnet 4.5:  $3.00 / 1M input tokens, $15.00 / 1M output tokens
-Opus 4.5:   $15.00 / 1M input tokens, $75.00 / 1M output tokens
+Opus 4.5:    $5.00 / 1M input tokens, $25.00 / 1M output tokens
 
-Sonnet is 12x more expensive than Haiku for input
-Opus is 60x more expensive than Haiku for input
+Sonnet is 3x more expensive than Haiku for input
+Opus is 5x more expensive than Haiku for input
 ```
 
 **Question**: Do you really need Sonnet for "list files in this directory"?
@@ -853,12 +853,44 @@ Savings: 92% ($11.50/month, $138/year)
 
 ## Next Steps
 
-You've completed the Advanced Prompting section!
+Congratulations! You've completed the Advanced Prompting section and mastered cost-aware prompting techniques.
 
-**To integrate these skills**:
-1. Review [Skills Guide](../04-skills/1-overview.md) - Package optimized prompts
-2. Check [Token Optimization](../12-optimization/1-cost-optimization.md) - System-wide strategies
-3. See [Examples](../13-examples/1-overview.md) - Real-world implementations
+### What You've Learned
+
+You now know how to:
+- Design prompts for maximum efficiency (reduce tokens without losing quality)
+- Use model cascading strategically (start cheap, escalate only when needed)
+- Batch similar tasks for cost reduction
+- Set and enforce quality thresholds
+- Track and optimize your costs systematically
+
+### Apply These Skills
+
+**Immediate actions**:
+1. Start tracking your weekly costs and model usage distribution
+2. Identify your 3 most frequent prompt patterns
+3. Apply efficiency techniques to those high-frequency prompts
+4. Measure your baseline before/after cost reduction
+
+**Integration with other Claude Code features**:
+- **[Skills Guide](../04-skills/1-overview.md)** - Package your optimized prompts as reusable skills
+- **[Token Optimization](../12-optimization/1-cost-optimization.md)** - Apply system-wide cost strategies
+- **[Context Management](../09-context/2-claude-md.md)** - Use CLAUDE.md files to reduce prompt length
+- **[Model Selection](../06-models/1-choosing-models.md)** - Deep dive into when to use each model
+
+**See it in action**:
+- **[Examples](../13-examples/1-overview.md)** - Real-world prompt optimization examples
+- **[Best Practices](../16-community/3-best-practices-catalog.md)** - Community patterns and lessons learned
+
+### Expected Results
+
+Within your first week of applying these techniques, you should see:
+- **30-60% cost reduction** on similar quality output
+- **Faster iterations** from clearer, more efficient prompts
+- **Better tracking** of where costs are going
+- **Consistent quality** from well-designed prompts
+
+**Target ROI**: 10-20x return in first month through cost savings and efficiency gains
 
 ---
 
