@@ -1284,7 +1284,7 @@ docker logs <container-id>
 
 ### Still Having Issues?
 
-1. **Check the official troubleshooting guide**: See [Troubleshooting MCP Servers](../13-reference/2-troubleshooting.md)
+1. **Check the official troubleshooting guide**: See [Troubleshooting MCP Servers](../14-reference/2-troubleshooting.md)
 2. **Search existing issues**: Check [GitHub Issues](https://github.com/modelcontextprotocol/specification/issues)
 3. **Ask the community**: Join [MCP Discord](https://discord.gg/anthropic) for help
 4. **Report bugs**: Open an issue at [MCP GitHub](https://github.com/modelcontextprotocol/specification/issues/new)
@@ -1303,7 +1303,7 @@ Excellent! You now know:
 
 **→ [Create Custom MCP Servers](4-creating-custom-servers.md)** - Build your own for internal tools
 
-**→ [Learn About Agents](../02-agents/1-overview.md)** - Understand how agents use these MCP tools
+**→ [Learn About Agents](../03-agents/1-overview.md)** - Understand how agents use these MCP tools
 
 **→ [MCP Best Practices](5-best-practices.md)** - Security, performance, error handling
 
@@ -1327,7 +1327,7 @@ Want to explore more? Here are excellent resources:
 
 - [MCP Overview](1-overview.md) - Conceptual foundation
 - [Installation Guide](2-installation.md) - Setup instructions
-- [Agents Overview](../02-agents/1-overview.md) - How agents use MCP servers
+- [Agents Overview](../03-agents/1-overview.md) - How agents use MCP servers
 - [Creating Custom Servers](4-creating-custom-servers.md) - Build your own
 
 ### 💬 Community & Support
@@ -1344,4 +1344,4 @@ Want to explore more? Here are excellent resources:
 
 ---
 
-**Ready to dive into agents?** Continue to [Agents Overview](../02-agents/1-overview.md) to learn how Claude uses these MCP tools effectively!
+**Ready to dive into agents?** Continue to [Agents Overview](../03-agents/1-overview.md) to learn how Claude uses these MCP tools effectively!
