@@ -387,26 +387,17 @@ Focus on the exported functions only, not internal helpers"
 
 Keep this handy while you work:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│           THE PROMPT FORMULA                            │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  1. INTENT:       What action (fix, create, refactor)  │
-│  2. CONTEXT:      Where (file path, tech stack)        │
-│  3. CONSTRAINTS:  How (requirements, don'ts)            │
-│  4. SUCCESS:      Done when (criteria, tests)           │
-│                                                         │
-├─────────────────────────────────────────────────────────┤
-│  EXAMPLE:                                               │
-│                                                         │
-│  "Fix the login timeout error in src/auth/login.ts     │
-│   by increasing the API timeout from 5s to 30s.        │
-│   Don't change the retry logic.                        │
-│   Success: Users can log in on slow connections"       │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-```
+### The Prompt Formula
+
+| Component | Description | Example |
+|-----------|-------------|---------|
+| **1. INTENT** | What action (fix, create, refactor) | "Fix the login timeout error" |
+| **2. CONTEXT** | Where (file path, tech stack) | "in src/auth/login.ts" |
+| **3. CONSTRAINTS** | How (requirements, don'ts) | "by increasing API timeout from 5s to 30s. Don't change retry logic" |
+| **4. SUCCESS** | Done when (criteria, tests) | "Users can log in on slow connections" |
+
+**Complete Example**:
+> "Fix the login timeout error in src/auth/login.ts by increasing the API timeout from 5s to 30s. Don't change the retry logic. Success: Users can log in on slow connections."
 
 ---
 

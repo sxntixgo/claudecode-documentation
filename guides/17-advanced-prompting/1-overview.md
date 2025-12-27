@@ -250,17 +250,19 @@ Unlike basic prompting where "it works" is enough, advanced prompting requires *
 
 ### How to Track
 
-```bash
-# Use Claude Code's built-in tracking
-claude-code stats --last-week
+Track your metrics manually or use your organization's cost tracking dashboard:
 
-# Example output:
-# Total tokens: 1.2M
-# Total cost: $18.50
-# Tasks completed: 127
-# Avg cost/task: $0.15
-# Model breakdown: 60% Haiku, 35% Sonnet, 5% Opus
 ```
+Example Weekly Metrics:
+─────────────────────────
+Total tokens:     1.2M
+Total cost:       $18.50
+Tasks completed:  127
+Avg cost/task:    $0.15
+Model breakdown:  60% Haiku, 35% Sonnet, 5% Opus
+```
+
+> **Tip**: Create a simple spreadsheet to track cost per task type. After a week, you'll see which patterns need optimization.
 
 See [Cost Optimization Guide](../12-optimization/1-cost-optimization.md) for detailed tracking strategies.
 
