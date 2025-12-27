@@ -14,31 +14,88 @@ Add a new guide section focused on **prompt engineering** specifically for Claud
 
 ## 2. Placement in Documentation Structure
 
-### Option A: New Guide Section (RECOMMENDED)
-**Location**: `guides/16-prompt-engineering/`
+### DECISION: Split Approach (Basics Early + Advanced Later)
 
-**Rationale**:
-- Logical progression: After community resources (15), add advanced communication techniques
-- Standalone topic that deserves dedicated coverage
-- Allows for comprehensive treatment without disrupting existing flow
-- Easy to reference from other guides
+**Rationale**: Users need basic prompting skills early, but advanced techniques require understanding the full system.
+
+---
+
+### Part 1: Basics (Early) - Position 02
+
+**Location**: `guides/02-prompt-basics/`
+
+**When**: Immediately after introduction, before diving into features
+**Purpose**: Foundation for effective communication
+**Reading Time**: 15-20 minutes
+**Skill Level**: Beginner
 
 **Structure**:
 ```
-guides/16-prompt-engineering/
-├── 1-overview.md                    # Introduction to prompt engineering for Claude Code
-├── 2-basic-patterns.md              # Common prompt patterns (fix, create, refactor, etc.)
-├── 3-advanced-techniques.md         # Advanced prompting strategies
-├── 4-context-in-prompts.md          # How to provide context effectively
-└── 5-anti-patterns.md               # Common mistakes and how to avoid them
+guides/02-prompt-basics/
+├── 1-overview.md           # Why prompting matters, basic formula
+└── 2-core-patterns.md      # 7 essential patterns (CREATE, FIX, REFACTOR, etc.)
 ```
 
-### Option B: Integrate into Existing Sections
-- Add to guides/08-context/ (context management already there)
-- Add to guides/09-keywords/ (keyword usage)
-- Problem: Doesn't give prompt engineering the prominence it deserves
+**Content Focus**:
+- Simple, standalone examples
+- No references to advanced features (agents, skills, MCP servers)
+- Core principles: clear intent, specific location, success criteria
+- Top 5 common mistakes
+- Quick wins for immediate improvement
 
-**DECISION: Option A - New dedicated section**
+---
+
+### Part 2: Advanced (Later) - Position 16
+
+**Location**: `guides/16-advanced-prompting/`
+
+**When**: After users understand the full Claude Code system
+**Purpose**: Expert-level techniques integrating all features
+**Reading Time**: 35-45 minutes
+**Skill Level**: Intermediate to Advanced
+
+**Structure**:
+```
+guides/16-advanced-prompting/
+├── 1-overview.md              # Advanced concepts introduction
+├── 2-techniques.md            # Chain-of-thought, few-shot, constraints
+├── 3-context-optimization.md  # CLAUDE.md integration, context layers
+└── 4-cost-aware-prompting.md  # Optimizing prompts for cost/quality
+```
+
+**Content Focus**:
+- Integration with agents, skills, hooks, thinking modes
+- Context management strategies with CLAUDE.md
+- Cost optimization through prompt design
+- Multi-step workflows
+- Real-world complex scenarios
+
+---
+
+### Renumbering Impact
+
+**Current structure** → **New structure**:
+```
+01. MCP Servers          →  01. MCP Servers
+                         →  02. Prompt Basics (NEW)
+02. Agents               →  03. Agents
+03. Skills               →  04. Skills
+04. Commands             →  05. Commands
+05. Models               →  06. Models
+06. Plugins              →  07. Plugins
+07. Thinking             →  08. Thinking
+08. Context              →  09. Context
+09. Keywords             →  10. Keywords
+10. Hooks                →  11. Hooks
+11. Optimization         →  12. Optimization
+12. Examples             →  13. Examples
+13. Reference            →  14. Reference
+14. Security             →  15. Security
+15. Community            →  16. Community
+                         →  17. Advanced Prompting (NEW)
+```
+
+**Note**: This renumbering will require updating all internal cross-references in existing guides.
 
 ---
 
@@ -897,29 +954,76 @@ Answer: "The product listing page loads in 5 seconds. Optimize by reducing API c
 
 ## 7. Implementation Checklist
 
-### Phase 1: Core Content (Week 1)
-- [ ] Create guides/16-prompt-engineering/ directory
-- [ ] Write 1-overview.md (introduction + principles)
-- [ ] Write 2-basic-patterns.md (7 core patterns)
-- [ ] Add cross-references from existing guides
+### Phase 1: Basic Prompt Engineering (Week 1)
+**Objective**: Get basics in place early for immediate user value
 
-### Phase 2: Advanced Content (Week 2)
-- [ ] Write 3-advanced-techniques.md
-- [ ] Write 4-context-in-prompts.md
-- [ ] Add Mermaid diagrams
-- [ ] Create practice exercises
+- [ ] Create guides/02-prompt-basics/ directory
+- [ ] Write 1-overview.md (why prompting matters, basic formula)
+- [ ] Write 2-core-patterns.md (7 essential patterns with simple examples)
+- [ ] No cross-references to advanced features yet
+- [ ] Review for beginner-friendliness
 
-### Phase 3: Polish (Week 3)
-- [ ] Write 5-anti-patterns.md
-- [ ] Add real-world examples to all guides
+### Phase 2: Renumber Existing Guides (Week 2)
+**Objective**: Make room for new section, update all references
+
+- [ ] Renumber guides 02-15 → 03-16
+- [ ] Update all internal cross-references in existing guides
 - [ ] Update TABLE_OF_CONTENTS.md
 - [ ] Update INTRODUCTION.md learning paths
+- [ ] Test all internal links
 
-### Phase 4: Review & Launch
+### Phase 3: Advanced Prompting (Week 3)
+**Objective**: Add expert-level techniques
+
+- [ ] Create guides/17-advanced-prompting/ directory
+- [ ] Write 1-overview.md (advanced concepts)
+- [ ] Write 2-techniques.md (chain-of-thought, few-shot, constraints)
+- [ ] Write 3-context-optimization.md (CLAUDE.md integration)
+- [ ] Write 4-cost-aware-prompting.md (cost optimization)
+- [ ] Add cross-references to agents, skills, context, optimization guides
+
+### Phase 4: Polish & Integration (Week 4)
+**Objective**: Ensure cohesive documentation
+
+- [ ] Add Mermaid diagrams to both sections
+- [ ] Create practice exercises for basics section
+- [ ] Add real-world examples to advanced section
+- [ ] Link from existing guides to prompt engineering sections
 - [ ] Technical review for accuracy
-- [ ] User testing with 3-5 developers
+- [ ] User testing with 3-5 developers at different skill levels
 - [ ] Incorporate feedback
 - [ ] Final polish and publish
+
+---
+
+## Alternative: Phased Rollout
+
+**If renumbering is too disruptive**, consider this approach:
+
+### Approach A: Add Without Renumbering (Faster)
+```
+01. MCP Servers
+02. Agents
+...
+15. Community
+16. Prompt Basics (NEW - temporary position)
+17. Advanced Prompting (NEW)
+```
+
+Then later, renumber everything in a separate PR.
+
+### Approach B: Add to Existing Sections (No Renumbering)
+```
+01. MCP Servers
+02. Agents
+    └── Add: prompt-patterns-for-agents.md
+03. Skills
+...
+09. Context
+    └── Expand: Add prompting guidance
+```
+
+**Recommended**: Full renumbering (original plan) for better pedagogical flow, but acknowledge it's a bigger change.
 
 ---
 
