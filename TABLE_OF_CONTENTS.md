@@ -376,6 +376,27 @@ graph TD
 
 ---
 
+### 1️⃣6️⃣ Advanced Prompting (Production Optimization)
+
+**Level**: 🔴 Intermediate to Advanced
+**Prerequisites**: [Prompt Basics](guides/02-prompt-basics/1-overview.md), [Agents](guides/03-agents/1-overview.md), [Context Management](guides/09-context/2-claude-md.md)
+**What You'll Master**: Advanced prompt engineering techniques for production workflows
+
+| Guide | Time | Topics |
+|-------|------|--------|
+| **[Advanced Prompting Overview](guides/17-advanced-prompting/1-overview.md)** | **25 min** | **What advanced prompting is, ROI, when to use** |
+| **[Advanced Techniques](guides/17-advanced-prompting/2-techniques.md)** | **45 min** | **Chain-of-thought, few-shot learning, constraints, meta-prompting** |
+| **[Context Optimization](guides/17-advanced-prompting/3-context-optimization.md)** | **35 min** | **CLAUDE.md integration, context layering, memory management** |
+| **[Cost-Aware Prompting](guides/17-advanced-prompting/4-cost-aware-prompting.md)** | **40 min** | **Prompt efficiency, model cascading, batch optimization, quality thresholds** |
+
+**Total Time**: ~2.5 hours
+**Dependencies**: Understanding of basics, agents, skills, and context management
+**Outcome**: 60-90% cost reduction while maintaining or improving quality
+
+**💰 Why Learn This**: Advanced prompting techniques pay for themselves within days. Typical ROI: 10-20x in first month through cost savings and efficiency gains.
+
+---
+
 ### 📄 Project Documentation
 
 | Document | Purpose |
