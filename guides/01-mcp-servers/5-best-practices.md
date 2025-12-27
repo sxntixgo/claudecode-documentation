@@ -1017,13 +1017,13 @@ volumes:
 **You've completed Phase 1 - Foundation Documentation! 🎉**
 
 **Continue to Phase 2:**
-- [Model Selection](../05-models/1-overview.md) - Deep dive into Haiku, Sonnet, and Opus
-- [Thinking Modes](../07-thinking/1-overview.md) - Control reasoning depth and quality
-- [Context Management](../08-context/1-overview.md) - Advanced context control strategies
+- [Model Selection](../06-models/1-overview.md) - Deep dive into Haiku, Sonnet, and Opus
+- [Thinking Modes](../08-thinking/1-overview.md) - Control reasoning depth and quality
+- [Context Management](../09-context/1-overview.md) - Advanced context control strategies
 
 **Explore Advanced Topics:**
-- [Token Optimization](../11-optimization/1-cost-optimization.md) - Achieve 70%+ cost savings
-- [Keywords & Triggers](../09-keywords/) - Power user features and automation
+- [Token Optimization](../12-optimization/1-cost-optimization.md) - Achieve 70%+ cost savings
+- [Keywords & Triggers](../10-keywords/) - Power user features and automation
 
 ---
 

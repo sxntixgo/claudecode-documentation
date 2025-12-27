@@ -9,20 +9,20 @@ Documentation is complete and follows a pedagogical progression from fundamental
 ```
 guides/
 ├── 01-mcp-servers/        # MCP servers - external tools
-├── 02-agents/             # Specialized AI assistants
-├── 03-skills/             # Custom workflow definitions
-├── 04-commands/           # Slash commands (quick shortcuts)
-├── 05-models/             # Model selection (Haiku/Sonnet/Opus)
-├── 06-plugins/            # Plugin ecosystem overview
-├── 07-thinking/           # Thinking modes & reasoning
-├── 08-context/            # Context management
-├── 09-keywords/           # Keywords & triggers
-├── 10-hooks/              # Automation triggers
-├── 11-optimization/       # Token & cost optimization
-├── 12-examples/           # Real-world projects & workflows
-├── 13-reference/          # API reference, cheat sheets
-├── 14-security/           # Security & compliance
-└── 15-community/          # Community resources
+├── 03-agents/             # Specialized AI assistants
+├── 04-skills/             # Custom workflow definitions
+├── 05-commands/           # Slash commands (quick shortcuts)
+├── 06-models/             # Model selection (Haiku/Sonnet/Opus)
+├── 07-plugins/            # Plugin ecosystem overview
+├── 08-thinking/           # Thinking modes & reasoning
+├── 09-context/            # Context management
+├── 10-keywords/           # Keywords & triggers
+├── 11-hooks/              # Automation triggers
+├── 12-optimization/       # Token & cost optimization
+├── 13-examples/           # Real-world projects & workflows
+├── 14-reference/          # API reference, cheat sheets
+├── 15-security/           # Security & compliance
+└── 16-community/          # Community resources
 ```
 
 ## Key Navigation Files
