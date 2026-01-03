@@ -450,14 +450,6 @@ In the next guide, you'll learn ready-to-use templates for:
 - [Anthropic Prompt Library](https://docs.anthropic.com/claude/page/prompts) - 50+ production-ready prompt examples
 - [Claude API Documentation](https://docs.anthropic.com/claude/reference) - Technical reference for Claude integration
 
-### Books
-
-**Prompt Engineering**:
-- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly, 2024)
-  - *Chapter 2*: Prompt patterns and templates
-  - *Chapter 3*: Writing effective instructions
-  - *Chapter 4*: Context and conversation management
-
 ### Security
 
 **Safe AI Usage**:

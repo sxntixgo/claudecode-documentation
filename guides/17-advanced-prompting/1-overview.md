@@ -392,15 +392,6 @@ Advanced prompting transforms Claude Code from a helpful assistant into a **prod
 - [Anthropic Prompt Library](https://docs.anthropic.com/claude/page/prompts) - Advanced prompt examples with explanations
 - [Anthropic Research Blog](https://www.anthropic.com/research) - Latest papers on prompt optimization and cost efficiency
 
-### Books
-
-**Advanced Prompting Techniques**:
-- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly, 2024)
-  - *Chapter 7*: Chain-of-thought prompting and reasoning
-  - *Chapter 9*: Few-shot learning techniques
-  - *Chapter 11*: Advanced optimization strategies
-  - *Chapter 12*: Production deployment patterns
-
 ### Security
 
 **Advanced Security Considerations**:
