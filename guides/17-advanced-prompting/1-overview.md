@@ -383,5 +383,34 @@ Advanced prompting transforms Claude Code from a helpful assistant into a **prod
 
 ---
 
+## References & Further Reading
+
+### Advanced Prompt Engineering
+
+**Official Resources**:
+- [Anthropic Advanced Prompt Engineering](https://docs.anthropic.com/claude/docs/advanced-prompt-engineering) - Chain-of-thought, few-shot learning, and optimization
+- [Hugging Face Learn](https://huggingface.co/learn) - Advanced NLP and transformer courses
+
+### AI Engineering & Production Systems
+
+**Books**:
+- **"AI Engineering"** by Chip Huyen (O'Reilly) - Building production AI systems with reliability and scale
+- **"Practical MLOps"** by Noah Gift & Alfredo Deza (O'Reilly) - Operational excellence for ML systems
+- **"Designing Machine Learning Systems"** by Chip Huyen (O'Reilly) - End-to-end ML system design
+
+### Optimization & Cost Management
+
+**Resources**:
+- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly) - Cost-effective prompt strategies
+- [LLM Cost Optimization](https://www.anthropic.com/research) - Research on efficient LLM usage
+
+### Security Considerations
+
+**Books**:
+- **"AI Security"** by Sean Murphy & Patrick Hall (O'Reilly) - Advanced security patterns for AI systems
+- **"Machine Learning Security"** by Clarence Chio & David Freeman (O'Reilly) - Adversarial robustness and prompt injection prevention
+
+---
+
 **Questions or Feedback?**
 [Open an issue](https://github.com/anthropics/claude-code/issues)

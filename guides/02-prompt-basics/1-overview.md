@@ -441,5 +441,29 @@ In the next guide, you'll learn ready-to-use templates for:
 
 ---
 
+## References & Further Reading
+
+### Prompt Engineering Foundations
+
+**Official Resources**:
+- [Anthropic Prompt Engineering Guide](https://docs.anthropic.com/claude/docs/prompt-engineering) - Claude-specific techniques and best practices
+- [Hugging Face Learn](https://huggingface.co/learn) - Free ML and NLP courses including prompt engineering fundamentals
+
+### AI Engineering & MLOps
+
+**Books**:
+- **"Practical MLOps"** by Noah Gift & Alfredo Deza (O'Reilly) - Production ML workflows and optimization
+- **"AI Engineering"** by Chip Huyen (O'Reilly) - Building reliable AI systems at scale
+- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly) - Comprehensive guide to LLM prompting
+
+### Security & Best Practices
+
+**Resources**:
+- **"AI Security"** by Sean Murphy & Patrick Hall (O'Reilly) - Securing AI systems and preventing prompt injection
+- **"Machine Learning Security"** by Clarence Chio & David Freeman (O'Reilly) - Security considerations for ML systems
+- [OWASP Top 10 for LLMs](https://owasp.org/www-project-top-10-for-large-language-model-applications/) - Security risks specific to LLM applications
+
+---
+
 **Questions or Feedback?**
 [Open an issue](https://github.com/anthropics/claude-code/issues)

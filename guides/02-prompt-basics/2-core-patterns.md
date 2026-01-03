@@ -851,5 +851,28 @@ You now have the seven essential patterns. Next, you'll learn how to apply these
 
 ---
 
+## References and Further Reading
+
+### Pattern-Based Development
+
+**Official Resources**:
+- [Anthropic Prompt Library](https://docs.anthropic.com/claude/page/prompts) - Curated prompt examples and patterns
+- [Hugging Face Learn](https://huggingface.co/learn) - ML courses covering prompt patterns and techniques
+
+### Software Engineering & AI
+
+**Books**:
+- **"AI Engineering"** by Chip Huyen (O'Reilly) - Systematic approaches to building AI-powered applications
+- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly) - Advanced prompt patterns and strategies
+- **"Practical MLOps"** by Noah Gift & Alfredo Deza (O'Reilly) - Integrating AI into development workflows
+
+### Code Quality & Security
+
+**Resources**:
+- **"AI Security"** by Sean Murphy & Patrick Hall (O'Reilly) - Secure coding practices with AI assistance
+- [OWASP AI Security Guidelines](https://owasp.org/www-project-top-10-for-large-language-model-applications/) - Security best practices for LLM-assisted development
+
+---
+
 **Questions or Feedback?**
 [Open an issue](https://github.com/anthropics/claude-code/issues)

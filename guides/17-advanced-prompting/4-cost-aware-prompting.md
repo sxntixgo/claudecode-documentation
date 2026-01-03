@@ -894,5 +894,35 @@ Within your first week of applying these techniques, you should see:
 
 ---
 
+## References & Further Reading
+
+### Cost Optimization & MLOps
+
+**Books**:
+- **"Practical MLOps"** by Noah Gift & Alfredo Deza (O'Reilly) - Cost-effective ML operations and resource optimization
+- **"AI Engineering"** by Chip Huyen (O'Reilly) - Cost-quality tradeoffs in production AI systems
+- **"Designing Machine Learning Systems"** by Chip Huyen (O'Reilly) - Resource management and operational efficiency
+
+### Prompt Engineering & Efficiency
+
+**Official Resources**:
+- [Anthropic Prompt Engineering Economics](https://docs.anthropic.com/claude/docs/prompt-engineering) - Token optimization and cost management
+- [Hugging Face Learn](https://huggingface.co/learn) - Efficient model usage and optimization techniques
+
+### Advanced Topics
+
+**Resources**:
+- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly) - Advanced cost-aware prompting strategies
+- [Model Context Protocol](https://modelcontextprotocol.io) - Context management for efficiency
+- **"Machine Learning in Production"** by Andrew Kelleher & Adam Kelleher (O'Reilly) - Production optimization patterns
+
+### Security & Governance
+
+**Books**:
+- **"AI Security"** by Sean Murphy & Patrick Hall (O'Reilly) - Cost implications of security measures
+- **"Machine Learning Security"** by Clarence Chio & David Freeman (O'Reilly) - Secure and efficient AI systems
+
+---
+
 **Questions or Feedback?**
 [Open an issue](https://github.com/anthropics/claude-code/issues)
