@@ -385,64 +385,36 @@ Advanced prompting transforms Claude Code from a helpful assistant into a **prod
 
 ## References & Further Reading
 
-### Advanced Prompt Engineering
+### Official Documentation
 
-**Free Online Courses**:
-- **[Hugging Face NLP Course](https://huggingface.co/learn/nlp-course)**
-  - *Chapter 8*: How to ask for help (advanced prompting strategies)
-  - *Chapter 9*: Building and sharing demos
-- **[Hugging Face Transformers Course](https://huggingface.co/learn/nlp-course)**
-  - Advanced sections on model optimization
-  - Fine-tuning for specific tasks
-- [Anthropic Advanced Prompt Engineering](https://docs.anthropic.com/claude/docs/advanced-prompt-engineering) - Chain-of-thought, few-shot learning, meta-prompting
+**Anthropic Resources** (Most Current):
+- [Anthropic Advanced Prompt Engineering](https://docs.anthropic.com/claude/docs/advanced-prompt-engineering) - Chain-of-thought, few-shot learning, meta-prompting techniques
+- [Anthropic Prompt Library](https://docs.anthropic.com/claude/page/prompts) - Advanced prompt examples with explanations
+- [Anthropic Research Blog](https://www.anthropic.com/research) - Latest papers on prompt optimization and cost efficiency
 
-**Books**:
-- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly)
-  - *Chapter 7*: Chain-of-thought prompting
+### Books
+
+**Advanced Prompting Techniques**:
+- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly, 2024)
+  - *Chapter 7*: Chain-of-thought prompting and reasoning
   - *Chapter 9*: Few-shot learning techniques
   - *Chapter 11*: Advanced optimization strategies
-- **"The Hundred-Page Machine Learning Book"** by Andriy Burkov
-  - *Chapter 4*: Anatomy of a learning algorithm
-  - *Chapter 9*: Unsupervised learning (pattern discovery)
-  - *Chapter 11*: Other forms of learning
+  - *Chapter 12*: Production deployment patterns
 
-### AI Engineering & Production Systems
+### Security
 
-**Books**:
-- **"AI Engineering"** by Chip Huyen (O'Reilly)
-  - *Chapter 6*: Model evaluation and selection
-  - *Chapter 8*: Data distribution shifts
-  - *Chapter 11*: Continual learning and model updates
-- **"Practical MLOps"** by Noah Gift & Alfredo Deza (O'Reilly)
-  - *Chapter 6*: MLOps for containers and edge devices
-  - *Chapter 8*: AutoML and KaizenML
-  - *Chapter 10*: Machine learning interoperability
-- **"Designing Machine Learning Systems"** by Chip Huyen (O'Reilly)
-  - *Chapter 4*: Training data
-  - *Chapter 9*: Continual learning and test in production
-- **"Math for Deep Learning"** by Ronald T. Kneusel (No Starch Press)
-  - *Chapter 5*: Optimizers (understanding model behavior)
-  - *Chapter 8*: Transformers architecture
+**Advanced Security Considerations**:
+- **"AI Security"** by Sean Murphy & Patrick Hall (O'Reilly, 2024)
+  - *Chapter 3*: Data poisoning and indirect prompt injection
+  - *Chapter 7*: Privacy in AI systems
+- [OWASP Top 10 for LLMs](https://owasp.org/www-project-top-10-for-large-language-model-applications/) (Updated 2024)
+  - LLM01: Prompt Injection - Advanced attack vectors
+  - LLM07: Insecure Plugin Design - Security with MCP servers
 
-### Optimization & Cost Management
+### Community Resources
 
-**Resources**:
-- [LLM Cost Optimization](https://www.anthropic.com/research) - Research papers on efficient LLM usage
-- **"Machine Learning in Production"** by Andrew Kelleher & Adam Kelleher (O'Reilly)
-  - *Chapter 3*: Building production systems
-  - *Chapter 7*: Monitoring and observability
-
-### Security & Advanced Topics
-
-**Books**:
-- **"AI Security"** by Sean Murphy & Patrick Hall (O'Reilly)
-  - *Chapter 3*: Data poisoning and backdoors
-  - *Chapter 5*: Model stealing and extraction
-  - *Chapter 7*: Privacy attacks (differential privacy)
-- **"Machine Learning Security"** by Clarence Chio & David Freeman (O'Reilly)
-  - *Chapter 4*: Adversarial machine learning
-  - *Chapter 6*: Privacy in machine learning
-  - *Chapter 8*: Auditing and interpreting models
+- [Claude Code Advanced Examples](https://github.com/anthropics/claude-code/discussions) - Community-contributed advanced patterns
+- [Model Context Protocol Specification](https://modelcontextprotocol.io/specification) - Deep dive into MCP architecture
 
 ---
 
