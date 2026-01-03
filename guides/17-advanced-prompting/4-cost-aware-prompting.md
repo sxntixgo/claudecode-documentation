@@ -896,66 +896,32 @@ Within your first week of applying these techniques, you should see:
 
 ## References & Further Reading
 
-### Cost Optimization & MLOps
+### Official Documentation
 
-**Free Online Courses**:
-- **[Hugging Face NLP Course](https://huggingface.co/learn/nlp-course)**
-  - *Chapter 5*: The Datasets library (efficient data handling)
-  - *Chapter 6*: The Tokenizers library (token optimization)
-- **[Hugging Face Optimization Course](https://huggingface.co/learn/optimization-course)**
-  - Model quantization and compression
-  - Inference optimization techniques
-- [Anthropic Prompt Engineering Economics](https://docs.anthropic.com/claude/docs/prompt-engineering) - Token optimization strategies
+**Anthropic Resources** (Most Current):
+- [Anthropic Prompt Engineering Guide](https://docs.anthropic.com/claude/docs/prompt-engineering) - Token optimization and cost-aware prompting strategies
+- [Anthropic API Pricing](https://www.anthropic.com/pricing) - Current model pricing (updated regularly)
+- [Anthropic Research Blog](https://www.anthropic.com/research) - Latest cost optimization research and techniques
 
-**Books**:
-- **"Practical MLOps"** by Noah Gift & Alfredo Deza (O'Reilly)
-  - *Chapter 3*: MLOps for AWS, Azure, and GCP (cost management)
-  - *Chapter 7*: Building MLOps pipelines (efficiency)
-  - *Chapter 11*: MLOps best practices (ROI optimization)
-- **"AI Engineering"** by Chip Huyen (O'Reilly)
-  - *Chapter 4*: Training data (cost-effective data strategies)
-  - *Chapter 12*: Infrastructure and tooling (resource optimization)
-- **"Designing Machine Learning Systems"** by Chip Huyen (O'Reilly)
-  - *Chapter 7*: Model deployment (efficient serving)
-  - *Chapter 10*: Infrastructure and tooling
-- **"The Hundred-Page Machine Learning Book"** by Andriy Burkov
-  - *Chapter 6*: Neural networks and deep learning (efficiency fundamentals)
-  - *Chapter 10*: Why did it work? (understanding cost-quality tradeoffs)
+### Books
 
-### Prompt Engineering & Efficiency
-
-**Books**:
-- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly)
+**Cost-Aware Prompting**:
+- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly, 2024)
   - *Chapter 10*: Optimization and cost management
-  - *Chapter 12*: Production deployment (efficiency at scale)
+  - *Chapter 12*: Production deployment at scale
   - *Chapter 13*: Monitoring and evaluation
-- **"Machine Learning in Production"** by Andrew Kelleher & Adam Kelleher (O'Reilly)
-  - *Chapter 5*: Performance and cost optimization
-  - *Chapter 8*: Monitoring production systems
 
-### Advanced Optimization
+### Context Efficiency
 
-**Books**:
-- **"Practical Deep Learning"** by Ronald T. Kneusel (No Starch Press)
-  - *Chapter 3*: Fully connected networks (efficiency fundamentals)
-  - *Chapter 12*: Where to go from here (optimization resources)
-- **"Math for Deep Learning"** by Ronald T. Kneusel (No Starch Press)
-  - *Chapter 3*: Derivatives (understanding optimization)
-  - *Chapter 5*: Optimizers (cost-effective training)
+**Efficient Context Management**:
+- [Model Context Protocol Documentation](https://modelcontextprotocol.io) - Best practices for efficient context usage
+- [Model Context Protocol Specification](https://modelcontextprotocol.io/specification) - Technical deep dive into context optimization
+- [Claude Code Context Management](https://docs.anthropic.com/claude/docs/context-management) - CLAUDE.md patterns for token reduction
 
-**Online Resources**:
-- [Model Context Protocol](https://modelcontextprotocol.io) - Efficient context management
-- [Anthropic Research](https://www.anthropic.com/research) - Cost optimization papers
+### Community Resources
 
-### Security & Governance
-
-**Books**:
-- **"AI Security"** by Sean Murphy & Patrick Hall (O'Reilly)
-  - *Chapter 9*: Governance and compliance (balancing security with cost)
-  - *Chapter 10*: Future of AI security
-- **"Machine Learning Security"** by Clarence Chio & David Freeman (O'Reilly)
-  - *Chapter 9*: Case studies (cost-effective security)
-  - *Chapter 10*: Future directions
+- [Claude Code Cost Optimization Discussions](https://github.com/anthropics/claude-code/discussions) - Real-world cost savings strategies
+- [Anthropic Developer Forum](https://www.anthropic.com/developers) - Community patterns and benchmarks
 
 ---
 

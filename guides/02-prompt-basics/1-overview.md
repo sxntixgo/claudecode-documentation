@@ -443,50 +443,32 @@ In the next guide, you'll learn ready-to-use templates for:
 
 ## References & Further Reading
 
-### Prompt Engineering Foundations
+### Official Documentation
 
-**Free Online Courses**:
-- **[Hugging Face NLP Course](https://huggingface.co/learn/nlp-course)** - Chapters 1-3: Transformer models, using transformers, fine-tuning
-- **[Hugging Face Deep Learning Course](https://huggingface.co/learn/deep-rl-course)** - Introduction to working with language models
-- [Anthropic Prompt Engineering Guide](https://docs.anthropic.com/claude/docs/prompt-engineering) - Claude-specific techniques and best practices
+**Anthropic Resources** (Most Current):
+- [Anthropic Prompt Engineering Guide](https://docs.anthropic.com/claude/docs/prompt-engineering) - Official Claude prompting techniques and best practices
+- [Anthropic Prompt Library](https://docs.anthropic.com/claude/page/prompts) - 50+ production-ready prompt examples
+- [Claude API Documentation](https://docs.anthropic.com/claude/reference) - Technical reference for Claude integration
 
-**Books - Fundamentals**:
-- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly)
+### Books
+
+**Prompt Engineering**:
+- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly, 2024)
   - *Chapter 2*: Prompt patterns and templates
   - *Chapter 3*: Writing effective instructions
-  - *Chapter 4*: Context management
-- **"The Hundred-Page Machine Learning Book"** by Andriy Burkov
-  - *Chapter 1*: Introduction (ML fundamentals for prompt engineering)
-  - *Chapter 8*: Neural Networks (understanding language models)
+  - *Chapter 4*: Context and conversation management
 
-### AI Engineering & Production
+### Security
 
-**Books**:
-- **"AI Engineering"** by Chip Huyen (O'Reilly)
-  - *Chapter 5*: Model development and iteration
-  - *Chapter 7*: Working with foundation models
-  - *Chapter 9*: Production best practices
-- **"Practical MLOps"** by Noah Gift & Alfredo Deza (O'Reilly)
-  - *Chapter 2*: MLOps foundations
-  - *Chapter 7*: Building MLOps pipelines
-- **"How AI Works"** by Ronald T. Kneusel (No Starch Press)
-  - *Chapter 5*: Large language models explained
-  - *Chapter 6*: Prompting and interaction patterns
+**Safe AI Usage**:
+- [OWASP Top 10 for LLMs](https://owasp.org/www-project-top-10-for-large-language-model-applications/) (Updated 2024)
+  - LLM01: Prompt Injection - Understanding and preventing malicious prompts
+  - LLM02: Insecure Output Handling - Safe processing of AI responses
 
-### Security & Best Practices
+### Community Resources
 
-**Books**:
-- **"AI Security"** by Sean Murphy & Patrick Hall (O'Reilly)
-  - *Chapter 4*: Prompt injection and mitigation
-  - *Chapter 6*: Secure AI development practices
-- **"Machine Learning Security"** by Clarence Chio & David Freeman (O'Reilly)
-  - *Chapter 3*: Adversarial input handling
-  - *Chapter 7*: Securing ML pipelines
-
-**Online Resources**:
-- [OWASP Top 10 for LLMs](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
-  - LLM01: Prompt Injection
-  - LLM02: Insecure Output Handling
+- [Model Context Protocol](https://modelcontextprotocol.io) - Official MCP documentation for extending Claude Code
+- [Claude Code GitHub Discussions](https://github.com/anthropics/claude-code/discussions) - Community patterns and solutions
 
 ---
 
