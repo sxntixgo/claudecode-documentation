@@ -445,23 +445,48 @@ In the next guide, you'll learn ready-to-use templates for:
 
 ### Prompt Engineering Foundations
 
-**Official Resources**:
+**Free Online Courses**:
+- **[Hugging Face NLP Course](https://huggingface.co/learn/nlp-course)** - Chapters 1-3: Transformer models, using transformers, fine-tuning
+- **[Hugging Face Deep Learning Course](https://huggingface.co/learn/deep-rl-course)** - Introduction to working with language models
 - [Anthropic Prompt Engineering Guide](https://docs.anthropic.com/claude/docs/prompt-engineering) - Claude-specific techniques and best practices
-- [Hugging Face Learn](https://huggingface.co/learn) - Free ML and NLP courses including prompt engineering fundamentals
 
-### AI Engineering & MLOps
+**Books - Fundamentals**:
+- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly)
+  - *Chapter 2*: Prompt patterns and templates
+  - *Chapter 3*: Writing effective instructions
+  - *Chapter 4*: Context management
+- **"The Hundred-Page Machine Learning Book"** by Andriy Burkov
+  - *Chapter 1*: Introduction (ML fundamentals for prompt engineering)
+  - *Chapter 8*: Neural Networks (understanding language models)
+
+### AI Engineering & Production
 
 **Books**:
-- **"Practical MLOps"** by Noah Gift & Alfredo Deza (O'Reilly) - Production ML workflows and optimization
-- **"AI Engineering"** by Chip Huyen (O'Reilly) - Building reliable AI systems at scale
-- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly) - Comprehensive guide to LLM prompting
+- **"AI Engineering"** by Chip Huyen (O'Reilly)
+  - *Chapter 5*: Model development and iteration
+  - *Chapter 7*: Working with foundation models
+  - *Chapter 9*: Production best practices
+- **"Practical MLOps"** by Noah Gift & Alfredo Deza (O'Reilly)
+  - *Chapter 2*: MLOps foundations
+  - *Chapter 7*: Building MLOps pipelines
+- **"How AI Works"** by Ronald T. Kneusel (No Starch Press)
+  - *Chapter 5*: Large language models explained
+  - *Chapter 6*: Prompting and interaction patterns
 
 ### Security & Best Practices
 
-**Resources**:
-- **"AI Security"** by Sean Murphy & Patrick Hall (O'Reilly) - Securing AI systems and preventing prompt injection
-- **"Machine Learning Security"** by Clarence Chio & David Freeman (O'Reilly) - Security considerations for ML systems
-- [OWASP Top 10 for LLMs](https://owasp.org/www-project-top-10-for-large-language-model-applications/) - Security risks specific to LLM applications
+**Books**:
+- **"AI Security"** by Sean Murphy & Patrick Hall (O'Reilly)
+  - *Chapter 4*: Prompt injection and mitigation
+  - *Chapter 6*: Secure AI development practices
+- **"Machine Learning Security"** by Clarence Chio & David Freeman (O'Reilly)
+  - *Chapter 3*: Adversarial input handling
+  - *Chapter 7*: Securing ML pipelines
+
+**Online Resources**:
+- [OWASP Top 10 for LLMs](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
+  - LLM01: Prompt Injection
+  - LLM02: Insecure Output Handling
 
 ---
 
