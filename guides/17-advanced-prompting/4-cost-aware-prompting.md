@@ -903,14 +903,6 @@ Within your first week of applying these techniques, you should see:
 - [Anthropic API Pricing](https://www.anthropic.com/pricing) - Current model pricing (updated regularly)
 - [Anthropic Research Blog](https://www.anthropic.com/research) - Latest cost optimization research and techniques
 
-### Books
-
-**Cost-Aware Prompting**:
-- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly, 2024)
-  - *Chapter 10*: Optimization and cost management
-  - *Chapter 12*: Production deployment at scale
-  - *Chapter 13*: Monitoring and evaluation
-
 ### Context Efficiency
 
 **Efficient Context Management**:

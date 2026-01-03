@@ -859,14 +859,6 @@ You now have the seven essential patterns. Next, you'll learn how to apply these
 - [Anthropic Prompt Library](https://docs.anthropic.com/claude/page/prompts) - 50+ production-ready examples organized by pattern (CREATE, FIX, REFACTOR, REVIEW, etc.)
 - [Anthropic Prompt Engineering Guide](https://docs.anthropic.com/claude/docs/prompt-engineering) - Official techniques for all prompt patterns
 
-### Books
-
-**Prompt Patterns**:
-- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly, 2024)
-  - *Chapter 5*: Advanced prompting patterns
-  - *Chapter 6*: Chain-of-thought and reasoning patterns
-  - *Chapter 8*: Pattern composition and reuse
-
 ### Security
 
 **Safe Prompt Usage**:
