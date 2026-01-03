@@ -855,22 +855,53 @@ You now have the seven essential patterns. Next, you'll learn how to apply these
 
 ### Pattern-Based Development
 
-**Official Resources**:
-- [Anthropic Prompt Library](https://docs.anthropic.com/claude/page/prompts) - Curated prompt examples and patterns
-- [Hugging Face Learn](https://huggingface.co/learn) - ML courses covering prompt patterns and techniques
+**Free Online Courses**:
+- **[Hugging Face NLP Course](https://huggingface.co/learn/nlp-course)**
+  - *Chapter 4*: Sharing models and tokenizers
+  - *Chapter 6*: The Tokenizers library (understanding token efficiency)
+  - *Chapter 7*: Main NLP tasks (pattern application)
+- [Anthropic Prompt Library](https://docs.anthropic.com/claude/page/prompts) - 50+ curated prompt examples organized by pattern
+
+**Books - Pattern Design**:
+- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly)
+  - *Chapter 5*: Advanced prompting patterns
+  - *Chapter 6*: Chain-of-thought and reasoning
+  - *Chapter 8*: Pattern composition and reuse
+- **"The Hundred-Page Machine Learning Book"** by Andriy Burkov
+  - *Chapter 3*: Fundamental algorithms (pattern recognition)
+  - *Chapter 5*: Basic practice (applying patterns systematically)
 
 ### Software Engineering & AI
 
 **Books**:
-- **"AI Engineering"** by Chip Huyen (O'Reilly) - Systematic approaches to building AI-powered applications
-- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly) - Advanced prompt patterns and strategies
-- **"Practical MLOps"** by Noah Gift & Alfredo Deza (O'Reilly) - Integrating AI into development workflows
+- **"AI Engineering"** by Chip Huyen (O'Reilly)
+  - *Chapter 3*: Data engineering for AI
+  - *Chapter 7*: Working with foundation models
+  - *Chapter 10*: Testing and monitoring
+- **"Practical MLOps"** by Noah Gift & Alfredo Deza (O'Reilly)
+  - *Chapter 4*: Continuous integration for ML
+  - *Chapter 5*: Continuous delivery for ML
+  - *Chapter 9*: Building MLOps command-line tools
+- **"Practical Deep Learning"** by Ronald T. Kneusel (No Starch Press)
+  - *Chapter 2*: Machine learning toolkit
+  - *Chapter 10*: Text generation and models
 
 ### Code Quality & Security
 
-**Resources**:
-- **"AI Security"** by Sean Murphy & Patrick Hall (O'Reilly) - Secure coding practices with AI assistance
-- [OWASP AI Security Guidelines](https://owasp.org/www-project-top-10-for-large-language-model-applications/) - Security best practices for LLM-assisted development
+**Books**:
+- **"AI Security"** by Sean Murphy & Patrick Hall (O'Reilly)
+  - *Chapter 2*: Threat modeling for AI systems
+  - *Chapter 4*: Prompt injection attacks and defenses
+  - *Chapter 8*: Code review with AI (security considerations)
+- **"Machine Learning Security"** by Clarence Chio & David Freeman (O'Reilly)
+  - *Chapter 2*: Attack surfaces in ML systems
+  - *Chapter 5*: Securing data pipelines
+
+**Online Resources**:
+- [OWASP Top 10 for LLMs](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
+  - LLM01: Prompt Injection
+  - LLM03: Training Data Poisoning
+  - LLM06: Sensitive Information Disclosure
 
 ---
 

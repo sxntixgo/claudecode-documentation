@@ -898,29 +898,64 @@ Within your first week of applying these techniques, you should see:
 
 ### Cost Optimization & MLOps
 
+**Free Online Courses**:
+- **[Hugging Face NLP Course](https://huggingface.co/learn/nlp-course)**
+  - *Chapter 5*: The Datasets library (efficient data handling)
+  - *Chapter 6*: The Tokenizers library (token optimization)
+- **[Hugging Face Optimization Course](https://huggingface.co/learn/optimization-course)**
+  - Model quantization and compression
+  - Inference optimization techniques
+- [Anthropic Prompt Engineering Economics](https://docs.anthropic.com/claude/docs/prompt-engineering) - Token optimization strategies
+
 **Books**:
-- **"Practical MLOps"** by Noah Gift & Alfredo Deza (O'Reilly) - Cost-effective ML operations and resource optimization
-- **"AI Engineering"** by Chip Huyen (O'Reilly) - Cost-quality tradeoffs in production AI systems
-- **"Designing Machine Learning Systems"** by Chip Huyen (O'Reilly) - Resource management and operational efficiency
+- **"Practical MLOps"** by Noah Gift & Alfredo Deza (O'Reilly)
+  - *Chapter 3*: MLOps for AWS, Azure, and GCP (cost management)
+  - *Chapter 7*: Building MLOps pipelines (efficiency)
+  - *Chapter 11*: MLOps best practices (ROI optimization)
+- **"AI Engineering"** by Chip Huyen (O'Reilly)
+  - *Chapter 4*: Training data (cost-effective data strategies)
+  - *Chapter 12*: Infrastructure and tooling (resource optimization)
+- **"Designing Machine Learning Systems"** by Chip Huyen (O'Reilly)
+  - *Chapter 7*: Model deployment (efficient serving)
+  - *Chapter 10*: Infrastructure and tooling
+- **"The Hundred-Page Machine Learning Book"** by Andriy Burkov
+  - *Chapter 6*: Neural networks and deep learning (efficiency fundamentals)
+  - *Chapter 10*: Why did it work? (understanding cost-quality tradeoffs)
 
 ### Prompt Engineering & Efficiency
 
-**Official Resources**:
-- [Anthropic Prompt Engineering Economics](https://docs.anthropic.com/claude/docs/prompt-engineering) - Token optimization and cost management
-- [Hugging Face Learn](https://huggingface.co/learn) - Efficient model usage and optimization techniques
+**Books**:
+- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly)
+  - *Chapter 10*: Optimization and cost management
+  - *Chapter 12*: Production deployment (efficiency at scale)
+  - *Chapter 13*: Monitoring and evaluation
+- **"Machine Learning in Production"** by Andrew Kelleher & Adam Kelleher (O'Reilly)
+  - *Chapter 5*: Performance and cost optimization
+  - *Chapter 8*: Monitoring production systems
 
-### Advanced Topics
+### Advanced Optimization
 
-**Resources**:
-- **"Prompt Engineering for Generative AI"** by James Phoenix & Mike Taylor (O'Reilly) - Advanced cost-aware prompting strategies
-- [Model Context Protocol](https://modelcontextprotocol.io) - Context management for efficiency
-- **"Machine Learning in Production"** by Andrew Kelleher & Adam Kelleher (O'Reilly) - Production optimization patterns
+**Books**:
+- **"Practical Deep Learning"** by Ronald T. Kneusel (No Starch Press)
+  - *Chapter 3*: Fully connected networks (efficiency fundamentals)
+  - *Chapter 12*: Where to go from here (optimization resources)
+- **"Math for Deep Learning"** by Ronald T. Kneusel (No Starch Press)
+  - *Chapter 3*: Derivatives (understanding optimization)
+  - *Chapter 5*: Optimizers (cost-effective training)
+
+**Online Resources**:
+- [Model Context Protocol](https://modelcontextprotocol.io) - Efficient context management
+- [Anthropic Research](https://www.anthropic.com/research) - Cost optimization papers
 
 ### Security & Governance
 
 **Books**:
-- **"AI Security"** by Sean Murphy & Patrick Hall (O'Reilly) - Cost implications of security measures
-- **"Machine Learning Security"** by Clarence Chio & David Freeman (O'Reilly) - Secure and efficient AI systems
+- **"AI Security"** by Sean Murphy & Patrick Hall (O'Reilly)
+  - *Chapter 9*: Governance and compliance (balancing security with cost)
+  - *Chapter 10*: Future of AI security
+- **"Machine Learning Security"** by Clarence Chio & David Freeman (O'Reilly)
+  - *Chapter 9*: Case studies (cost-effective security)
+  - *Chapter 10*: Future directions
 
 ---
 
