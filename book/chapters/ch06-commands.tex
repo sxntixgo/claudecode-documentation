@@ -76,9 +76,15 @@ the missing input).
 \texttt{description}              & No  & Shown in \texttt{/help} output and used for auto-invocation matching \\
 \texttt{model}                    & No  & Override: \texttt{haiku}, \texttt{sonnet}, \texttt{opus} \\
 \texttt{disable-model-invocation} & No  & \texttt{true} prevents Claude auto-triggering this command \\
+\texttt{allowed-tools}            & No  & Tools the command may call without prompting for permission (see \cref{ch:skills}) \\
+\texttt{arguments}                & No  & Named positional arguments substituted in the body (see \cref{ch:skills}) \\
 \bottomrule
 \end{tabularx}
 \end{table}
+
+Because commands and skills share the same backing mechanism, the full
+frontmatter set documented for skills (\cref{ch:skills}) also works
+for commands.
 
 \section{Team Workflows}
 \label{sec:command-team}

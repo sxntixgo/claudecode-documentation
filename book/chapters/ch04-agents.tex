@@ -49,7 +49,7 @@ ones for your own domain.
   & Complex multi-step tasks requiring read and write \\
 statusline-setup          & Sonnet           & Read, Edit
   & Configuring the status line (\texttt{/statusline}) \\
-claude-code-guide         & Haiku            & Web search
+claude-code-guide         & Default          & Read, Bash, web search
   & Answering questions about Claude Code features \\
 \bottomrule
 \end{tabularx}
@@ -61,8 +61,7 @@ field explicitly includes the \texttt{Agent} tool (with or without an
 allowlist of permitted children, e.g.\
 \texttt{tools: Agent(researcher, worker), Read}). When \texttt{Agent} is
 omitted from the \texttt{tools} field, the subagent cannot spawn other
-subagents. The Plan subagent skips \texttt{CLAUDE.md} files for speed;
-all other subagents load them.
+subagents.
 \end{notebox}
 
 Claude automatically routes tasks to the appropriate subagent. You can also
@@ -240,14 +239,20 @@ These exercises continue the running project.
 \begin{itemize}
   \item Subagents run in their own context windows, preserving tokens in your
         main conversation and enabling tool restriction and model routing.
-  \item Three built-in subagents: \textbf{Explore} (Haiku, read-only),
-        \textbf{Plan} (read-only, inherits model), and \textbf{General-purpose}
-        (all tools, inherits model).
+  \item Five built-in subagents: \textbf{Explore} (Haiku, read-only),
+        \textbf{Plan} (read-only), \textbf{General-purpose} (all tools),
+        plus the more specialized \texttt{statusline-setup} and
+        \texttt{claude-code-guide}.
   \item Custom subagents are Markdown files in \texttt{.claude/agents/} with
-        YAML frontmatter specifying \texttt{name}, \texttt{description},
-        \texttt{tools}, and optionally \texttt{model}.
+        YAML frontmatter. \texttt{name} and \texttt{description} are
+        required; \texttt{tools}, \texttt{model}, \texttt{memory},
+        \texttt{permissionMode}, \texttt{mcpServers}, \texttt{skills},
+        \texttt{maxTurns}, and \texttt{isolation} are optional.
   \item The \texttt{description} field is how Claude decides when to delegate
         automatically — write it clearly.
+  \item Set \texttt{memory: user|project|local} in the frontmatter to give
+        a subagent a persistent notes directory that survives across
+        conversations.
   \item A subagent can spawn other subagents only when its \texttt{tools}
         allowlist includes \texttt{Agent} (optionally with a child allowlist).
         For parallel multi-session workflows, use background agents or

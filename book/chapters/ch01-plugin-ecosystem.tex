@@ -21,8 +21,10 @@ different things:
 \begin{itemize}
   \item \textbf{Extension types} are the four primitives that change what
         Claude can do: \emph{MCP servers}, \emph{skills}, \emph{hooks}, and
-        \emph{slash commands}. Each lives in \texttt{.claude/} in your
-        project. This chapter — and most of the book — is about these.
+        \emph{slash commands}. Their configuration lives in
+        \texttt{.claude/} (or, for MCP, in \texttt{.mcp.json} at the
+        project root or \texttt{\textasciitilde/.claude.json} for personal
+        scope). This chapter — and most of the book — is about these.
   \item \textbf{Plugins} are \emph{installable bundles} that package one or
         more of those extensions (plus optional LSP servers, background
         monitors, and bin executables) behind a single
@@ -171,8 +173,11 @@ MCP servers are configured inside \texttt{settings.json} under the
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Write",
-        "hooks": [{"command": "npm run format -- --write $FILE"}]
+        "matcher": "Write|Edit",
+        "hooks": [{
+          "type": "command",
+          "command": "jq -r '.tool_input.file_path' | xargs -I{} npm run format -- --write {}"
+        }]
       }
     ]
   }
@@ -312,9 +317,14 @@ extend it.
         Confirm Claude picks up the directory (the prompt header should
         show the project root).
   \item Add \texttt{.claude/} to version control with
-        \texttt{git add .claude/}. Commit it. Confirm
-        \texttt{settings.json} is committed but \texttt{settings.local.json}
-        (which you will create later) will be ignored.
+        \texttt{git add .claude/}. Commit it. Add the following line to
+        your \texttt{.gitignore} so personal overrides created later
+        (\texttt{settings.local.json}, \texttt{CLAUDE.local.md}) are
+        excluded:
+\begin{verbatim}
+.claude/settings.local.json
+CLAUDE.local.md
+\end{verbatim}
   \item Identify which of the four extension types you would use for each
         of these needs. Write your answer in one line each:
         \emph{(a)} run \texttt{npm run lint} after every file write;

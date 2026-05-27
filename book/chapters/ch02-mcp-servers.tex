@@ -257,7 +257,14 @@ a remote HTTP server or a local stdio server.
 
 \subsection{Anatomy of a Minimal Stdio Server (TypeScript)}
 
-\begin{lstlisting}[language=Java,caption={Minimal MCP server skeleton (TypeScript)}]
+The sketch below shows the shape of an MCP server. It is illustrative —
+the exact handler-registration API of \texttt{@modelcontextprotocol/sdk}
+has evolved across releases (modern versions register handlers with
+schema constants like \texttt{ListToolsRequestSchema}). Use
+\texttt{/mcp-server-dev:build-mcp-server} above to scaffold a current,
+compilable starter.
+
+\begin{lstlisting}[language=Java,caption={Minimal MCP server skeleton (TypeScript, illustrative)}]
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from
   '@modelcontextprotocol/sdk/server/stdio.js';
@@ -267,7 +274,9 @@ const server = new Server(
   { capabilities: { tools: {} } }
 );
 
-server.setRequestHandler('tools/list', async () => ({
+// Register a tools/list handler that returns one `greet` tool, then
+// a tools/call handler that returns "Hello, <name>!"
+server.setRequestHandler(/* tools/list schema */ ..., async () => ({
   tools: [{
     name: 'greet',
     description: 'Return a greeting',
@@ -279,7 +288,7 @@ server.setRequestHandler('tools/list', async () => ({
   }]
 }));
 
-server.setRequestHandler('tools/call', async (req) => {
+server.setRequestHandler(/* tools/call schema */ ..., async (req) => {
   const { name } = req.params.arguments as { name: string };
   return { content: [{ type: 'text', text: `Hello, ${name}!` }] };
 });
@@ -393,27 +402,40 @@ These exercises continue the running project from \cref{ch:plugin-ecosystem}.
 You should have a \texttt{.claude/} directory under version control.
 
 \begin{enumerate}
+  \item Create a GitHub fine-grained personal access token at
+        \url{https://github.com/settings/personal-access-tokens} with
+        access to the repository you want Claude to work with. Export
+        it as an environment variable in your shell profile so it isn't
+        baked into any committed file:
+\begin{verbatim}
+export GITHUB_PAT=ghp_yourTokenHere
+\end{verbatim}
   \item Install the GitHub MCP server at \textbf{project scope}, using
-        the HTTP transport. Verify with \texttt{claude mcp list} that
-        \texttt{github} appears with scope \texttt{project}.
+        the HTTP transport. Pass the header with a \texttt{\$\{GITHUB\_PAT\}}
+        reference so the literal token never lands in
+        \texttt{.mcp.json}:
 \begin{verbatim}
 claude mcp add --transport http github \
   https://api.githubcopilot.com/mcp/ \
+  --header "Authorization: Bearer ${GITHUB_PAT}" \
   --scope project
 \end{verbatim}
+        Verify with \texttt{claude mcp list} that \texttt{github}
+        appears with scope \texttt{project}.
   \item Open the resulting \texttt{.mcp.json} at the project root.
-        Confirm the URL is stored literally but \emph{no} GitHub PAT is
-        in the file. Add the file to git and commit it.
-  \item Open a Claude Code session and run \texttt{/mcp}. Complete the
-        OAuth flow when prompted. The panel should then show
-        \texttt{github} with a non-zero tool count.
+        Confirm the URL is stored literally and the header value reads
+        \texttt{\$\{GITHUB\_PAT\}} — \emph{not} the literal token.
+        Stage and commit the file.
+  \item Open a Claude Code session and run \texttt{/mcp}. The panel
+        should show \texttt{github} as connected with a non-zero tool
+        count.
   \item Ask Claude, in plain language:
         ``List the five most recent open issues in this repository.''
         Confirm Claude calls a GitHub MCP tool rather than asking you
         for a browser URL or guessing.
   \item As a safety check, run
-        \texttt{git diff -- .mcp.json} and confirm there are no secrets
-        in the file you are about to push.
+        \texttt{git diff -- .mcp.json} and confirm there are no
+        literal secrets in the file you are about to push.
 \end{enumerate}
 \end{exercisebox}
 
@@ -436,8 +458,11 @@ claude mcp add --transport http github \
   \item Browse and install vetted servers from the Anthropic Directory
         (\url{https://claude.ai/directory}). Use
         \texttt{/mcp-server-dev:build-mcp-server} to scaffold a custom server.
-  \item Remote servers support OAuth 2.0 authentication; run \texttt{/mcp}
-        inside a session to complete the browser flow.
+  \item Authentication varies by server. Many remote servers (Sentry,
+        Notion) use OAuth 2.0 — run \texttt{/mcp} inside a session to
+        complete the browser flow. Others (GitHub) accept a personal
+        access token via the \texttt{Authorization} header at
+        configuration time.
 \end{itemize}
 \end{summarybox}
 

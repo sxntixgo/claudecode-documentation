@@ -72,8 +72,10 @@ When compacting, preserve test output and the list of modified files.
 
 \index{cost!model selection}
 
-The cost ratios from \cref{ch:models} matter: Opus is roughly 5× Sonnet,
-which is roughly 3× Haiku. The rule of thumb from \cref{ch:models} —
+The cost ratios from \cref{ch:models} matter: Opus is roughly $5\times$
+Haiku, and Sonnet is roughly $3\times$ Haiku; between the two larger
+tiers Opus is about $1.7\times$ Sonnet (per million tokens, on either
+input or output). The rule of thumb from \cref{ch:models} —
 \emph{use the least powerful model that can get the job done correctly} —
 is also the biggest single cost lever you have.
 

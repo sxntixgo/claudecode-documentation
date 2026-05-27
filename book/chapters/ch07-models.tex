@@ -140,7 +140,7 @@ job done correctly}.
 \begin{lstlisting}[language=bash,caption={Selecting a model for a session}]
 claude --model claude-opus-4-7
 claude --model claude-sonnet-4-6
-claude --model claude-haiku-4-5
+claude --model claude-haiku-4-5-20251001
 \end{lstlisting}
 
 \textbf{Default for a project} (\texttt{.claude/settings.json}):
@@ -151,9 +151,11 @@ claude --model claude-haiku-4-5
 \end{lstlisting}
 
 \textbf{Per-subagent} (frontmatter in \texttt{.claude/agents/}):
-\begin{lstlisting}[caption={Assigning Haiku to the Explore subagent (already the default)}]
+\begin{lstlisting}[caption={Assigning Haiku to a search-focused subagent}]
 ---
-name: explore
+name: search-helper
+description: Fast read-only codebase search and grep.
+tools: Read, Grep, Glob
 model: haiku
 ---
 \end{lstlisting}
@@ -191,8 +193,9 @@ three chapters.
 
 \begin{enumerate}
   \item Open \texttt{.claude/agents/security-reviewer.md}
-        (\cref{ch:agents}). Add \texttt{model: opus} to its frontmatter.
-        Security work is the canonical Opus use case.
+        (\cref{ch:agents}) and confirm it has \texttt{model: opus}.
+        Add the line if your copy is missing it: security work is the
+        canonical Opus use case.
   \item Open \texttt{.claude/agents/test-runner.md}. Confirm it has
         \texttt{model: haiku} (or add it). The test runner does no
         reasoning — Haiku is plenty.
