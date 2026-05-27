@@ -118,9 +118,10 @@ curl https://api.anthropic.com/v1/messages \
 \index{thinking modes!output}
 
 On Claude~4 models the API returns \textbf{summarized} thinking by default:
-the response includes a condensed view of the model's reasoning, while the
-full reasoning is still billed against the input. The structure of a
-thinking response is:
+the response includes a condensed view of the model's reasoning, while
+the full thinking tokens are still billed as output tokens (you pay for
+the reasoning that produced the answer, not just the summary you see).
+The structure of a thinking response is:
 
 \begin{lstlisting}[language=json,caption={Response structure with extended thinking}]
 {

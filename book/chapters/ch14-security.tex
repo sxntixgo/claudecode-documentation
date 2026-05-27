@@ -4,10 +4,12 @@
 
 \index{security}\index{compliance}
 
-Claude Code's security model rests on three pillars: a permission system
-that requires explicit consent for risky actions, sandboxing that limits
-the blast radius, and a fail-closed default for anything that touches the
-network or filesystem outside the project. This chapter covers the
+Claude Code's security model rests on three pillars: a \textbf{permission
+system} that requires explicit consent for risky actions,
+\textbf{sandboxing} that limits the blast radius, and \textbf{deterministic
+hooks} for policies that must hold regardless of what Claude decides.
+Built on top is a fail-closed default: anything that doesn't match an
+explicit allow rule prompts for approval. This chapter covers the
 mechanisms, the threats they mitigate, and how to compose them for
 team-wide and enterprise deployments.
 

@@ -5,13 +5,15 @@
 \index{keywords}\index{at-references}
 
 Keywords are the small textual cues that shift Claude's behavior without
-opening a configuration file. You have already seen two families of them:
-the thinking keywords from \cref{ch:thinking} (\texttt{think},
+opening a configuration file. You have already seen two families: the
+thinking keywords from \cref{ch:thinking} (\texttt{think},
 \texttt{ultrathink}) and the slash commands from \cref{ch:commands}
-(\texttt{/code-review}, \texttt{/deploy}). This chapter completes the set
-with two more: \textbf{@-references} that pull content into context, and
-\textbf{auto-invocation} that lets Claude decide which skill applies based
-on what you type.
+(\texttt{/code-review}, \texttt{/deploy}). This chapter covers the rest:
+\textbf{@-references} that pull files and resources into context,
+\textbf{auto-invocation} that lets Claude pick the right skill based on
+your wording, the built-in \textbf{keyboard shortcuts} that modify a
+running session, and the \textbf{\$ARGUMENTS} substitution that
+parameterizes commands.
 
 \section{The @-Reference Syntax}
 \label{sec:at-references}
@@ -196,7 +198,7 @@ These exercises continue from \cref{ch:context}.
         \emph{``Review my pull request''} (without slash) and
         confirming the skill activates.
   \item In an interactive session, press \texttt{Esc}, \texttt{Esc},
-        select a message a few turns back, and choose \emph{Summarise
+        select a message a few turns back, and choose \emph{Summarize
         from here}. Continue working and confirm the older detail is
         gone but the most recent edits remain.
 \end{enumerate}
