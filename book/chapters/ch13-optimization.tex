@@ -1,3 +1,252 @@
-% Stub — populated in Task 9
+% book/chapters/ch13-optimization.tex
 \chapter{Token Optimization}
 \label{ch:optimization}
+
+\index{cost!optimization}\index{token usage}
+
+Token cost scales with the amount of context Claude processes. Most teams who
+spend more than they want to are spending on the same handful of avoidable
+patterns: stale context that never got cleared, Opus where Sonnet was enough,
+CLAUDE.md files bloated into reference manuals, and MCP tools all loaded up
+front. This chapter is a checklist of levers, ordered roughly from highest
+impact to lowest.
+
+\begin{warningbox}
+Per the current Anthropic documentation
+(\url{https://code.claude.com/docs/en/costs}, verified 2026-05-27), the
+median enterprise deployment runs at about \$13 per developer per active
+day and \$150--\$250 per month. If you're well outside that range, the
+levers below are usually enough to bring it in line.
+\end{warningbox}
+
+\section{Track Before You Optimize}
+\label{sec:cost-track}
+
+\index{cost!tracking}
+
+Optimization without measurement is guesswork. Three commands surface the
+data you need:
+
+\begin{itemize}
+  \item \texttt{/usage} — the canonical view: API token count for the
+        current session, dollar estimate, and (on paid plans) a breakdown
+        attributing usage to skills, subagents, plugins, and individual
+        MCP servers over the last 24 hours or 7 days.
+  \item \texttt{/context} — what is consuming the active context window
+        right now. Use this when a session feels slow or expensive to find
+        the bloated component.
+  \item \texttt{/cost} — quick total for the current session.
+\end{itemize}
+
+For continuous awareness, configure the status line to display context
+usage as a percentage. See
+\url{https://code.claude.com/docs/en/statusline}.
+
+\section{Level 1 — Manage Context Aggressively}
+\label{sec:cost-context}
+
+\index{cost!context management}
+
+Context-window content is the single biggest cost driver. Three habits:
+
+\begin{itemize}
+  \item \textbf{\texttt{/clear} between unrelated tasks.} Stale context
+        accrues tokens on every subsequent message.
+        Name important sessions with \texttt{/rename} before clearing so
+        you can return via \texttt{/resume}.
+  \item \textbf{Targeted \texttt{/compact}.} \texttt{/compact focus on
+        the API changes} preserves what matters and drops the rest. You
+        can also write persistent compaction instructions in
+        \texttt{CLAUDE.md}:
+\begin{verbatim}
+# Compact instructions
+When compacting, preserve test output and the list of modified files.
+\end{verbatim}
+  \item \textbf{Rewind and retry.} If Claude is off track, double-tap
+        \texttt{Esc} and restore the checkpoint instead of accumulating
+        more corrections in context.
+\end{itemize}
+
+\section{Level 2 — Choose the Right Model}
+\label{sec:cost-model}
+
+\index{cost!model selection}
+
+The cost ratios from \cref{ch:models} matter: Opus is roughly 5× Sonnet,
+which is roughly 3× Haiku. The rule of thumb from \cref{ch:models} —
+\emph{use the least powerful model that can get the job done correctly} —
+is also the biggest single cost lever you have.
+
+\begin{itemize}
+  \item Set the project default in \texttt{settings.json} to
+        \texttt{claude-sonnet-4-6} unless a chapter-of-work needs Opus.
+  \item Use \texttt{model: haiku} in subagent frontmatter for search,
+        formatting, and read-only checks (\cref{ch:agents}).
+  \item Use \texttt{/model} mid-session to drop to a cheaper model when
+        the work pivots from architecture to mechanical edits.
+\end{itemize}
+
+\section{Level 3 — Trim CLAUDE.md and Use Skills}
+\label{sec:cost-claude-md}
+
+\index{cost!CLAUDE.md}\index{cost!skills}
+
+Anything in \texttt{CLAUDE.md} loads on every session. A 500-line file
+costs you 500 lines of tokens for every prompt you ever issue in that
+project. From \cref{ch:context}: \textbf{target under 200 lines per
+\texttt{CLAUDE.md}}.
+
+Move specialized workflows to skills. A skill that explains your
+deployment process, for example, costs nothing until the moment you
+invoke it.
+
+\section{Level 4 — Tame MCP Servers}
+\label{sec:cost-mcp}
+
+\index{cost!MCP servers}
+
+By default in 2026, MCP tool definitions are \emph{deferred} (Tool Search;
+\cref{ch:mcp-servers}) — only tool names load up front. Confirm with
+\texttt{/context}; the MCP section should be small.
+
+Two further moves:
+
+\begin{itemize}
+  \item \textbf{Prefer CLI tools to MCP servers} where both exist.
+        \texttt{gh}, \texttt{aws}, \texttt{gcloud}, and \texttt{sentry-cli}
+        cost no per-tool listing tokens; Claude calls them directly via
+        Bash.
+  \item \textbf{Disable unused servers.} \texttt{/mcp} shows what is
+        configured; \texttt{claude mcp remove <name>} drops what you
+        don't use.
+\end{itemize}
+
+\section{Level 5 — Offload to Hooks and Subagents}
+\label{sec:cost-offload}
+
+\index{cost!hooks}\index{cost!subagents}
+
+Two patterns push verbose data \emph{out} of the main context:
+
+\begin{itemize}
+  \item \textbf{Filtering hooks (\cref{ch:hooks}).} A \texttt{PreToolUse}
+        hook on \texttt{Bash} can grep test output for failures before
+        Claude ever sees it. The example from the cost docs reduces a
+        10\,000-line log file to the failing lines:
+\begin{verbatim}
+if [[ "$cmd" =~ ^(npm test|pytest|go test) ]]; then
+  filtered_cmd="$cmd 2>&1 | grep -A 5 -E '(FAIL|ERROR)' | head -100"
+  # rewrite the command via updatedInput
+fi
+\end{verbatim}
+  \item \textbf{Subagents (\cref{ch:agents}).} Delegate the high-volume
+        reads — searching a large repo, fetching long documentation
+        pages, running long test suites — to a Haiku subagent. Only the
+        summary returns to your main context.
+\end{itemize}
+
+\section{Level 6 — Tune Thinking}
+\label{sec:cost-thinking}
+
+\index{cost!thinking}
+
+Extended thinking is enabled by default and bills as output tokens. On
+simpler tasks where deep reasoning isn't needed:
+
+\begin{itemize}
+  \item Drop the effort level with \texttt{/effort low} or
+        \texttt{/effort medium}.
+  \item Set \texttt{MAX\_THINKING\_TOKENS=8000} in your environment
+        for hard-cap manual control on Sonnet and Haiku.
+  \item Don't reach for \texttt{ultrathink} on trivial tasks — see the
+        cost comparison in \cref{tab:model-cost} and the lesson in
+        \cref{ch:thinking}.
+\end{itemize}
+
+\section{Level 7 — Write Specific Prompts}
+\label{sec:cost-prompts}
+
+\index{cost!prompts}
+
+A vague prompt (``improve this codebase'') triggers broad scanning. A
+specific prompt (``add input validation to \texttt{login()} in
+\texttt{auth.ts}, covering missing email and weak password'') skips the
+exploration phase entirely. Verify-first prompts
+(\cref{ch:prompt-basics}) also save tokens: when Claude can check its own
+work, you don't pay for a follow-up correction round.
+
+\section{Plan Mode for Expensive Work}
+\label{sec:cost-plan-mode}
+
+\index{cost!plan mode}
+
+Before a large, multi-file change, switch to plan mode (\texttt{Shift+Tab}).
+Claude reads files and proposes a plan but doesn't write code. Approving
+or correcting the plan is dramatically cheaper than letting Claude pursue
+a wrong direction across many edits.
+
+\section{Team-Level Controls}
+\label{sec:cost-team}
+
+\index{cost!team controls}
+
+For teams on Pro/Max/Team/Enterprise plans:
+
+\begin{itemize}
+  \item \texttt{/usage-credits} sets a monthly spend cap for the current
+        account.
+  \item In the Claude Console, workspace spend limits cap total Claude
+        Code spend across the organization.
+  \item The recommended rate limits scale with team size (TPM/RPM per
+        user); see
+        \url{https://code.claude.com/docs/en/costs\#rate-limit-recommendations}
+        for the full table.
+\end{itemize}
+
+\begin{exercisebox}[Exercises — measure, then optimize]
+These exercises don't need a particular project; pick one you have been
+running Claude Code in for at least a few sessions.
+
+\begin{enumerate}
+  \item Run \texttt{/usage} and note the per-skill, per-subagent, and
+        per-MCP-server breakdown over the last 7 days. Which line item
+        is the largest? That is your first optimization target.
+  \item Run \texttt{/context} after 30 minutes of work. Identify the
+        single largest consumer in the context window (often a long
+        CLAUDE.md, a verbose tool output, or a deferred MCP server that
+        forgot to defer). Apply one of the levers above to it.
+  \item Open your project's \texttt{CLAUDE.md}. If it is over 200 lines,
+        move one section into \texttt{.claude/skills/} as a named skill
+        with a precise \texttt{description}. Measure tokens-per-session
+        before and after.
+  \item Add the test-output filtering hook from \cref{sec:cost-offload}
+        to your project's settings. Run \texttt{npm test} (or your
+        equivalent) and confirm Claude only sees the failing lines —
+        not the full output.
+  \item For one full day, force-use Sonnet for everything by setting
+        \texttt{defaultModel: claude-sonnet-4-6}. Note which tasks
+        actually needed Opus and which didn't. Adjust your subagent
+        \texttt{model:} fields accordingly.
+\end{enumerate}
+\end{exercisebox}
+
+%% ---------------------------------------------------------------
+\begin{summarybox}
+\begin{itemize}
+  \item Cost scales with context. Track first with \texttt{/usage},
+        \texttt{/context}, and \texttt{/cost}; don't optimize blind.
+  \item The biggest levers, in order: \texttt{/clear} between unrelated
+        tasks; model choice (Sonnet for most work, Haiku for searches);
+        keep \texttt{CLAUDE.md} under 200 lines and move workflows to
+        skills; let MCP Tool Search defer tool definitions.
+  \item Push verbose data out with filtering hooks and Haiku subagents.
+  \item Tune thinking effort to the task; \texttt{MAX\_THINKING\_TOKENS}
+        gives a hard cap on Sonnet/Haiku.
+  \item Specific prompts and plan mode pay for themselves by avoiding
+        wrong-direction rework.
+  \item For teams: \texttt{/usage-credits}, workspace spend limits in
+        the Console, and the documented per-user TPM/RPM table.
+\end{itemize}
+\end{summarybox}
+
+\printbibliography[heading=subbibliography,title={References}]

@@ -1,3 +1,317 @@
-% Stub — populated in Task 9
+% book/chapters/ch15-examples.tex
 \chapter{Real-World Examples}
 \label{ch:examples}
+
+\index{examples}
+
+This final chapter ties the book's pieces together. Each example below is
+a working configuration that combines extensions, models, prompts, hooks,
+and security rules into a complete workflow. They are designed as
+\emph{starting points} — adapt them to your project's actual stack and
+conventions.
+
+\section{Example 1: Solo Developer, Web App}
+\label{sec:ex-solo-webapp}
+
+\textbf{Profile.} One developer on a TypeScript / React / Postgres
+project. Wants Claude Code to help with feature work, code review, and
+PR generation without breaking the bank.
+
+\subsection{Configuration}
+
+\begin{lstlisting}[language=json,caption={\texttt{.claude/settings.json} — solo developer baseline}]
+{
+  "defaultModel": "claude-sonnet-4-6",
+  "permissions": {
+    "allow": [
+      "Bash(npm test *)",
+      "Bash(npm run lint *)",
+      "Bash(npm run build *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr view *)"
+    ],
+    "deny": [
+      "Write(.env*)",
+      "Bash(rm -rf /*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          { "type": "command",
+            "command": "jq -r '.tool_input.file_path' | xargs -I{} npx prettier --write {}" }
+        ]
+      }
+    ]
+  }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={\texttt{.claude/CLAUDE.md} — under 150 lines}]
+# Stack
+- React 18 + TypeScript + Vite
+- Node.js 20 + Express + Prisma + Postgres 15
+- Vitest + React Testing Library
+
+# Conventions
+- TypeScript strict mode
+- Functional React components, hooks-based state
+- API responses: { success, data?, error? }
+- Migrations: never edit applied migrations; add new ones
+
+# Workflow
+- Run `npm test -- --watch` during iteration
+- Run `npm run lint && npm run build` before opening a PR
+- Use `gh pr create` for PRs; reference the issue number
+
+# Don't
+- Don't introduce new dependencies without asking
+- Don't commit to main directly
+\end{lstlisting}
+
+\subsection{Skills and Commands}
+
+\begin{itemize}
+  \item \texttt{.claude/skills/feature/SKILL.md} — auto-invoked when the
+        user asks to ``add a feature''. Walks through scope, scaffolding,
+        tests, PR.
+  \item \texttt{.claude/commands/pr.md} — alias for ``open a PR for the
+        current branch with summary + test plan.''
+\end{itemize}
+
+\section{Example 2: Team of 8, Microservices Repo}
+\label{sec:ex-team}
+
+\textbf{Profile.} Eight backend engineers on a Node.js monorepo with five
+services. Wants consistent code review, blocked migrations file edits,
+and per-service rules.
+
+\subsection{Configuration}
+
+A managed \texttt{CLAUDE.md} pins org-wide conventions:
+
+\begin{lstlisting}[caption={Managed \texttt{CLAUDE.md} (e.g.\ \texttt{/etc/claude-code/CLAUDE.md} on Linux)}]
+# Org standards
+- Use pnpm, not npm.
+- All API handlers wrap in asyncHandler.
+- Migrations go through the migrations-review process; never edit
+  applied migration files.
+\end{lstlisting}
+
+Per-service rules live in \texttt{.claude/rules/} with path scopes
+(\cref{ch:context}):
+
+\begin{lstlisting}[caption={\texttt{.claude/rules/auth-service.md}}]
+---
+paths:
+  - "services/auth/**/*.ts"
+---
+
+# Auth service
+- Use the shared session library at @services/shared/sessions.
+- Never log tokens. Never log password fields.
+- Validate inputs with the `zod-auth` schemas in `./schemas/`.
+\end{lstlisting}
+
+Project-scoped MCP servers shared by the team:
+
+\begin{lstlisting}[language=json,caption={\texttt{.mcp.json} at the repo root}]
+{
+  "mcpServers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
+    "sentry": {
+      "type": "http",
+      "url": "https://mcp.sentry.dev/mcp"
+    }
+  }
+}
+\end{lstlisting}
+
+A team \texttt{security-reviewer} subagent in \texttt{.claude/agents/}
+runs Opus and has read-only tools — every PR gets reviewed through it
+before merge.
+
+\subsection{Hooks}
+
+\begin{lstlisting}[language=json,caption={Team-wide hooks (excerpt)}]
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [{ "type": "command",
+                    "command": "~/.claude/hooks/block-migrations.sh" }]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [{ "type": "command",
+                    "command": "jq -r '.tool_input.file_path' | xargs -I{} pnpm exec prettier --write {}" }]
+      }
+    ],
+    "ConfigChange": [
+      {
+        "matcher": "",
+        "hooks": [{ "type": "command",
+                    "command": "echo \"$(date) $USER changed config\" >> .claude/audit.log" }]
+      }
+    ]
+  }
+}
+\end{lstlisting}
+
+The \texttt{block-migrations.sh} script exits 2 if the target path
+matches \texttt{services/*/migrations/[0-9]*\_*.sql}.
+
+\section{Example 3: Long-Horizon Refactor with Subagents}
+\label{sec:ex-refactor}
+
+\textbf{Profile.} A 50-file refactor: moving a Node.js service from
+callbacks to async/await. Single developer wants to use Claude to do
+most of the work in parallel.
+
+\subsection{Workflow}
+
+\begin{enumerate}
+  \item \textbf{Plan.} Enter plan mode (\texttt{Shift+Tab}) and ask
+        Opus to produce a migration plan, ordered so independent files
+        can be processed in parallel. Save the plan to
+        \texttt{PLAN.md}.
+  \item \textbf{Fan out.} Use the bundled \texttt{/batch} skill:
+\begin{verbatim}
+/batch Migrate each file in services/api/handlers/ from
+callbacks to async/await. Run npm test after each.
+\end{verbatim}
+        \texttt{/batch} creates a worktree per file and runs each
+        migration independently.
+  \item \textbf{Adversarial review.} For each completed file, dispatch
+        the \texttt{security-reviewer} subagent in a fresh context with
+        the diff and the plan: ``Review against PLAN.md; flag gaps,
+        not style.''
+  \item \textbf{Sweep up.} Open one PR per service with the migrated
+        files; the security reviewer's findings become the PR's
+        checklist.
+\end{enumerate}
+
+This is the canonical Claude Code parallel pattern: explore → plan →
+fan-out → adversarial review → ship.
+
+\section{Example 4: Code Review Pipeline}
+\label{sec:ex-review}
+
+\textbf{Profile.} Continuous PR review via the GitHub MCP plus the
+bundled \texttt{/code-review} skill, run from CI in non-interactive mode.
+
+\begin{lstlisting}[language=bash,caption={CI step: review every open PR}]
+# .github/workflows/claude-review.yml (excerpt)
+- name: Review PR with Claude Code
+  run: |
+    claude -p "/code-review $PR_NUMBER" \
+      --permission-mode auto \
+      --output-format json \
+      --allowedTools "Read,Grep,Bash(gh pr *)" \
+      > review.json
+
+    # Post the findings as a PR comment
+    jq -r '.summary' review.json | gh pr comment "$PR_NUMBER" --body-file -
+\end{lstlisting}
+
+\texttt{--permission-mode auto} lets Claude work uninterrupted but still
+blocks scope escalation. The \texttt{--allowedTools} flag pins what
+Claude can do — no writes outside the comment.
+
+\section{Example 5: Spec-Driven Development}
+\label{sec:ex-spec}
+
+\textbf{Profile.} A feature that touches multiple subsystems. The
+developer wants to lock the design before any code is written.
+
+\subsection{Phase 1 — Interview}
+
+\begin{lstlisting}[caption={Spec interview prompt}]
+I want to add a "scheduled report" feature: users pick a frequency
+and recipients, the system emails a CSV nightly. Interview me using
+the AskUserQuestion tool. Ask about edge cases, UI flow, and
+implementation tradeoffs I haven't considered. Keep going until
+you've covered all surfaces, then write a complete spec to SPEC.md.
+\end{lstlisting}
+
+\subsection{Phase 2 — Plan}
+
+Fresh session, with \texttt{@SPEC.md} attached. ``Read \texttt{SPEC.md}
+and produce a task-by-task plan ordered for testability. Save to
+\texttt{PLAN.md}.''
+
+\subsection{Phase 3 — Implementation}
+
+\texttt{/loop Implement \texttt{PLAN.md} task-by-task. After each task,
+run the tests and report. Stop on the first failure.}
+
+This pattern — spec in one session, plan in another, implementation in a
+third — keeps each phase's context clean. The earlier sessions only show
+up through their saved artifacts (\texttt{SPEC.md}, \texttt{PLAN.md}),
+not their conversation transcripts.
+
+\begin{exercisebox}[Exercises — assemble your own production setup]
+These exercises tie everything in the book together.
+
+\begin{enumerate}
+  \item Take Example 1 verbatim and adapt it to your actual project's
+        stack and conventions. Replace the build commands, swap the
+        framework references, and prune the CLAUDE.md until it's under
+        100 lines.
+  \item Open one of your PRs and run the bundled \texttt{/code-review}
+        skill on it interactively. Save the findings to a new file
+        \texttt{REVIEW.md}. Read through the findings critically — how
+        many are real issues vs. style preferences?
+  \item Build a CI workflow that runs \texttt{claude -p "/code-review
+        \$PR\_NUMBER"} on every PR (similar to Example 4). Test it on a
+        throwaway PR first; confirm permissions are scoped tightly.
+  \item Pick a refactor in your codebase that could be parallelized.
+        Try the Example~3 pattern: plan in plan mode, then
+        \texttt{/batch} the implementation, then run an adversarial
+        review subagent. Compare the wall time and the final code
+        quality to doing it sequentially.
+  \item \textbf{Capstone.} For your project, write down a one-page
+        ``Claude Code configuration'' document covering: model defaults,
+        permissions, hooks, MCP servers, skills, subagents. Treat it as
+        living documentation — refine it monthly.
+\end{enumerate}
+\end{exercisebox}
+
+%% ---------------------------------------------------------------
+\begin{summarybox}
+\begin{itemize}
+  \item A working Claude Code setup is the composition of every chapter
+        in this book: model choice (\cref{ch:models}), CLAUDE.md and
+        rules (\cref{ch:context}), MCP servers (\cref{ch:mcp-servers}),
+        subagents (\cref{ch:agents}), skills (\cref{ch:skills}), slash
+        commands (\cref{ch:commands}), hooks (\cref{ch:hooks}), and
+        permissions (\cref{ch:security}).
+  \item Solo developer: a Sonnet default, a \textasciitilde100-line
+        \texttt{CLAUDE.md}, a Prettier-on-save hook, and a small allow
+        list go a long way.
+  \item Team: managed \texttt{CLAUDE.md} for org standards, path-scoped
+        rules per service, project-scoped MCP servers in
+        \texttt{.mcp.json}, an audit hook on \texttt{ConfigChange}.
+  \item Long-horizon work: plan, then fan-out (\texttt{/batch} or
+        worktrees), then adversarial review in fresh subagent contexts.
+  \item Spec-driven development: separate sessions for interview, plan,
+        and implementation. Saved artifacts carry context across the
+        seams.
+  \item The best configuration is one you maintain. Treat
+        \texttt{.claude/} like code: review, prune, evolve.
+\end{itemize}
+\end{summarybox}
+
+\printbibliography[heading=subbibliography,title={References}]
