@@ -1,3 +1,166 @@
-% Stub
-\chapter{ch06-commands}
-\label{ch:ch06-commands}
+% book/chapters/ch06-commands.tex
+\chapter{Slash Commands}
+\label{ch:commands}
+
+\index{slash commands}
+
+Slash commands are the lightest-weight way to package a workflow. Type
+\texttt{/command-name} and Claude executes the prompt template stored in
+the corresponding Markdown file. No model selection, no subagent context,
+no \texttt{SKILL.md} frontmatter required — just a \texttt{.md} file and a
+forward slash.
+
+\begin{notebox}
+As of mid-2025, custom commands and skills have been unified. A file at
+\texttt{.claude/commands/deploy.md} and a skill at
+\texttt{.claude/skills/deploy/SKILL.md} both create the \texttt{/deploy}
+command and behave identically. If both exist with the same name, the skill
+takes precedence. Existing \texttt{commands/} files continue to work without
+migration.
+\end{notebox}
+
+\section{Anatomy of a Command File}
+\label{sec:command-anatomy}
+
+A command is a Markdown file with an optional YAML frontmatter header:
+
+\begin{lstlisting}[caption={A minimal command: \texttt{.claude/commands/review-pr.md}}]
+---
+description: Review a pull request for security and quality issues
+---
+
+Review pull request $ARGUMENTS for:
+1. Security vulnerabilities (OWASP Top 10)
+2. Code quality and style consistency
+3. Test coverage for new code
+4. Performance implications
+
+Output: a numbered list of findings, rated Critical / Major / Minor.
+If no issues found, state "No issues found."
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Invoking the command}]
+/review-pr 456
+# $ARGUMENTS = "456"
+\end{lstlisting}
+
+\section{The \$ARGUMENTS Variable}
+\label{sec:command-arguments}
+
+\index{slash commands!\$ARGUMENTS}
+
+\texttt{\$ARGUMENTS} captures all text typed after the command name. Use it
+to pass PR numbers, file paths, ticket IDs, or any other dynamic input:
+
+\begin{lstlisting}[caption={Examples of \$ARGUMENTS usage}]
+/deploy staging        # $ARGUMENTS = "staging"
+/generate-docs api/v2  # $ARGUMENTS = "api/v2"
+/fix-issue 1234        # $ARGUMENTS = "1234"
+\end{lstlisting}
+
+If no arguments are given, \texttt{\$ARGUMENTS} is an empty string. Your
+command should handle that gracefully (e.g., prompt the user to supply
+the missing input).
+
+\section{Frontmatter Fields}
+\label{sec:command-frontmatter}
+
+\begin{table}[ht]
+\centering
+\caption{Command/skill frontmatter fields}
+\label{tab:command-frontmatter}
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Field} & \textbf{Required} & \textbf{Description} \\
+\midrule
+\texttt{description}              & No  & Shown in \texttt{/help} output and used for auto-invocation matching \\
+\texttt{model}                    & No  & Override: \texttt{haiku}, \texttt{sonnet}, \texttt{opus} \\
+\texttt{disable-model-invocation} & No  & \texttt{true} prevents Claude auto-triggering this command \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Team Workflows}
+\label{sec:command-team}
+
+\index{slash commands!team workflows}
+
+Commands stored in \texttt{.claude/commands/} (committed to the repository)
+give every team member identical, consistently-executed workflows:
+
+\begin{lstlisting}[language=bash,caption={Team command file layout}]
+.claude/
+  commands/
+    review-pr.md       # Standardised PR review checklist
+    deploy.md          # Deployment safety checks
+    generate-docs.md   # API documentation generation
+    onboard-feature.md # New feature scaffolding
+\end{lstlisting}
+
+\begin{lstlisting}[caption={A deployment command with safety guardrails}]
+---
+description: Deploy to the specified environment with pre-flight checks
+disable-model-invocation: true
+---
+
+Deploy to environment: $ARGUMENTS
+
+Pre-flight checklist:
+1. Run `npm run lint` and confirm zero errors
+2. Run `npm test` and confirm all tests pass
+3. Confirm git working tree is clean (`git status`)
+4. Run `npm run build` and confirm success
+
+If all checks pass, proceed with deployment.
+If any check fails, stop and report the failure.
+Do not deploy to production unless $ARGUMENTS is exactly "production"
+and the user explicitly types "CONFIRM PRODUCTION DEPLOY".
+\end{lstlisting}
+
+\section{Built-In Commands}
+\label{sec:built-in-commands}
+
+\index{slash commands!built-in}
+
+Claude Code ships with built-in commands that are always available:
+
+\begin{table}[ht]
+\centering
+\caption{Selected built-in Claude Code commands}
+\label{tab:built-in-commands}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Command} & \textbf{Purpose} \\
+\midrule
+\texttt{/help}         & List available commands and skills \\
+\texttt{/clear}        & Reset conversation context \\
+\texttt{/compact}      & Summarise and compress conversation history \\
+\texttt{/rewind}       & Open checkpoint browser to restore earlier state \\
+\texttt{/mcp}          & Open MCP server management panel \\
+\texttt{/agents}       & Create and manage subagents \\
+\texttt{/hooks}        & Browse configured hooks \\
+\texttt{/permissions}  & Review and modify permission settings \\
+\texttt{/code-review}  & Built-in code review skill (bundled) \\
+\texttt{/debug}        & Built-in debugging skill (bundled) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+%% ---------------------------------------------------------------
+\begin{summarybox}
+\begin{itemize}
+  \item Slash commands are Markdown files in \texttt{.claude/commands/}
+        that execute as prompt templates. They are now unified with skills
+        (\texttt{.claude/skills/}); skills take precedence when names
+        conflict.
+  \item \texttt{\$ARGUMENTS} captures everything typed after the command
+        name, enabling dynamic input (PR numbers, file paths, environment
+        names).
+  \item Commit \texttt{.claude/commands/} to version control so every team
+        member gets the same workflows.
+  \item Use \texttt{disable-model-invocation: true} for commands with
+        side-effects that should only run when explicitly invoked.
+\end{itemize}
+\end{summarybox}
+
+\printbibliography[heading=subbibliography,title={References}]

@@ -1,3 +1,205 @@
-% Stub
-\chapter{ch07-models}
-\label{ch:ch07-models}
+% book/chapters/ch07-models.tex
+\chapter{Model Selection}
+\label{ch:models}
+
+\index{model selection}
+
+Claude Code uses three models from the Claude~4 family. Choosing the right
+model for each task is the fastest lever for reducing both cost and latency
+without sacrificing quality. This chapter describes the current models, their
+capabilities, and a decision framework.
+
+\begin{warningbox}
+Model names, pricing, and capabilities change as Anthropic releases new
+versions. Always verify current information at
+\url{https://docs.anthropic.com/en/docs/about-claude/models/overview}.
+The data below was verified against the Anthropic platform documentation
+on 2026-05-27.
+\end{warningbox}
+
+\section{The Claude 4 Model Family}
+\label{sec:model-family}
+
+\index{Claude Opus 4.7}\index{Claude Sonnet 4.6}\index{Claude Haiku 4.5}
+
+\begin{table}[ht]
+\centering
+\caption{Current Claude model comparison (verified 2026-05-27)}
+\label{tab:model-comparison}
+\begin{tabularx}{\textwidth}{lllll}
+\toprule
+\textbf{Feature}        & \textbf{Opus 4.7}     & \textbf{Sonnet 4.6}   & \textbf{Haiku 4.5} \\
+\midrule
+API ID                  & \texttt{claude-opus-4-7}
+                        & \texttt{claude-sonnet-4-6}
+                        & \texttt{claude-haiku-4-5-20251001} \\
+Context window          & 1M tokens             & 1M tokens             & 200K tokens \\
+Max output              & 128K tokens           & 64K tokens            & 64K tokens \\
+Input price (per MTok)  & \$5                   & \$3                   & \$1 \\
+Output price (per MTok) & \$25                  & \$15                  & \$5 \\
+Extended thinking       & No (adaptive only)    & Yes                   & Yes \\
+Relative latency        & Moderate              & Fast                  & Fastest \\
+Knowledge cutoff        & Jan 2026              & Aug 2025              & Feb 2025 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Claude Opus 4.7 — Most Capable}
+
+Opus 4.7 is Anthropic's most capable generally available model.
+Its strengths are complex reasoning and agentic coding: tasks that involve
+planning across many files, making architectural decisions, or synthesising
+information from a large context.
+
+\begin{lstlisting}[caption={Tasks suited to Opus 4.7}]
+"Design a scalable microservices architecture for this monolith"
+"Deep security audit for OWASP Top 10 across the entire codebase"
+"Refactor this module to an event-driven pattern with full test coverage"
+\end{lstlisting}
+
+\subsection{Claude Sonnet 4.6 — Best Speed/Intelligence Balance}
+
+Sonnet 4.6 handles the vast majority of development work: feature
+implementation, bug fixing, code review, and test generation. It supports
+extended thinking (for explicit reasoning), has a 1M-token context window,
+and is fast enough for interactive use.
+
+\begin{lstlisting}[caption={Tasks suited to Sonnet 4.6}]
+"Add user authentication to this Express API"
+"Refactor this class to use the repository pattern"
+"Write integration tests for the checkout flow"
+\end{lstlisting}
+
+\subsection{Claude Haiku 4.5 — Fastest, Most Cost-Efficient}
+
+Haiku 4.5 is 3× cheaper than Sonnet and responds in seconds. It excels at
+tasks that do not require deep reasoning: file searches, formatting, simple
+transformations, and quick lookups. Use it as the default for the Explore
+subagent and for any automation that runs at high frequency.
+
+\begin{lstlisting}[caption={Tasks suited to Haiku 4.5}]
+"Find all React components importing useState"
+"Format this file with Prettier"
+"Sort these imports alphabetically"
+\end{lstlisting}
+
+\section{Pricing and Cost Optimisation}
+\label{sec:model-pricing}
+
+\index{model selection!cost}
+
+A well-chosen model mix can reduce daily token costs by 50–60\,\% versus
+using Sonnet or Opus for everything:
+
+\begin{table}[ht]
+\centering
+\caption{Daily cost comparison: all-Sonnet vs.\ smart mix}
+\label{tab:model-cost}
+\begin{tabularx}{\textwidth}{Xrrr}
+\toprule
+\textbf{Task type (ops/day)} & \textbf{All Sonnet} & \textbf{Smart mix} & \textbf{Model used} \\
+\midrule
+File searches (20)       & \$0.36 & \$0.06 & Haiku \\
+Formatting (15)          & \$0.27 & \$0.04 & Haiku \\
+Bug fixes (10)           & \$0.90 & \$0.90 & Sonnet \\
+Feature development (5)  & \$0.45 & \$0.45 & Sonnet \\
+Architecture design (2)  & \$0.90 & \$1.60 & Opus \\
+\midrule
+\textbf{Daily total}     & \$2.88 & \$3.05 & \\
+\multicolumn{4}{l}{\small Note: smart mix costs slightly more here because Opus tasks are 2×.} \\
+\multicolumn{4}{l}{\small For 40 searches and 0 architecture, smart mix saves $\approx$50\%.} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Model Selection Decision Framework}
+\label{sec:model-decision}
+
+\index{model selection!decision framework}
+
+\begin{itemize}
+  \item \textbf{Simple task, no code understanding required?}
+        $\Rightarrow$ \textbf{Haiku 4.5}
+        (searches, formatting, linting, import sorting)
+  \item \textbf{Standard coding task?}
+        $\Rightarrow$ \textbf{Sonnet 4.6}
+        (features, bug fixes, tests, documentation, reviews)
+  \item \textbf{Architecture, security-critical, or long-context synthesis?}
+        $\Rightarrow$ \textbf{Opus 4.7}
+\end{itemize}
+
+\textbf{Rule of thumb}: use the \emph{least powerful model that can get the
+job done correctly}.
+
+\section{Configuring Models in Claude Code}
+\label{sec:model-config}
+
+\index{model selection!configuration}
+
+\textbf{Session-level} (CLI flag):
+\begin{lstlisting}[language=bash,caption={Selecting a model for a session}]
+claude --model claude-opus-4-7
+claude --model claude-sonnet-4-6
+claude --model claude-haiku-4-5
+\end{lstlisting}
+
+\textbf{Default for a project} (\texttt{.claude/settings.json}):
+\begin{lstlisting}[language=json,caption={Setting the project default model}]
+{
+  "defaultModel": "claude-sonnet-4-6"
+}
+\end{lstlisting}
+
+\textbf{Per-subagent} (frontmatter in \texttt{.claude/agents/}):
+\begin{lstlisting}[caption={Assigning Haiku to the Explore subagent (already the default)}]
+---
+name: explore
+model: haiku
+---
+\end{lstlisting}
+
+\textbf{Per-skill} (frontmatter in \texttt{SKILL.md}):
+\begin{lstlisting}[caption={Routing a skill to Opus for architecture work}]
+---
+name: design-architecture
+model: opus
+---
+\end{lstlisting}
+
+\section{Legacy Models}
+\label{sec:model-legacy}
+
+\index{model selection!deprecated}
+
+Several earlier models remain available but should be migrated away from:
+
+\begin{itemize}
+  \item \textbf{Claude Sonnet~4} (\texttt{claude-sonnet-4-20250514}) and
+        \textbf{Claude Opus~4} (\texttt{claude-opus-4-20250514}) are
+        \textbf{deprecated} and will be retired on \textbf{June 15, 2026}.
+        Migrate to Sonnet~4.6 and Opus~4.7 respectively.
+  \item Sonnet~4.5, Opus~4.5, Opus~4.6, and Opus~4.1 are still available
+        but no longer the recommended option.
+\end{itemize}
+
+%% ---------------------------------------------------------------
+\begin{summarybox}
+\begin{itemize}
+  \item Three current models: \textbf{Opus 4.7} (most capable, 1M context,
+        \$5/\$25/MTok), \textbf{Sonnet 4.6} (balanced, 1M context,
+        \$3/\$15/MTok), \textbf{Haiku 4.5} (fastest, 200K context,
+        \$1/\$5/MTok).
+  \item Opus 4.7 and Sonnet 4.6 both have \textbf{1M-token context windows}
+        — a major increase from the 200K reported in earlier documentation.
+  \item Only Sonnet 4.6 and Haiku 4.5 support extended thinking; Opus 4.7
+        uses adaptive thinking instead.
+  \item Use Haiku for simple/search tasks, Sonnet for 90\,\% of coding work,
+        and Opus only for architecture or security-critical analysis.
+  \item Models can be set globally (\texttt{defaultModel} in
+        \texttt{settings.json}), per session (CLI flag), per subagent, or
+        per skill.
+  \item Sonnet~4 and Opus~4 are deprecated; retire by June 15, 2026.
+\end{itemize}
+\end{summarybox}
+
+\printbibliography[heading=subbibliography,title={References}]
