@@ -138,7 +138,7 @@ automatable process.
 \section{Configuration Layout}
 \label{sec:config-layout}
 
-All plugin configuration lives under \texttt{.claude/} in your project root
+All extension configuration lives under \texttt{.claude/} in your project root
 (or in user-level config at \texttt{\textasciitilde/.claude/}):
 
 \begin{lstlisting}[language=bash,caption={The \texttt{.claude/} directory structure}]
@@ -255,7 +255,7 @@ Search GitHub for the topic \texttt{mcp-server} or \texttt{claude-skill}, or
 browse the \texttt{awesome-claude-code} curated list
 (\url{https://github.com/hesreallyhim/awesome-claude-code}).
 
-\section{Choosing the Right Plugin Type}
+\section{Choosing the Right Extension Type}
 \label{sec:choosing}
 
 Use this decision guide when you encounter a new automation need:
@@ -276,7 +276,7 @@ Use this decision guide when you encounter a new automation need:
 \begin{itemize}
   \item \textbf{Version-control \texttt{.claude/}.} Committing skills, hooks,
         and commands ensures the whole team uses the same configuration.
-  \item \textbf{Keep plugins focused.} A skill that does one thing well is
+  \item \textbf{Keep extensions focused.} A skill that does one thing well is
         easier to maintain than one that handles every case.
   \item \textbf{Use descriptive names.} \texttt{code-review-security} is
         discoverable; \texttt{cr} is not.

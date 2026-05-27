@@ -102,7 +102,7 @@ model: sonnet
 disable-model-invocation: false
 ---
 
-Analyse and fix the GitHub issue: $ARGUMENTS
+Analyze and fix the GitHub issue: $ARGUMENTS
 
 1. Run `gh issue view $ARGUMENTS` to read the issue
 2. Search the codebase for relevant files
@@ -303,10 +303,12 @@ description: Reviews an open pull request for security
         and can work across multiple AI tools.
   \item Skills are stored in \texttt{.claude/skills/<name>/SKILL.md} (project)
         or \texttt{\textasciitilde/.claude/skills/<name>/SKILL.md} (personal).
-  \item The \texttt{name} field becomes a \texttt{/name} slash command;
-        the \texttt{description} field controls auto-invocation; \texttt{model}
-        routes to a specific Claude model; \texttt{\$ARGUMENTS} captures
-        command-line input.
+  \item The slash command name comes from the skill's \emph{directory}
+        name (with the plugin-root exception); the \texttt{description}
+        field controls auto-invocation; \texttt{model} routes to a
+        specific Claude model; \texttt{\$ARGUMENTS} captures
+        command-line input, and \texttt{arguments: [a, b]} declares named
+        positional inputs.
   \item Custom commands (\texttt{.claude/commands/}) are still supported and
         behave identically to skills.
 \end{itemize}

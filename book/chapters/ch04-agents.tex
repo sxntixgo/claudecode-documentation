@@ -10,8 +10,8 @@ reviews code, or executes a multi-step procedure without consuming tokens in
 your main conversation. When it finishes, it returns a summary and the work is
 done.
 
-Three built-in subagents ship with Claude Code; you can also define custom ones
-for your own domain.
+Several built-in subagents ship with Claude Code; you can also define custom
+ones for your own domain.
 
 \section{Why Use Subagents?}
 \label{sec:agent-why}
@@ -248,8 +248,10 @@ These exercises continue the running project.
         \texttt{tools}, and optionally \texttt{model}.
   \item The \texttt{description} field is how Claude decides when to delegate
         automatically — write it clearly.
-  \item Subagents cannot spawn other subagents. For parallel multi-session
-        workflows, use background agents or agent teams.
+  \item A subagent can spawn other subagents only when its \texttt{tools}
+        allowlist includes \texttt{Agent} (optionally with a child allowlist).
+        For parallel multi-session workflows, use background agents or
+        agent teams.
 \end{itemize}
 \end{summarybox}
 

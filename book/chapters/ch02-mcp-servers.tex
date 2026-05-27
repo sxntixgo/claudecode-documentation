@@ -20,7 +20,7 @@ mechanisms:
 
 \begin{table}[ht]
 \centering
-\caption{MCP transport options (as of 2025)}
+\caption{MCP transport options (verified 2026-05-27)}
 \label{tab:mcp-transports}
 \begin{tabularx}{\textwidth}{llX}
 \toprule
@@ -257,7 +257,7 @@ a remote HTTP server or a local stdio server.
 
 \subsection{Anatomy of a Minimal Stdio Server (TypeScript)}
 
-\begin{lstlisting}[language={[Sharp]C},caption={Minimal MCP server skeleton (TypeScript)}]
+\begin{lstlisting}[language=Java,caption={Minimal MCP server skeleton (TypeScript)}]
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from
   '@modelcontextprotocol/sdk/server/stdio.js';
