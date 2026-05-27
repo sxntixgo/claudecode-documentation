@@ -1,3 +1,266 @@
-% Stub
-\chapter{ch03-prompt-basics}
-\label{ch:ch03-prompt-basics}
+% book/chapters/ch03-prompt-basics.tex
+\chapter{Prompt Engineering Basics}
+\label{ch:prompt-basics}
+
+\index{prompt engineering}
+
+The difference between a vague prompt and a precise one can mean the difference
+between a five-second fix and five minutes of follow-up. More concretely:
+
+\begin{itemize}
+  \item A vague prompt like \emph{``Make the code better''} typically triggers
+        a clarifying question before any work begins.
+  \item A precise prompt like \emph{``Refactor the authentication function in
+        \texttt{auth.ts} to use \texttt{async}/\texttt{await} instead of
+        promise chains, and add error handling for network timeouts''} produces
+        the intended change on the first attempt.
+\end{itemize}
+
+Good prompts also save money: an extra iteration that could have been avoided
+with more context can cost \$0.10–\$0.20 in tokens, compounding across a
+full working day.
+
+\section{The Effective Prompt Formula}
+\label{sec:prompt-formula}
+
+Every well-formed Claude Code prompt contains four components:
+
+\begin{enumerate}
+  \item \textbf{Clear intent} — the specific action you want
+  \item \textbf{Sufficient context} — what Claude needs to know to do it
+  \item \textbf{Specific constraints} — boundaries and requirements
+  \item \textbf{Success criteria} — how Claude can verify the result
+\end{enumerate}
+
+\begin{table}[ht]
+\centering
+\caption{Vague vs.\ precise prompt examples}
+\label{tab:prompt-examples}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Vague} & \textbf{Precise} \\
+\midrule
+``Look at this code'' & ``Review \texttt{src/auth.ts} for SQL injection vulnerabilities'' \\
+``Help with tests''  & ``Write unit tests for the \texttt{login()} function covering success, wrong password, and locked account cases'' \\
+``Fix the bug''      & ``Fix the null pointer exception on line 42 of \texttt{UserService.java}; the error appears when \texttt{userId} is \texttt{null}'' \\
+``Add a database''   & ``Add a PostgreSQL connection using the \texttt{pg} library; store credentials in \texttt{.env}; do not commit \texttt{.env} to git'' \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Give Claude a Way to Verify Its Work}
+
+Anthropic's own best-practices documentation identifies this as the
+\emph{single highest-leverage improvement} you can make to your prompts:
+include tests, screenshots, or expected outputs so Claude can check itself
+without waiting for you.
+
+\begin{lstlisting}[caption={Prompt without vs.\ with verification criteria}]
+# Without verification -- Claude may produce plausible-but-wrong output
+"Implement a function that validates email addresses"
+
+# With verification -- Claude can run tests and self-correct
+"Write a validateEmail function.
+ Test cases: user@example.com -> true, invalid -> false,
+             user@.com -> false.
+ Run the tests after implementing and fix any failures."
+\end{lstlisting}
+
+\section{The Explore-Plan-Implement-Commit Workflow}
+\label{sec:epi-workflow}
+
+\index{plan mode}
+
+For tasks that modify multiple files or involve unfamiliar code, use the
+four-phase workflow built into Claude Code:
+
+\begin{enumerate}
+  \item \textbf{Explore} — switch to plan mode (\texttt{Shift+Tab} to toggle,
+        or prefix your message with ``think about'') and ask Claude to read
+        relevant files \emph{without} making changes.
+  \item \textbf{Plan} — ask Claude to write out an implementation plan. Press
+        \texttt{Ctrl+G} to open the plan in your editor and modify it before
+        Claude proceeds.
+  \item \textbf{Implement} — exit plan mode and let Claude code against the
+        agreed plan, running tests and verifying results.
+  \item \textbf{Commit} — ask Claude to write a descriptive commit message and
+        open a pull request.
+\end{enumerate}
+
+\begin{notebox}
+Skip the explore/plan phases for small, obviously-scoped changes like fixing
+a typo or renaming a variable. The overhead is only worthwhile when the scope
+is uncertain or the change touches multiple files.
+\end{notebox}
+
+\section{Core Prompt Patterns}
+\label{sec:prompt-patterns}
+
+\index{prompt patterns}
+
+Seven patterns cover the vast majority of software development tasks. Each
+follows the four-component formula; the templates below make that structure
+explicit.
+
+\subsection{Pattern 1: CREATE}
+
+Use when building something new from scratch.
+
+\begin{lstlisting}[caption={CREATE pattern template}]
+Create [what] in [where] using [technology/approach].
+
+Requirements:
+- [Requirement 1]
+- [Requirement 2]
+
+Style/Conventions:
+- [Convention 1]
+\end{lstlisting}
+
+\begin{lstlisting}[caption={CREATE: a TypeScript React component}]
+Create a LoadingSpinner component in src/components/LoadingSpinner.tsx.
+
+Requirements:
+- Accepts 'size' prop ('small', 'medium', 'large')
+- Accepts optional 'color' prop (defaults to blue)
+- Uses CSS animations (no external libraries)
+- Export as default
+
+Verify: render it in Storybook and confirm all three sizes display.
+\end{lstlisting}
+
+\subsection{Pattern 2: FIX}
+
+Use when addressing a known bug or error.
+
+\begin{lstlisting}[caption={FIX pattern template}]
+Fix [specific issue] in [file/component].
+
+Error: [exact error message or symptom]
+Reproduce: [steps or failing test]
+
+Do not change unrelated code.
+Verify: [test that must pass]
+\end{lstlisting}
+
+\subsection{Pattern 3: REFACTOR}
+
+Use when restructuring code without changing behavior.
+
+\begin{lstlisting}[caption={REFACTOR pattern template}]
+Refactor [what] to [goal].
+
+Keep all existing tests passing.
+Do not change the public API.
+[Constraint: e.g., no new dependencies]
+\end{lstlisting}
+
+\subsection{Pattern 4: REVIEW}
+
+Use for code review, security audits, or quality checks.
+
+\begin{lstlisting}[caption={REVIEW pattern template}]
+Review [file/function/PR] for [focus area].
+
+Report:
+1. Critical issues (must fix)
+2. Suggestions (optional)
+
+Do not make changes; report only.
+\end{lstlisting}
+
+\subsection{Pattern 5: EXPLAIN}
+
+Use when you need to understand unfamiliar code.
+
+\begin{lstlisting}[caption={EXPLAIN pattern template}]
+Explain [file/function/concept].
+
+Audience: [your level / team context]
+Focus: [specific aspect, e.g., "why async here?"]
+\end{lstlisting}
+
+\subsection{Pattern 6: TEST}
+
+Use when writing test suites.
+
+\begin{lstlisting}[caption={TEST pattern template}]
+Write [unit/integration/e2e] tests for [target].
+
+Cover:
+- Happy path: [description]
+- Error cases: [description]
+- Edge cases: [description]
+
+Framework: [pytest/jest/etc.]
+Run the tests and fix any failures.
+\end{lstlisting}
+
+\subsection{Pattern 7: OPTIMIZE}
+
+Use for performance improvements.
+
+\begin{lstlisting}[caption={OPTIMIZE pattern template}]
+Optimize [target] for [metric: speed/memory/cost].
+
+Current: [benchmark or symptom]
+Constraint: [e.g., "do not change the public API"]
+Verify: run the benchmark and show the before/after numbers.
+\end{lstlisting}
+
+\section{Providing Rich Context}
+\label{sec:rich-context}
+
+Beyond typed text, Claude Code accepts several forms of rich input:
+
+\begin{itemize}
+  \item \textbf{\texttt{@file-path}} — reference a file directly; Claude reads
+        it before responding.
+  \item \textbf{Images} — paste or drag-and-drop screenshots, mockups, or
+        error dialogs.
+  \item \textbf{URLs} — paste documentation or API reference URLs for Claude
+        to fetch.
+  \item \textbf{Piped input} —
+        \texttt{cat error.log | claude -p "What caused this?"} sends file
+        contents directly.
+\end{itemize}
+
+\section{Common Mistakes}
+\label{sec:prompt-mistakes}
+
+\begin{table}[ht]
+\centering
+\caption{Common prompting mistakes and their fixes}
+\label{tab:prompt-mistakes}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Mistake} & \textbf{Fix} \\
+\midrule
+No verification criteria & Add a test to run or a command whose output Claude can check \\
+Missing file path & Reference the exact file with \texttt{@path} or a path in the prompt \\
+Conflating tasks & One prompt, one goal; split complex work across steps \\
+Skipping constraints & State what must \emph{not} change (API, dependencies, test suite) \\
+Over-specifying trivial tasks & Simple tasks need simple prompts; save structure for complex ones \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+%% ---------------------------------------------------------------
+\begin{summarybox}
+\begin{itemize}
+  \item Every effective Claude Code prompt specifies \textbf{intent},
+        \textbf{context}, \textbf{constraints}, and \textbf{success criteria}.
+  \item Adding a verification step (a test, a command, a screenshot check) is
+        the single highest-leverage improvement you can make.
+  \item For multi-file or uncertain-scope tasks, use the
+        \textbf{Explore~$\to$ Plan~$\to$ Implement~$\to$ Commit} workflow and
+        plan mode.
+  \item Seven patterns cover 95\,\% of development work: CREATE, FIX,
+        REFACTOR, REVIEW, EXPLAIN, TEST, and OPTIMIZE. Each is a template —
+        fill in the four components.
+  \item Provide rich context via \texttt{@file} references, pasted images,
+        URLs, and piped shell input.
+\end{itemize}
+\end{summarybox}
+
+\printbibliography[heading=subbibliography,title={References}]
