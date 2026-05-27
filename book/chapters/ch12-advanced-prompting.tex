@@ -1,3 +1,317 @@
-% Stub — populated in Task 8
+% book/chapters/ch12-advanced-prompting.tex
 \chapter{Advanced Prompting}
 \label{ch:advanced-prompting}
+
+\index{prompt engineering!advanced}
+
+\Cref{ch:prompt-basics} covered the four-part formula (intent, context,
+constraints, success criteria) and the seven patterns that get you 95\,\%
+of the way. This chapter is what to reach for when those don't suffice:
+structuring with XML tags, multi-shot examples, role-based system prompts,
+long-context techniques, and tuning specifically for the Claude~4 family.
+
+\section{Structure Prompts with XML Tags}
+\label{sec:xml-tags}
+
+\index{prompt engineering!XML tags}
+
+When a prompt has multiple distinct parts — instructions, examples,
+context, an item to act on — wrap each in an XML tag. Claude was trained
+heavily on tag-structured prompts and uses the tags as semantic anchors:
+
+\begin{lstlisting}[caption={A prompt without XML — Claude has to guess what is what}]
+Review the code below for security issues. Here are the rules we follow.
+1. No hardcoded secrets. 2. Validate all input. 3. Parameterize SQL.
+Here's an example of a finding we'd want: "user.id is concatenated into
+the SQL query at line 42, vulnerable to injection." Now review this code.
+[code dump]
+\end{lstlisting}
+
+\begin{lstlisting}[caption={The same prompt with XML structure}]
+<task>Review the code for security issues and report findings.</task>
+
+<rules>
+  1. No hardcoded secrets.
+  2. Validate all input at the API boundary.
+  3. Parameterize every SQL query.
+</rules>
+
+<example>
+  Finding: user.id is concatenated into the SQL query at line 42,
+  vulnerable to SQL injection. Severity: Critical.
+</example>
+
+<code>
+[code dump]
+</code>
+\end{lstlisting}
+
+The second version is dramatically more reliable: Claude knows that
+\texttt{<rules>} is the checklist, \texttt{<example>} demonstrates the
+output format, and \texttt{<code>} is what to analyze. Pick tag names that
+describe the role of each block; the tag names are not magic words — what
+matters is that they delimit the regions.
+
+\section{Multi-Shot Examples}
+\label{sec:multishot}
+
+\index{prompt engineering!examples}
+
+Showing Claude two to five worked examples of the input--output pair you
+want is the single most reliable way to control output format. This works
+even when the format is hard to specify in words.
+
+\begin{lstlisting}[caption={Multi-shot prompt for log line classification}]
+Classify each log line as INFO, WARN, or ERROR.
+
+<example>
+Input:  "Database connection pool exhausted, retrying"
+Output: WARN
+</example>
+
+<example>
+Input:  "User 1234 logged in"
+Output: INFO
+</example>
+
+<example>
+Input:  "Cannot allocate memory; aborting"
+Output: ERROR
+</example>
+
+<lines>
+{paste your log lines here}
+</lines>
+\end{lstlisting}
+
+Two pointers that matter in practice:
+
+\begin{itemize}
+  \item \textbf{Diversity beats volume}. Three varied examples beat ten
+        near-duplicates. Cover edge cases — show the ambiguous
+        \texttt{WARN}-vs-\texttt{ERROR} case explicitly.
+  \item \textbf{Match the real input shape}. If your real inputs include
+        timestamps or prefixes, include them in the examples. Claude
+        copies surface patterns aggressively.
+\end{itemize}
+
+\section{Role and System Prompts}
+\label{sec:roles}
+
+\index{prompt engineering!roles}
+
+A system prompt — set in the API, or via \texttt{--append-system-prompt}
+in Claude Code — gives Claude a persona and high-priority instructions
+that persist for the whole session. Use it for behaviors you want active
+on every turn:
+
+\begin{lstlisting}[language=bash,caption={Appending a system prompt to a Claude Code session}]
+claude --append-system-prompt "$(cat <<'EOF'
+You are a senior database engineer reviewing migration files.
+Always check for: NOT NULL columns added without a default; ALTER
+operations that take an exclusive lock; missing rollback steps.
+Never edit migration files yourself; only report.
+EOF
+)"
+\end{lstlisting}
+
+Role prompts work best when they describe \emph{behavior}, not personality.
+``You are a senior engineer'' is fine; ``You are a brilliant
+\dots'' adds nothing.
+
+\section{Long-Context Techniques}
+\label{sec:long-context}
+
+\index{prompt engineering!long context}
+
+Opus 4.7 and Sonnet 4.6 both have 1M-token context windows. When you
+genuinely use the window — pasting a long PDF, a 50-file codebase dump,
+hours of transcript — three techniques materially improve recall:
+
+\begin{itemize}
+  \item \textbf{Put the question \emph{after} the data.} Claude attends
+        strongly to the most recent content. State the data first, the
+        instruction last.
+  \item \textbf{Quote the relevant passages first.} Ask Claude to find
+        and quote the spans it will use before reasoning about them.
+        This forces grounding.
+  \item \textbf{Use XML tags as section markers.} Wrap each document in
+        \texttt{<document>} with a \texttt{name} attribute, and ask
+        Claude to cite the document name in its answer.
+\end{itemize}
+
+\begin{lstlisting}[caption={Long-context skeleton}]
+<documents>
+  <document name="contract-v3">{...}</document>
+  <document name="contract-v4">{...}</document>
+  <document name="legal-review">{...}</document>
+</documents>
+
+First, find and quote the passages that discuss termination clauses
+in each document. Then summarize the differences in termination
+language between v3 and v4. Cite the document name and section.
+\end{lstlisting}
+
+\section{Prompting with Tools}
+\label{sec:tool-use-prompting}
+
+\index{prompt engineering!tool use}
+
+When Claude has tools available (in Claude Code: Read, Edit, Bash, MCP
+tools, \dots), the prompt should bias \emph{toward} or \emph{against}
+calling them. Two patterns:
+
+\begin{itemize}
+  \item \textbf{Force verification with tool use.} ``Don't assume — run
+        \texttt{npm test} and show the actual output.'' This is the
+        verify-first principle from \cref{ch:prompt-basics}, expressed
+        as a tool-use bias.
+  \item \textbf{Encourage parallelism.} For independent reads, say:
+        ``Read all three files in parallel before reasoning about them.''
+        Claude Opus~4.7 will often parallelize unprompted; older models
+        benefit from the explicit hint.
+\end{itemize}
+
+\section{Interaction with Thinking Modes}
+\label{sec:advanced-thinking}
+
+\index{prompt engineering!extended thinking}
+
+Extended thinking (\cref{ch:thinking}) is itself a prompt-engineering
+lever. Useful combinations:
+
+\begin{itemize}
+  \item Use \texttt{think hard} together with multi-shot examples on
+        \emph{hard} classification tasks — the extra thinking lets Claude
+        actually compare against each example.
+  \item For step-by-step proofs or algorithm walkthroughs, ask for the
+        answer \emph{after} the thinking block:
+        ``After reasoning through the steps, state the final answer on
+        its own line beginning with \texttt{ANSWER:}.''
+  \item Avoid \texttt{ultrathink} on tool-use-heavy tasks. Long thinking
+        before a tool call delays the call without improving its result;
+        the bottleneck is real-world data, not reasoning.
+\end{itemize}
+
+\section{Output Control}
+\label{sec:output-control}
+
+\index{prompt engineering!output control}
+
+\subsection{Format}
+
+To get JSON, Markdown, or a specific schema reliably:
+
+\begin{enumerate}
+  \item State the format explicitly: ``Respond with a single JSON
+        object\dots''
+  \item Provide a schema in the prompt as a code block.
+  \item Show one filled-in example.
+  \item For JSON, ask Claude to wrap its answer in
+        \texttt{<json>}\dots\texttt{</json>} so a regex extractor can
+        find it cleanly.
+\end{enumerate}
+
+\subsection{Length}
+
+Claude Opus~4.7 calibrates response length to task complexity rather than
+defaulting to a fixed verbosity. To override:
+
+\begin{lstlisting}[caption={Capping response length}]
+Provide concise, focused responses. Skip non-essential context, keep
+examples minimal, and answer in at most five sentences.
+\end{lstlisting}
+
+To go the other way (force more detail):
+\texttt{Walk through your reasoning step by step before giving the
+final answer.}
+
+\subsection{Migration Note: Prefill Is Going Away}
+
+\index{prompt engineering!prefill}
+
+In earlier API generations you could force Claude to start its response
+with a specific string (prefill). The current best-practices guide for
+Claude~4 advises migrating away from prefill: use explicit format
+instructions and examples instead, since the calibrated-verbosity
+behavior makes prefilled prefixes less reliable.
+
+\section{Claude Opus 4.7-Specific Patterns}
+\label{sec:opus-47-prompting}
+
+\index{prompt engineering!Opus 4.7}
+
+The Opus~4.7 model is more literal about instructions than its
+predecessors, which changes a few habits:
+
+\begin{itemize}
+  \item \textbf{Don't over-specify when defaults are fine.} The model
+        chooses verbosity based on the task. Telling it ``be thorough''
+        when the task is trivial wastes tokens.
+  \item \textbf{Be explicit when you need atypical behavior.}
+        ``Override the default and produce a one-line answer.''
+  \item \textbf{Subagent spawning is calibrated.} Opus~4.7 dispatches
+        subagents more readily than earlier models for research-heavy
+        work; if you don't want that, say ``stay in this conversation;
+        don't spawn subagents.''
+  \item \textbf{Effort levels.} On the API, \texttt{effort: low|medium|high|xhigh}
+        is the Opus~4.7 equivalent of the old
+        \texttt{budget\_tokens}. In Claude Code this maps to the
+        thinking keywords from \cref{ch:thinking}.
+\end{itemize}
+
+\begin{exercisebox}[Exercises — graduate from basic to advanced prompting]
+These exercises stand alone; they don't continue the running project.
+
+\begin{enumerate}
+  \item \textbf{XML structure refactor.} Take any long prompt you've
+        recently written (or one you have to write repeatedly). Refactor
+        it to use XML tags for each region (\texttt{<rules>},
+        \texttt{<example>}, \texttt{<input>}). Run both versions on the
+        same input and note which gives a more consistent format.
+  \item \textbf{Multi-shot.} Pick a classification task — labeling log
+        lines, categorizing PR descriptions, sentiment of customer
+        feedback. Write a three-example multi-shot prompt that covers
+        \emph{ambiguous} cases, not just easy ones. Verify that the
+        ambiguous cases are now classified the way your examples imply.
+  \item \textbf{Long context.} Paste a 100-page PDF (or any large
+        document) into a session, wrap it in
+        \texttt{<document name="doc1">\dots</document>}, and ask Claude
+        to quote-then-summarize. Then re-run with the question
+        \emph{before} the document — note the recall difference.
+  \item \textbf{Verify-first as prompt habit.} For one full day of
+        work, add an explicit verification step (test, command, or
+        check) to every coding prompt. Notice how often Claude catches
+        its own mistakes without you intervening.
+  \item \textbf{Length calibration.} On Opus~4.7, run the same prompt
+        with and without the ``concise, focused responses'' override.
+        Measure the token delta and decide whether the longer version
+        added value.
+\end{enumerate}
+\end{exercisebox}
+
+%% ---------------------------------------------------------------
+\begin{summarybox}
+\begin{itemize}
+  \item Wrap distinct parts of a prompt — instructions, rules, examples,
+        input — in \textbf{XML tags}. Tag names are not magic; the
+        delimitation is what matters.
+  \item \textbf{Multi-shot examples} are the most reliable way to
+        control output format. Three diverse examples beat ten
+        near-duplicates.
+  \item Use \textbf{system prompts} (\texttt{--append-system-prompt})
+        for behaviors that should hold all session.
+  \item In long-context prompts: put the data first, the question last;
+        ask Claude to quote relevant passages before reasoning; mark
+        documents with named XML tags.
+  \item Combine prompting with \cref{ch:thinking}: multi-shot~+~\texttt{think hard}
+        for hard classification; explicit final-answer markers after
+        thinking blocks.
+  \item Claude Opus~4.7 is more literal and self-calibrating; tell it
+        when you want atypical behavior, don't over-specify when defaults
+        suffice, and prefer effort-level / thinking keywords over the
+        deprecated prefill technique.
+\end{itemize}
+\end{summarybox}
+
+\printbibliography[heading=subbibliography,title={References}]

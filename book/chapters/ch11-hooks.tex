@@ -1,3 +1,338 @@
-% Stub — populated in Task 8
+% book/chapters/ch11-hooks.tex
 \chapter{Hooks and Automation}
 \label{ch:hooks}
+
+\index{hooks}
+
+A hook is a shell command that Claude Code runs automatically at a specific
+point in its lifecycle. Where CLAUDE.md and skills are \emph{advisory} (Claude
+reads them and tries to comply), hooks are \emph{deterministic} — the command
+runs every time the matching event fires, regardless of what Claude decides
+to do.
+
+Use hooks when an action must happen with zero exceptions: format on save,
+block writes to protected files, refresh environment variables when a
+directory changes, or send a desktop notification when Claude is waiting on
+your input.
+
+\section{Where Hooks Live}
+\label{sec:hook-location}
+
+\index{hooks!configuration location}
+
+Hooks are JSON entries inside a settings file. They can be placed at four
+scopes:
+
+\begin{table}[ht]
+\centering
+\caption{Settings files that can declare hooks}
+\label{tab:hook-scopes}
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Scope} & \textbf{File} & \textbf{Notes} \\
+\midrule
+User    & \texttt{\textasciitilde/.claude/settings.json}
+        & Applies to every project on your machine \\
+Project & \texttt{.claude/settings.json}
+        & Team-shared; commit to version control \\
+Local   & \texttt{.claude/settings.local.json}
+        & Personal project notes; add to \texttt{.gitignore} \\
+Plugin  & \texttt{<plugin>/hooks/hooks.json}
+        & Bundled with a plugin; activates when the plugin is enabled \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Hooks from every scope are merged at runtime. If the same event has hooks
+defined at multiple scopes, all of them run.
+
+\section{Hook Events}
+\label{sec:hook-events}
+
+\index{hooks!events}
+
+Claude Code fires hooks at many points in its lifecycle. The events you reach
+for most often are these:
+
+\begin{table}[ht]
+\centering
+\caption{Core hook events}
+\label{tab:hook-events}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Event} & \textbf{When it fires} \\
+\midrule
+\texttt{PreToolUse}        & After Claude has chosen tool parameters, before the tool actually runs. Can block. \\
+\texttt{PostToolUse}       & After a tool call returns successfully. Cannot block. \\
+\texttt{PostToolUseFailure}& After a failed tool call. \\
+\texttt{UserPromptSubmit}  & When you submit a prompt, before Claude sees it. Can rewrite or block. \\
+\texttt{Notification}      & When Claude Code wants to show a UI notification (e.g.\ waiting for permission). \\
+\texttt{SessionStart}      & When a session begins or resumes. Useful for loading per-project context. \\
+\texttt{SessionEnd}        & When a session terminates. \\
+\texttt{Stop}              & When Claude finishes responding. \\
+\texttt{SubagentStop}      & When a subagent finishes. \\
+\texttt{PreCompact}        & Before context compaction. \\
+\texttt{InstructionsLoaded}& When a CLAUDE.md or rule file loads into context. \\
+\texttt{FileChanged}       & When a watched file changes on disk. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The full list (including \texttt{Setup}, \texttt{UserPromptExpansion},
+\texttt{PermissionRequest}, \texttt{PermissionDenied}, \texttt{PostToolBatch},
+\texttt{SubagentStart}, \texttt{TaskCreated}, \texttt{TaskCompleted},
+\texttt{StopFailure}, \texttt{TeammateIdle}, \texttt{ConfigChange},
+\texttt{CwdChanged}, \texttt{WorktreeCreate}, \texttt{WorktreeRemove},
+\texttt{PostCompact}, \texttt{Elicitation}, \texttt{ElicitationResult}) is at
+\url{https://code.claude.com/docs/en/hooks}.
+
+\section{Hook Configuration}
+\label{sec:hook-config}
+
+\index{hooks!configuration}
+
+A hook entry has three parts: the event name, an optional \emph{matcher} that
+filters by tool name (or other event-specific criteria), and one or more
+commands to run.
+
+\begin{lstlisting}[language=json,caption={Format on save with Prettier}]
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | xargs -I{} npx prettier --write {}"
+          }
+        ]
+      }
+    ]
+  }
+}
+\end{lstlisting}
+
+The \texttt{matcher} is a regular expression over the tool name; the empty
+string \texttt{""} matches every tool. Each entry's \texttt{hooks} array can
+contain multiple commands; they run in order.
+
+\begin{lstlisting}[language=json,caption={Block writes to a protected directory}]
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path'); case \"$f\" in *db/migrations/*) echo 'migrations are protected'; exit 2;; esac"
+          }
+        ]
+      }
+    ]
+  }
+}
+\end{lstlisting}
+
+\section{Input and Output Format}
+\label{sec:hook-io}
+
+\index{hooks!input format}\index{hooks!output format}
+
+Claude Code writes a single JSON object to the hook command's stdin. Every
+event includes a base set of fields; tool events add tool-specific data.
+
+\begin{lstlisting}[language=json,caption={JSON delivered to a \texttt{PostToolUse} hook}]
+{
+  "session_id": "abc123",
+  "transcript_path": "/Users/.../transcript.jsonl",
+  "cwd": "/Users/me/myproject",
+  "permission_mode": "default",
+  "hook_event_name": "PostToolUse",
+  "tool_name": "Write",
+  "tool_input":   { "file_path": "/path/to/file.ts", "content": "..." },
+  "tool_response":{ "status": "success" },
+  "tool_use_id":  "tool-123"
+}
+\end{lstlisting}
+
+The hook can write JSON back on stdout (when it exits 0) to influence the
+session. Useful fields:
+
+\begin{itemize}
+  \item \texttt{continue} — set to \texttt{false} to stop Claude entirely.
+  \item \texttt{suppressOutput} — hide this hook's output from the transcript.
+  \item \texttt{systemMessage} — display a warning to the user.
+  \item \texttt{hookSpecificOutput.additionalContext} — inject text into
+        Claude's next turn.
+  \item \texttt{hookSpecificOutput.permissionDecision} — for
+        \texttt{PreToolUse}, \texttt{allow} or \texttt{deny} the call.
+\end{itemize}
+
+\subsection{Exit-Code Semantics}
+
+\index{hooks!exit codes}
+
+\begin{table}[ht]
+\centering
+\caption{Hook exit-code meanings}
+\label{tab:hook-exit-codes}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Exit code} & \textbf{Meaning} \\
+\midrule
+\texttt{0}     & Success. Stdout (if JSON) is parsed for output fields. \\
+\texttt{2}     & \emph{Blocking error}. Stderr is sent to Claude as a tool message; the action is blocked for events that support blocking. \\
+Anything else  & Non-blocking error. Stderr appears in the transcript; the action proceeds. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Exit code 2 is the lever for enforcement: combine a \texttt{PreToolUse} hook
+with \texttt{exit 2} to deterministically prevent an action, and stderr
+becomes the explanation Claude reads.
+
+\section{Common Patterns}
+\label{sec:hook-patterns}
+
+\begin{itemize}
+  \item \textbf{Format on save} — \texttt{PostToolUse} matching
+        \texttt{Edit|Write}, runs Prettier / Black / gofmt on the changed file.
+  \item \textbf{Block protected paths} — \texttt{PreToolUse} matching
+        \texttt{Write|Edit}, exits 2 if the path is in
+        \texttt{db/migrations/} or \texttt{.env}.
+  \item \textbf{Desktop notification when waiting} — \texttt{Notification}
+        with a platform-native command (\texttt{osascript}, \texttt{notify-send},
+        or PowerShell).
+  \item \textbf{Re-inject context after compaction} — \texttt{PreCompact}
+        writes a summary of important state into
+        \texttt{additionalContext}.
+  \item \textbf{Audit configuration changes} — \texttt{ConfigChange} appends
+        a line to an audit log every time \texttt{settings.json} is edited.
+  \item \textbf{Auto-approve safe commands} — \texttt{PreToolUse} on
+        \texttt{Bash} returns \texttt{permissionDecision: "allow"} when the
+        command matches a safe-list pattern.
+\end{itemize}
+
+\section{Prompt-Based and Agent-Based Hooks}
+\label{sec:smart-hooks}
+
+\index{hooks!prompt-based}\index{hooks!agent-based}
+
+Some decisions cannot be expressed as a regex or a shell script — they need
+judgment. Two hook types call back into Claude:
+
+\begin{itemize}
+  \item \textbf{Prompt-based hooks} — \texttt{type: "prompt"} runs a one-shot
+        prompt against a model and uses its response. Cheap and fast.
+  \item \textbf{Agent-based hooks} — \texttt{type: "agent"} dispatches to a
+        named subagent and uses its decision. Heavier but more capable.
+\end{itemize}
+
+\begin{lstlisting}[language=json,caption={A prompt-based hook that blocks risky bash}]
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "prompt",
+            "model": "haiku",
+            "prompt": "Is this command potentially destructive (rm -rf, dd, mkfs, etc.)? Answer 'block' or 'allow' only.\n\nCommand: $TOOL_INPUT"
+          }
+        ]
+      }
+    ]
+  }
+}
+\end{lstlisting}
+
+\section{HTTP Hooks}
+\label{sec:http-hooks}
+
+\index{hooks!HTTP}
+
+Instead of running a local shell command, a hook can \texttt{POST} the event
+JSON to a URL. This is useful for sending hook events to a remote audit
+service, a Slack channel, or a queue:
+
+\begin{lstlisting}[language=json,caption={An HTTP hook}]
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "https://hooks.example.com/claude/turn-complete",
+            "headers": { "Authorization": "Bearer ${LOG_TOKEN}" }
+          }
+        ]
+      }
+    ]
+  }
+}
+\end{lstlisting}
+
+\section{Inspecting Configured Hooks}
+
+Run \texttt{/hooks} inside a session to see every hook that is currently
+active, grouped by event, with the source file and command for each. Use it
+to diagnose ``why didn't my hook fire'' — if the entry isn't listed, the
+settings file didn't parse.
+
+\begin{exercisebox}[Exercises — automate your project's quality gates]
+These exercises continue from the project setup in earlier chapters.
+
+\begin{enumerate}
+  \item Add a \texttt{PostToolUse} hook to \texttt{.claude/settings.json}
+        that runs Prettier (or your language's formatter) on any file
+        Claude writes or edits. Test it by asking Claude to edit any
+        source file and confirm the formatter ran.
+  \item Add a \texttt{PreToolUse} hook with \texttt{matcher: "Write|Edit"}
+        that exits 2 when the target path is under
+        \texttt{.github/workflows/}. Confirm in a session that Claude
+        cannot edit a CI workflow file without you removing the hook.
+  \item Configure a \texttt{Notification} hook for your platform
+        (\texttt{osascript} on macOS, \texttt{notify-send} on Linux, the
+        PowerShell snippet on Windows). Step away from the terminal,
+        prompt Claude with a permission-requiring command, and confirm
+        the OS notification fires.
+  \item Run \texttt{/hooks} and confirm all three hooks above appear in
+        the listing. Click into each to verify the source file and the
+        exact command.
+  \item \textbf{Bonus.} Write a \texttt{Stop} HTTP hook that POSTs to a
+        local \texttt{nc -l 8080} listener. Inspect the JSON Claude Code
+        sent — note the \texttt{session\_id} and \texttt{transcript\_path}
+        fields, which let you correlate events to a session.
+\end{enumerate}
+\end{exercisebox}
+
+%% ---------------------------------------------------------------
+\begin{summarybox}
+\begin{itemize}
+  \item Hooks are \textbf{deterministic} — unlike CLAUDE.md and skills,
+        which Claude may interpret loosely, a hook command runs every
+        time its event fires.
+  \item Hooks live in \texttt{settings.json} at four scopes: user,
+        project, local, and plugin-bundled. Entries from every scope
+        are merged.
+  \item Core events include \texttt{PreToolUse}, \texttt{PostToolUse},
+        \texttt{UserPromptSubmit}, \texttt{Notification},
+        \texttt{SessionStart/End}, \texttt{Stop/SubagentStop},
+        \texttt{PreCompact}, \texttt{InstructionsLoaded}, and
+        \texttt{FileChanged}.
+  \item Hooks receive a JSON object on stdin and can write JSON back on
+        stdout. \textbf{Exit code 2} blocks the action and sends stderr
+        to Claude; other non-zero exits warn but don't block.
+  \item For decisions that need judgment, use \emph{prompt-based} or
+        \emph{agent-based} hooks instead of shell scripts. For sending
+        events off-host, use \emph{HTTP hooks}.
+  \item Inspect what is configured with \texttt{/hooks}.
+\end{itemize}
+\end{summarybox}
+
+\printbibliography[heading=subbibliography,title={References}]
