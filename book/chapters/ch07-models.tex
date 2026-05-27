@@ -182,6 +182,38 @@ Several earlier models remain available but should be migrated away from:
         but no longer the recommended option.
 \end{itemize}
 
+\section{Exercises}
+\label{sec:model-exercises}
+
+\begin{exercisebox}[Exercises — route the right model to the right job]
+These exercises build on the skill, agent, and command from the previous
+three chapters.
+
+\begin{enumerate}
+  \item Open \texttt{.claude/agents/security-reviewer.md}
+        (\cref{ch:agents}). Add \texttt{model: opus} to its frontmatter.
+        Security work is the canonical Opus use case.
+  \item Open \texttt{.claude/agents/test-runner.md}. Confirm it has
+        \texttt{model: haiku} (or add it). The test runner does no
+        reasoning — Haiku is plenty.
+  \item Open \texttt{.claude/skills/code-review/SKILL.md}
+        (\cref{ch:skills}). Decide which model fits: Sonnet for the
+        review itself (it's standard coding work), Opus only if you
+        expect to use the skill for security-critical audits. Set
+        \texttt{model:} accordingly and commit.
+  \item Set the project default in \texttt{.claude/settings.json} to
+        \texttt{claude-sonnet-4-6} so any command or session without an
+        explicit override lands on Sonnet. Verify by running
+        \texttt{/review-pr 1} and watching the status line — the model
+        used per turn should be Opus inside the skill, Sonnet elsewhere.
+  \item \textbf{Cost check.} Approximate the cost of one
+        \texttt{/review-pr} invocation under three configurations:
+        all-Sonnet, all-Opus, and the smart mix above. Use the rates in
+        \cref{tab:model-comparison}. Which gives the best
+        cost-for-quality trade-off for your team?
+\end{enumerate}
+\end{exercisebox}
+
 %% ---------------------------------------------------------------
 \begin{summarybox}
 \begin{itemize}

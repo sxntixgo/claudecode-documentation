@@ -146,6 +146,36 @@ Claude Code ships with built-in commands that are always available:
 \end{tabularx}
 \end{table}
 
+\section{Exercises}
+\label{sec:command-exercises}
+
+\begin{exercisebox}[Exercises — wrap your skill as a slash command]
+These exercises continue from the code-review skill in
+\cref{ch:skills}.
+
+\begin{enumerate}
+  \item Create \texttt{.claude/commands/review-pr.md} that takes a PR
+        number via \texttt{\$ARGUMENTS} and invokes the
+        \texttt{code-review} skill against that PR. Set
+        \texttt{disable-model-invocation: true} since this command has
+        side effects (it reads from GitHub).
+  \item Test it: run \texttt{/review-pr 1} (or any open PR number).
+        Verify in the output that \texttt{\$ARGUMENTS} was substituted
+        correctly — the response should reference PR \#1 specifically.
+  \item Add a deploy-style safety command:
+        \texttt{.claude/commands/deploy.md}. It should:
+        \emph{(a)} require \texttt{\$ARGUMENTS} to be one of
+        \texttt{staging} or \texttt{production}; \emph{(b)} for
+        \texttt{production}, require the literal phrase
+        \texttt{CONFIRM PRODUCTION DEPLOY} in the next message before
+        proceeding. This mirrors the pattern from this chapter's
+        deploy example.
+  \item Run \texttt{/help} inside a session. Confirm both new commands
+        appear with their descriptions. If a description is missing or
+        wrong, edit the frontmatter until \texttt{/help} reads cleanly.
+\end{enumerate}
+\end{exercisebox}
+
 %% ---------------------------------------------------------------
 \begin{summarybox}
 \begin{itemize}

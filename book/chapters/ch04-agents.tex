@@ -155,6 +155,37 @@ For workloads larger than a single session:
 Both are covered in the official documentation at
 \url{https://code.claude.com/docs/en/agent-teams}.
 
+\section{Exercises}
+\label{sec:agent-exercises}
+
+\begin{exercisebox}[Exercises — define and use a custom subagent]
+These exercises continue the running project.
+
+\begin{enumerate}
+  \item Create \texttt{.claude/agents/security-reviewer.md} using the
+        frontmatter template from this chapter. Set
+        \texttt{tools: Read, Grep, Glob, Bash} so the subagent cannot
+        modify files. Commit it.
+  \item In a session, delegate explicitly:
+        \emph{``Use the security-reviewer subagent to scan
+        \texttt{src/} for hardcoded secrets and unsafe shell calls.''}
+        Confirm the response is a list of findings, and check that the
+        subagent did \emph{not} write anything to disk (the tool restriction
+        worked).
+  \item Now \emph{remove} the explicit ``Use the security-reviewer
+        subagent'' phrasing and just ask: \emph{``Audit \texttt{src/}
+        for security issues.''} The \texttt{description} field of your
+        agent should match, so Claude routes to it automatically. If it
+        doesn't, refine the \texttt{description} until it does.
+  \item Add a second custom subagent: \texttt{test-runner.md} with
+        \texttt{model: haiku} and tools \texttt{Bash, Read}. Its job is
+        to run the project's test suite and report failures verbatim.
+        Verify that a question like ``Run the tests and show me what
+        failed'' triggers the haiku-backed agent rather than the main
+        Sonnet session.
+\end{enumerate}
+\end{exercisebox}
+
 %% ---------------------------------------------------------------
 \begin{summarybox}
 \begin{itemize}

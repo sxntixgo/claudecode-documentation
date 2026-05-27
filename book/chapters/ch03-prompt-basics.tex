@@ -245,6 +245,37 @@ Over-specifying trivial tasks & Simple tasks need simple prompts; save structure
 \end{tabularx}
 \end{table}
 
+\section{Exercises}
+\label{sec:prompt-exercises}
+
+\begin{exercisebox}[Exercises — apply the seven patterns to your project]
+Each exercise targets one of the seven patterns. Use a file from your
+running project that you can actually verify against.
+
+\begin{enumerate}
+  \item \textbf{CREATE.} Pick a file Claude should produce (a helper
+        module, a small CLI, a test scaffolding). Write a prompt
+        following the CREATE template with all four components: intent,
+        context, constraints, success criteria. Run the prompt and
+        confirm the produced file passes whatever check you specified
+        (compiles, tests pass, linter happy).
+  \item \textbf{FIX.} Introduce a deliberate bug in one of your test
+        files (off-by-one, swapped operands). Run \texttt{npm test}
+        (or your equivalent), copy the exact failure into a FIX prompt,
+        and confirm Claude fixes only the offending lines.
+  \item \textbf{REVIEW.} Use the GitHub MCP server installed in
+        \cref{ch:mcp-servers} to fetch an open pull request in your
+        repo. Run a REVIEW prompt against it: ``Review PR \#N for
+        security and performance issues; report findings only, do not
+        change code.''
+  \item \textbf{Verification step.} Take the prompt you wrote in
+        exercise 1 above and \emph{rewrite} it with an explicit
+        verification clause (``run the tests and fix any failures'').
+        Note the difference in Claude's behavior: it should now show
+        evidence (test output) rather than just asserting success.
+\end{enumerate}
+\end{exercisebox}
+
 %% ---------------------------------------------------------------
 \begin{summarybox}
 \begin{itemize}

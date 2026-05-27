@@ -187,6 +187,34 @@ Architecture      & Opus 4.7    & Adaptive    & Highest-quality reasoning \\
 \end{tabularx}
 \end{table}
 
+\section{Exercises}
+\label{sec:thinking-exercises}
+
+\begin{exercisebox}[Exercises — calibrate your thinking budget]
+These exercises are topical (per-feature) and do not depend on the
+running project from earlier chapters.
+
+\begin{enumerate}
+  \item Pick a small refactor in your codebase — say, splitting a
+        single 200-line function into three. Ask Claude with no
+        thinking keyword. Then re-prompt with the same task prefixed
+        \texttt{think hard:}. Compare the two outputs: did the second
+        catch any edge case the first missed? Was the extra latency
+        worth it?
+  \item Run the same architecture-design prompt on Opus~4.7 (which uses
+        adaptive thinking automatically) and on Sonnet~4.6 with
+        \texttt{think hard}. Compare the depth of the response.
+  \item Open the API trace (or the streamed response if you have one)
+        for a \texttt{think hard} session and locate a
+        \texttt{thinking} content block. Confirm it is summarized
+        (shorter than the actual reasoning that was billed).
+  \item \textbf{Anti-exercise.} Run \texttt{ultrathink: format this
+        file with Prettier} on a trivial file. Compare the cost to
+        running the same task without any keyword. Note the multiplier
+        — this is the cost of over-thinking.
+\end{enumerate}
+\end{exercisebox}
+
 %% ---------------------------------------------------------------
 \begin{summarybox}
 \begin{itemize}

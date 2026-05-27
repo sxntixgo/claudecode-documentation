@@ -308,6 +308,38 @@ await server.connect(new StdioServerTransport());
         tools with \texttt{anthropic/maxResultSizeChars}.
 \end{itemize}
 
+\section{Exercises}
+\label{sec:mcp-exercises}
+
+\begin{exercisebox}[Exercises — connect your project to a real MCP server]
+These exercises continue the running project from \cref{ch:plugin-ecosystem}.
+You should have a \texttt{.claude/} directory under version control.
+
+\begin{enumerate}
+  \item Install the GitHub MCP server at \textbf{project scope}, using
+        the HTTP transport. Verify with \texttt{claude mcp list} that
+        \texttt{github} appears with scope \texttt{project}.
+\begin{verbatim}
+claude mcp add --transport http github \
+  https://api.githubcopilot.com/mcp/ \
+  --scope project
+\end{verbatim}
+  \item Open the resulting \texttt{.mcp.json} at the project root.
+        Confirm the URL is stored literally but \emph{no} GitHub PAT is
+        in the file. Add the file to git and commit it.
+  \item Open a Claude Code session and run \texttt{/mcp}. Complete the
+        OAuth flow when prompted. The panel should then show
+        \texttt{github} with a non-zero tool count.
+  \item Ask Claude, in plain language:
+        ``List the five most recent open issues in this repository.''
+        Confirm Claude calls a GitHub MCP tool rather than asking you
+        for a browser URL or guessing.
+  \item As a safety check, run
+        \texttt{git diff -- .mcp.json} and confirm there are no secrets
+        in the file you are about to push.
+\end{enumerate}
+\end{exercisebox}
+
 %% ---------------------------------------------------------------
 \begin{summarybox}
 \begin{itemize}

@@ -214,6 +214,47 @@ Use this decision guide when you encounter a new automation need:
         references in all configuration files.
 \end{itemize}
 
+\section{Exercises}
+\label{sec:plugin-exercises}
+
+\begin{exercisebox}[Exercises — set up your project's \texttt{.claude/} directory]
+Throughout the next several chapters you will build up a working
+configuration for a small project (any Node.js, Python, or Go service of
+yours will do). These first exercises lay the foundation; later chapters
+extend it.
+
+\begin{enumerate}
+  \item In your project root, create the directory tree:
+\begin{verbatim}
+.claude/
+  settings.json
+  commands/
+  skills/
+  agents/
+\end{verbatim}
+  \item Write a minimal \texttt{.claude/settings.json}:
+\begin{verbatim}
+{
+  "defaultModel": "claude-sonnet-4-6"
+}
+\end{verbatim}
+        Start a Claude Code session in the project and run \texttt{/help}.
+        Confirm Claude picks up the directory (the prompt header should
+        show the project root).
+  \item Add \texttt{.claude/} to version control with
+        \texttt{git add .claude/}. Commit it. Confirm
+        \texttt{settings.json} is committed but \texttt{settings.local.json}
+        (which you will create later) will be ignored.
+  \item Identify which of the four extension types you would use for each
+        of these needs. Write your answer in one line each:
+        \emph{(a)} run \texttt{npm run lint} after every file write;
+        \emph{(b)} package a standard PR-review workflow for your team;
+        \emph{(c)} let Claude query your staging Postgres database;
+        \emph{(d)} let a teammate type \texttt{/deploy staging} to run a
+        deploy script.
+\end{enumerate}
+\end{exercisebox}
+
 %% ---------------------------------------------------------------
 \begin{summarybox}
 \begin{itemize}

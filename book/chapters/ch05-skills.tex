@@ -191,6 +191,41 @@ production-ready skills for common workflows:
 After installation, skills such as \texttt{/code-review}, \texttt{/test-driven-development},
 and \texttt{/writing-plans} are available immediately.
 
+\section{Exercises}
+\label{sec:skill-exercises}
+
+\begin{exercisebox}[Exercises — write a code-review skill that uses the GitHub MCP]
+These exercises build on the GitHub MCP installation from
+\cref{ch:mcp-servers} and the security-reviewer agent from
+\cref{ch:agents}.
+
+\begin{enumerate}
+  \item Create \texttt{.claude/skills/code-review/SKILL.md} with a
+        frontmatter that specifies a precise \texttt{description}:
+\begin{verbatim}
+description: Reviews an open pull request for security
+             and quality issues. Invoke when the user asks
+             to review a PR, audit a diff, or check changes
+             before merge.
+\end{verbatim}
+        Body: list the four checks (security, correctness, performance,
+        tests) and tell Claude to fetch the PR diff via the GitHub MCP
+        tool.
+  \item Test auto-invocation. Without typing a slash command, ask:
+        \emph{``Review my latest pull request.''} The skill should load
+        because its \texttt{description} matches. Verify by checking
+        that Claude actually fetched the PR via MCP (not by guessing).
+  \item Add a supporting file: \texttt{.claude/skills/code-review/checklist.md}
+        containing the security checklist you want enforced. Reference
+        it from \texttt{SKILL.md} so Claude reads it when the skill
+        runs.
+  \item Make the skill safer: add
+        \texttt{disable-model-invocation: true} to the frontmatter,
+        commit, and confirm the skill no longer auto-invokes — only the
+        slash command \texttt{/code-review} triggers it.
+\end{enumerate}
+\end{exercisebox}
+
 %% ---------------------------------------------------------------
 \begin{summarybox}
 \begin{itemize}
