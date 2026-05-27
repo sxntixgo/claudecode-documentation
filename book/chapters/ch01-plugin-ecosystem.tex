@@ -1,3 +1,235 @@
-% Stub
-\chapter{ch01-plugin-ecosystem}
-\label{ch:ch01-plugin-ecosystem}
+% book/chapters/ch01-plugin-ecosystem.tex
+\chapter{The Plugin Ecosystem}
+\label{ch:plugin-ecosystem}
+
+Claude Code ships with a powerful built-in skill set: it reads files, writes
+code, executes shell commands, and understands entire codebases. Yet many of
+the most valuable development tasks require reaching \emph{outside} that
+baseline — querying a live database, fetching current documentation, automating
+a post-commit hook, or packaging a multi-step review process so the whole team
+runs it consistently. The plugin ecosystem is how you add those capabilities.
+
+\index{plugin ecosystem}
+\index{extension types}
+
+\section{What Is the Plugin Ecosystem?}
+
+Think of Claude Code as a smartphone: capable out of the box, but transformative
+once you install the right apps. Plugins are those apps. They let you:
+
+\begin{itemize}
+  \item \textbf{Connect to external tools} — GitHub, databases, APIs —
+        via \emph{MCP Servers};
+  \item \textbf{Define reusable workflows} — code review checklists, deployment
+        pipelines — via \emph{Skills};
+  \item \textbf{Automate repetitive actions} — format on save, test on commit —
+        via \emph{Hooks};
+  \item \textbf{Create keyboard-friendly shortcuts} for any workflow via
+        \emph{Slash Commands}.
+\end{itemize}
+
+Each type solves a distinct class of problem.
+\Cref{tab:plugin-types} summarises them side by side.
+
+\begin{table}[ht]
+\centering
+\caption{The four Claude Code plugin types}
+\label{tab:plugin-types}
+\begin{tabularx}{\textwidth}{llXl}
+\toprule
+\textbf{Type} & \textbf{Purpose} & \textbf{Best for} & \textbf{Chapter} \\
+\midrule
+MCP Server    & External tool connector & Live data (GitHub, databases, APIs)
+              & \cref{ch:mcp-servers} \\
+Skill         & Workflow definition & Multi-step, repeatable processes
+              & \cref{ch:skills} \\
+Hook          & Automation trigger  & On-save, pre-commit, post-deploy actions
+              & \cref{ch:hooks} \\
+Slash Command & Quick shortcut      & One-command invocation of saved workflows
+              & \cref{ch:commands} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{The Four Extension Types}
+\label{sec:four-types}
+
+\subsection{MCP Servers}
+\index{MCP Server}
+
+\textbf{Model Context Protocol (MCP) servers} are programs that implement the
+open MCP standard to expose tools and data sources to Claude Code. An MCP
+server can wrap a REST API, a database driver, a search engine, or any
+executable — giving Claude structured, authenticated access to it.
+
+Without the GitHub MCP server, asking Claude to ``create a pull request'' yields
+a manual instruction to visit a browser. With it, Claude issues the API call
+directly and returns the PR URL. The protocol is described in full in
+\cref{ch:mcp-servers}.
+
+\subsection{Skills}
+\index{Skills}
+
+\textbf{Skills} are Markdown files (\texttt{SKILL.md}) that define how Claude
+should execute a repeatable workflow. A code-review skill might specify which
+security checks to run, which formatting rules to enforce, and which model to
+use — once. Everyone on the team who invokes \texttt{/code-review} gets the
+same systematic process. Skills are covered in \cref{ch:skills}.
+
+\subsection{Hooks}
+\index{Hooks}
+
+\textbf{Hooks} execute shell commands automatically in response to Claude Code
+events: before a tool runs (\texttt{PreToolUse}), after it completes
+(\texttt{PostToolUse}), when a notification fires, or when Claude stops
+responding. They are configured in \texttt{.claude/settings.json} and require
+no code — just the commands you want to run. See \cref{ch:hooks}.
+
+\subsection{Slash Commands}
+\index{Slash Commands}
+
+\textbf{Slash commands} (\texttt{/command-name}) are Markdown files stored in
+\texttt{.claude/commands/} that Claude interprets as a prompt template when
+invoked. They accept arguments via the \texttt{\$ARGUMENTS} variable and are
+the lightest-weight way to package a workflow. They are detailed in
+\cref{ch:commands}.
+
+\section{How the Four Types Work Together}
+\label{sec:plugin-synergy}
+
+The real power emerges when types are combined. Consider an automated code
+review pipeline:
+
+\begin{enumerate}
+  \item A \textbf{Hook} (\texttt{PreToolUse} on \texttt{Bash}) triggers the
+        review before every commit.
+  \item A \textbf{Skill} (\texttt{code-review}) guides Claude through security
+        checks, style enforcement, and test coverage analysis.
+  \item An \textbf{MCP Server} (GitHub) lets Claude post inline comments
+        directly on the pull request.
+  \item A \textbf{Slash Command} (\texttt{/review-pr}) gives the team a manual
+        trigger for the same workflow on demand.
+\end{enumerate}
+
+Each piece is reusable independently, but together they form a consistent,
+automatable process.
+
+\section{Configuration Layout}
+\label{sec:config-layout}
+
+All plugin configuration lives under \texttt{.claude/} in your project root
+(or in user-level config at \texttt{\textasciitilde/.claude/}):
+
+\begin{lstlisting}[language=bash,caption={The \texttt{.claude/} directory structure}]
+your-project/
+  .claude/
+    settings.json      # global settings, hooks, MCP servers, default model
+    commands/          # slash command definitions
+      review.md
+      deploy.md
+    skills/            # skill definitions
+      code-review/
+        SKILL.md
+\end{lstlisting}
+
+MCP servers are configured inside \texttt{settings.json} under the
+\texttt{mcpServers} key, or added interactively with \texttt{claude mcp add}.
+
+\begin{lstlisting}[language=json,caption={Minimal \texttt{.claude/settings.json} with one MCP server and one hook}]
+{
+  "defaultModel": "claude-sonnet-4-6",
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      }
+    }
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [{"command": "npm run format -- --write $FILE"}]
+      }
+    ]
+  }
+}
+\end{lstlisting}
+
+\begin{notebox}[Security note]
+Never hardcode secrets in \texttt{settings.json}. Always use environment
+variable references such as \texttt{\$\{GITHUB\_TOKEN\}} so that sensitive
+values are read at runtime and never committed to version control.
+\end{notebox}
+
+\section{Plugin Discovery}
+\label{sec:plugin-discovery}
+
+\textbf{Official sources}
+
+\begin{itemize}
+  \item \textbf{MCP servers}: The official registry at
+        \url{https://github.com/modelcontextprotocol/servers} contains
+        curated, maintained server implementations for common services.
+  \item \textbf{Skills}: The community superpowers collection at
+        \url{https://github.com/obra/superpowers} provides production-ready
+        skills for common workflows. Install with
+        \texttt{/plugin install superpowers@claude-plugins-official}.
+\end{itemize}
+
+\textbf{Community sources}
+
+Search GitHub for the topic \texttt{mcp-server} or \texttt{claude-skill}, or
+browse the \texttt{awesome-claude-code} curated list
+(\url{https://github.com/hesreallyhim/awesome-claude-code}).
+
+\section{Choosing the Right Plugin Type}
+\label{sec:choosing}
+
+Use this decision guide when you encounter a new automation need:
+
+\begin{itemize}
+  \item \textbf{Need real-time external data or API actions?} $\Rightarrow$
+        MCP Server (\cref{ch:mcp-servers})
+  \item \textbf{Need to document and share a multi-step workflow?} $\Rightarrow$
+        Skill (\cref{ch:skills})
+  \item \textbf{Need to run a command automatically on every tool use?}
+        $\Rightarrow$ Hook (\cref{ch:hooks})
+  \item \textbf{Need a quick one-liner shortcut for a canned prompt?}
+        $\Rightarrow$ Slash Command (\cref{ch:commands})
+\end{itemize}
+
+\section{Best Practices}
+
+\begin{itemize}
+  \item \textbf{Version-control \texttt{.claude/}.} Committing skills, hooks,
+        and commands ensures the whole team uses the same configuration.
+  \item \textbf{Keep plugins focused.} A skill that does one thing well is
+        easier to maintain than one that handles every case.
+  \item \textbf{Use descriptive names.} \texttt{code-review-security} is
+        discoverable; \texttt{cr} is not.
+  \item \textbf{Never hardcode credentials.} Use environment variable
+        references in all configuration files.
+\end{itemize}
+
+%% ---------------------------------------------------------------
+\begin{summarybox}
+\begin{itemize}
+  \item Claude Code has four plugin types: \textbf{MCP Servers} (external
+        tool connectors), \textbf{Skills} (workflow definitions),
+        \textbf{Hooks} (automation triggers), and \textbf{Slash Commands}
+        (quick shortcuts).
+  \item All configuration lives under \texttt{.claude/} via
+        \texttt{settings.json}, Markdown files, or both.
+  \item The four types are complementary: combine them to build consistent,
+        automated, team-wide workflows.
+  \item Secrets must never be hardcoded; always use environment variable
+        references (\texttt{\$\{VAR\}}).
+  \item Official plugins are discoverable via the MCP server registry and
+        community collections such as the superpowers skill set.
+\end{itemize}
+\end{summarybox}
+
+\printbibliography[heading=subbibliography,title={References}]
