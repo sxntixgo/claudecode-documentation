@@ -1,3 +1,335 @@
-% Stub
-\chapter{ch02-mcp-servers}
-\label{ch:ch02-mcp-servers}
+% book/chapters/ch02-mcp-servers.tex
+\chapter{MCP Servers}
+\label{ch:mcp-servers}
+
+\index{MCP!overview}
+
+Claude Code's built-in tools — reading files, writing code, executing shell
+commands — cover most of your local development needs. The Model Context
+Protocol (MCP) extends those capabilities to the outside world: live databases,
+issue trackers, cloud APIs, monitoring dashboards, and any other service that
+matters to your workflow.
+
+\section{What Is the Model Context Protocol?}
+\label{sec:mcp-what}
+
+\textbf{MCP} is an open standard published by Anthropic that defines how AI
+assistants communicate with external tools and data sources. It uses
+\textbf{JSON-RPC 2.0} as its wire protocol and supports three transport
+mechanisms:
+
+\begin{table}[ht]
+\centering
+\caption{MCP transport options (as of 2025)}
+\label{tab:mcp-transports}
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Transport} & \textbf{Status} & \textbf{Use case} \\
+\midrule
+\texttt{http} (streamable HTTP) & Recommended & Cloud-based services; remote servers \\
+\texttt{stdio}                  & Stable       & Local processes; scripts; direct system access \\
+\texttt{sse} (Server-Sent Events) & Deprecated & Legacy servers only; prefer HTTP \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+An MCP server exposes:
+\begin{itemize}
+  \item \textbf{Tools} — functions Claude can call
+        (e.g.\ \texttt{create\_issue}, \texttt{run\_query});
+  \item \textbf{Resources} — data Claude can fetch and reference with
+        \texttt{@server:protocol://path} syntax;
+  \item \textbf{Prompts} — server-provided prompt templates that appear as
+        \texttt{/mcp\_\_servername\_\_promptname} slash commands.
+\end{itemize}
+
+\section{How MCP Works}
+\label{sec:mcp-how}
+
+\begin{enumerate}
+  \item You ask Claude in plain language:
+        ``Review PR \#456 and suggest improvements.''
+  \item Claude identifies which registered MCP tool can satisfy the request.
+  \item Claude Code sends a JSON-RPC request to the server.
+  \item The server executes the tool (e.g.\ calls the GitHub API) and returns
+        a structured result.
+  \item Claude interprets the result and presents it to you.
+\end{enumerate}
+
+This happens automatically — no custom scripting required on your part.
+
+\subsection{Request and Response Example}
+
+\begin{lstlisting}[language=json,caption={MCP tool call (JSON-RPC 2.0)}]
+{
+  "jsonrpc": "2.0",
+  "method": "tools/call",
+  "params": {
+    "name": "create_issue",
+    "arguments": {
+      "repo": "owner/repo",
+      "title": "Bug: login fails",
+      "body": "Reproducible with credentials X"
+    }
+  },
+  "id": 1
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=json,caption={MCP response}]
+{
+  "jsonrpc": "2.0",
+  "result": { "issue_number": 123,
+              "url": "https://github.com/owner/repo/issues/123" },
+  "id": 1
+}
+\end{lstlisting}
+
+\section{Installing MCP Servers}
+\label{sec:mcp-install}
+
+\index{MCP!installation}
+
+Claude Code supports three installation methods.
+
+\subsection{Method 1: HTTP Servers (Recommended)}
+
+Remote HTTP servers are the simplest option for cloud-based services. Many
+providers now publish hosted MCP endpoints directly:
+
+\begin{lstlisting}[language=bash,caption={Adding an HTTP MCP server}]
+# Basic form
+claude mcp add --transport http <name> <url>
+
+# Example: GitHub (via GitHub Copilot MCP endpoint)
+claude mcp add --transport http github \
+  https://api.githubcopilot.com/mcp/ \
+  --header "Authorization: Bearer YOUR_GITHUB_PAT"
+
+# Example: Sentry
+claude mcp add --transport http sentry https://mcp.sentry.dev/mcp
+\end{lstlisting}
+
+After adding a remote server that uses OAuth, run \texttt{/mcp} inside a
+Claude Code session to complete the browser authentication flow.
+
+\subsection{Method 2: Local Stdio Servers}
+
+Stdio servers run as local processes and are ideal for custom scripts or tools
+that need direct file-system access:
+
+\begin{lstlisting}[language=bash,caption={Adding a local stdio MCP server}]
+# PostgreSQL database connector
+claude mcp add --transport stdio db -- npx -y @bytebase/dbhub \
+  --dsn "postgresql://readonly:pass@localhost:5432/mydb"
+
+# Custom Python script
+claude mcp add --transport stdio my-api -- python3 /path/to/server.py
+\end{lstlisting}
+
+\begin{notebox}
+Claude Code sets \texttt{CLAUDE\_PROJECT\_DIR} in the spawned server's
+environment so the server can resolve project-relative paths without depending
+on the working directory.
+\end{notebox}
+
+\subsection{Method 3: Import from Claude Desktop}
+
+If you have servers already configured in the Claude Desktop app, import them
+in one step:
+
+\begin{lstlisting}[language=bash,caption={Import from Claude Desktop (macOS/WSL)}]
+claude mcp add-from-claude-desktop
+\end{lstlisting}
+
+\subsection{Managing Servers}
+
+\begin{lstlisting}[language=bash,caption={Server management commands}]
+claude mcp list          # list all configured servers
+claude mcp get github    # show details for one server
+claude mcp remove github # remove a server
+# Within a session:
+/mcp                     # interactive panel (shows tool count, auth status)
+\end{lstlisting}
+
+\section{Configuration and Scopes}
+\label{sec:mcp-scopes}
+
+\index{MCP!configuration scopes}
+
+Every MCP server has a \emph{scope} that controls where it loads and whether
+it is shared with teammates.
+
+\begin{table}[ht]
+\centering
+\caption{MCP server configuration scopes}
+\label{tab:mcp-scopes}
+\begin{tabularx}{\textwidth}{lllX}
+\toprule
+\textbf{Scope} & \textbf{Stored in} & \textbf{Team-shared?} & \textbf{Use for} \\
+\midrule
+\texttt{local} (default) & \texttt{\textasciitilde/.claude.json}
+  & No & Personal dev servers, secrets \\
+\texttt{project}         & \texttt{.mcp.json} (project root)
+  & Yes & Team-wide integrations \\
+\texttt{user}            & \texttt{\textasciitilde/.claude.json}
+  & No & Personal servers across all projects \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{lstlisting}[language=bash,caption={Adding a project-scoped server}]
+# Written to .mcp.json at project root — commit this file to share with team
+claude mcp add --transport http paypal --scope project \
+  https://mcp.paypal.com/mcp
+\end{lstlisting}
+
+\begin{lstlisting}[language=json,caption={Resulting \texttt{.mcp.json} (safe to commit — no secrets)}]
+{
+  "mcpServers": {
+    "paypal": {
+      "type": "http",
+      "url": "https://mcp.paypal.com/mcp"
+    }
+  }
+}
+\end{lstlisting}
+
+Environment variables expand inside \texttt{.mcp.json} using
+\texttt{\$\{VAR\}} or \texttt{\$\{VAR:-default\}} syntax, so API keys stay
+out of version control:
+
+\begin{lstlisting}[language=json,caption={Environment variable expansion in \texttt{.mcp.json}}]
+{
+  "mcpServers": {
+    "internal-api": {
+      "type": "http",
+      "url": "${API_BASE_URL:-https://api.example.com}/mcp",
+      "headers": { "Authorization": "Bearer ${API_KEY}" }
+    }
+  }
+}
+\end{lstlisting}
+
+\section{Popular MCP Servers}
+\label{sec:mcp-popular}
+
+\index{MCP!popular servers}
+
+Browse the \textbf{Anthropic Directory} at \url{https://claude.ai/directory}
+for a curated, reviewed catalogue. Any server listed there can be added with
+\texttt{claude mcp add}. The table below covers the most widely used options.
+
+\begin{table}[ht]
+\centering
+\caption{Frequently used MCP servers}
+\label{tab:mcp-popular}
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Server} & \textbf{Transport} & \textbf{Capabilities} \\
+\midrule
+GitHub (Copilot MCP) & HTTP & Issues, PRs, code review, repo management \\
+Sentry               & HTTP & Error monitoring, stack traces, deployment history \\
+Notion               & HTTP & Read/write pages and databases \\
+PostgreSQL (dbhub)   & stdio & Natural-language SQL queries, schema exploration \\
+Playwright           & stdio & Browser automation, screenshot testing \\
+Perplexity           & HTTP/stdio & Web search with citations \\
+Context7             & HTTP & Up-to-date framework documentation \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Creating Custom MCP Servers}
+\label{sec:mcp-custom}
+
+\index{MCP!custom servers}
+
+When no existing server fits your needs, build one. The fastest route is to
+have Claude scaffold it for you:
+
+\begin{lstlisting}[language=bash,caption={Scaffolding a new MCP server with the dev plugin}]
+/plugin install mcp-server-dev@claude-plugins-official
+/mcp-server-dev:build-mcp-server
+\end{lstlisting}
+
+Claude will ask about your use case and generate a starter project for either
+a remote HTTP server or a local stdio server.
+
+\subsection{Anatomy of a Minimal Stdio Server (TypeScript)}
+
+\begin{lstlisting}[language={[Sharp]C},caption={Minimal MCP server skeleton (TypeScript)}]
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from
+  '@modelcontextprotocol/sdk/server/stdio.js';
+
+const server = new Server(
+  { name: 'my-server', version: '1.0.0' },
+  { capabilities: { tools: {} } }
+);
+
+server.setRequestHandler('tools/list', async () => ({
+  tools: [{
+    name: 'greet',
+    description: 'Return a greeting',
+    inputSchema: {
+      type: 'object',
+      properties: { name: { type: 'string' } },
+      required: ['name']
+    }
+  }]
+}));
+
+server.setRequestHandler('tools/call', async (req) => {
+  const { name } = req.params.arguments as { name: string };
+  return { content: [{ type: 'text', text: `Hello, ${name}!` }] };
+});
+
+await server.connect(new StdioServerTransport());
+\end{lstlisting}
+
+\section{Best Practices}
+\label{sec:mcp-best-practices}
+
+\index{MCP!best practices}
+
+\begin{itemize}
+  \item \textbf{Prefer HTTP servers over stdio} for anything that has a hosted
+        endpoint — they reconnect automatically and require no local process
+        management.
+  \item \textbf{Use project scope (\texttt{.mcp.json}) for team servers.}
+        Commit it alongside the rest of your project configuration. Keep
+        secrets out via environment variable references.
+  \item \textbf{Verify trust before connecting.} Servers that fetch external
+        content can expose you to prompt-injection attacks.
+  \item \textbf{Use the Anthropic Directory} (\url{https://claude.ai/directory})
+        as your primary discovery source — servers there have been reviewed.
+  \item \textbf{Set appropriate output limits.} If an MCP tool returns large
+        results, set \texttt{MAX\_MCP\_OUTPUT\_TOKENS} or annotate individual
+        tools with \texttt{anthropic/maxResultSizeChars}.
+\end{itemize}
+
+%% ---------------------------------------------------------------
+\begin{summarybox}
+\begin{itemize}
+  \item MCP (Model Context Protocol) is Anthropic's open standard for
+        connecting Claude Code to external tools via JSON-RPC 2.0. The
+        recommended transport is \textbf{HTTP} (streamable-http); SSE is
+        deprecated.
+  \item Servers are added with \texttt{claude mcp add --transport http <name>
+        <url>} (HTTP) or \texttt{claude mcp add -- <cmd>} (stdio).
+  \item Three configuration scopes: \textbf{local} (default,
+        \texttt{\textasciitilde/.claude.json}), \textbf{project}
+        (\texttt{.mcp.json} at project root, commit to share with the team),
+        and \textbf{user} (\texttt{\textasciitilde/.claude.json}, all
+        projects).
+  \item Secrets must never appear literally in configuration files; use
+        \texttt{\$\{VAR\}} expansion.
+  \item Browse and install vetted servers from the Anthropic Directory
+        (\url{https://claude.ai/directory}). Use
+        \texttt{/mcp-server-dev:build-mcp-server} to scaffold a custom server.
+  \item Remote servers support OAuth 2.0 authentication; run \texttt{/mcp}
+        inside a session to complete the browser flow.
+\end{itemize}
+\end{summarybox}
+
+\printbibliography[heading=subbibliography,title={References}]
