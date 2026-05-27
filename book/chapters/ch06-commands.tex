@@ -117,34 +117,146 @@ Do not deploy to production unless $ARGUMENTS is exactly "production"
 and the user explicitly types "CONFIRM PRODUCTION DEPLOY".
 \end{lstlisting}
 
-\section{Built-In Commands}
+\section{Built-In Commands and Bundled Skills}
 \label{sec:built-in-commands}
 
-\index{slash commands!built-in}
+\index{slash commands!built-in}\index{slash commands!bundled skills}
 
-Claude Code ships with built-in commands that are always available:
+Claude Code ships with two kinds of pre-defined commands:
+
+\begin{itemize}
+  \item \textbf{Built-in commands} — fixed logic coded into the CLI
+        (\texttt{/help}, \texttt{/compact}, \texttt{/mcp} \dots). They run
+        the same way every time.
+  \item \textbf{Bundled skills} — prompt-driven, marked as skills in the
+        \texttt{/help} listing. They use the same mechanism as the skills
+        you write yourself; Claude can also auto-invoke them when relevant.
+        Major ones: \texttt{/code-review}, \texttt{/debug},
+        \texttt{/batch}, \texttt{/loop}, \texttt{/claude-api},
+        \texttt{/security-review}.
+\end{itemize}
+
+Type \texttt{/} in any session to see every command available to you;
+\texttt{/help} expands each one with a short description. Below is a
+working subset, grouped by what you reach for them to do.
+
+\subsection{Session and Context Control}
 
 \begin{table}[ht]
 \centering
-\caption{Selected built-in Claude Code commands}
-\label{tab:built-in-commands}
+\caption{Session and context commands}
+\label{tab:cmd-session}
 \begin{tabularx}{\textwidth}{lX}
 \toprule
 \textbf{Command} & \textbf{Purpose} \\
 \midrule
-\texttt{/help}         & List available commands and skills \\
-\texttt{/clear}        & Reset conversation context \\
-\texttt{/compact}      & Summarise and compress conversation history \\
-\texttt{/rewind}       & Open checkpoint browser to restore earlier state \\
-\texttt{/mcp}          & Open MCP server management panel \\
-\texttt{/agents}       & Create and manage subagents \\
-\texttt{/hooks}        & Browse configured hooks \\
-\texttt{/permissions}  & Review and modify permission settings \\
-\texttt{/code-review}  & Built-in code review skill (bundled) \\
-\texttt{/debug}        & Built-in debugging skill (bundled) \\
+\texttt{/help}              & List every command and skill available now \\
+\texttt{/clear}             & Reset conversation context (start fresh) \\
+\texttt{/compact [hint]}    & Summarize history; optional hint focuses the summary \\
+\texttt{/context}           & Show what is consuming the context window \\
+\texttt{/rewind}            & Open checkpoint browser; restore or summarize \\
+\texttt{/undo}              & Revert the most recent set of changes \\
+\texttt{/resume [session]}  & Resume a previous conversation \\
+\texttt{/continue}          & Resume the most recent session in this directory \\
+\texttt{/fork}              & Branch the current conversation \\
+\texttt{/new}               & Start a fresh session \\
+\texttt{/btw <question>}    & Aside that does not enter conversation history \\
 \bottomrule
 \end{tabularx}
 \end{table}
+
+\subsection{Project Setup}
+
+\begin{table}[ht]
+\centering
+\caption{Setup commands}
+\label{tab:cmd-setup}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Command} & \textbf{Purpose} \\
+\midrule
+\texttt{/init}              & Generate a starter CLAUDE.md by inspecting the codebase \\
+\texttt{/memory}            & Browse loaded CLAUDE.md files and auto-memory \\
+\texttt{/mcp}               & Manage MCP servers; complete OAuth flows \\
+\texttt{/agents}            & Manage subagents (built-in and custom) \\
+\texttt{/hooks}             & Inspect or define hooks \\
+\texttt{/permissions}       & Review and modify permission rules \\
+\texttt{/plugin}            & Browse marketplaces; install plugins \\
+\texttt{/reload-plugins}    & Reload plugins after editing them \\
+\texttt{/skills}            & List installed skills \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{During-Task Controls}
+
+\begin{table}[ht]
+\centering
+\caption{In-flight task controls}
+\label{tab:cmd-task}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Command} & \textbf{Purpose} \\
+\midrule
+\texttt{/plan [description]} & Switch to plan mode (also \texttt{Shift+Tab}) \\
+\texttt{/model [model]}      & Override the model for this session \\
+\texttt{/effort [level]}     & Set reasoning effort (Opus 4.7 adaptive thinking) \\
+\texttt{/fast [on/off]}      & Toggle the faster-output mode \\
+\texttt{/stop}               & Interrupt the current operation \\
+\texttt{/goal [condition]}   & Tell Claude what counts as ``done'' \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Parallel and Background Work}
+
+\begin{table}[ht]
+\centering
+\caption{Parallel and background commands}
+\label{tab:cmd-parallel}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Command} & \textbf{Purpose} \\
+\midrule
+\texttt{/background [prompt]} & Detach the session to keep running while you work elsewhere \\
+\texttt{/tasks}              & List background tasks in this session \\
+\texttt{/batch <instruction>}& \textbf{Bundled skill.} Apply the same operation across many files in parallel worktrees \\
+\texttt{/loop}               & \textbf{Bundled skill.} Self-paced iteration over a goal \\
+\texttt{/branch [name]}      & Switch to a different git worktree \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Code Review, Debugging, Diagnostics}
+
+\begin{table}[ht]
+\centering
+\caption{Review and diagnostic commands}
+\label{tab:cmd-review}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Command} & \textbf{Purpose} \\
+\midrule
+\texttt{/code-review [PR]}   & \textbf{Bundled skill.} Review the current diff or a named PR \\
+\texttt{/security-review}    & \textbf{Bundled skill.} Security-focused review \\
+\texttt{/review [PR]}        & Generate or refine a PR description \\
+\texttt{/debug [description]}& \textbf{Bundled skill.} Walk through a debugging session \\
+\texttt{/claude-api}         & \textbf{Bundled skill.} Help building applications on the Claude API \\
+\texttt{/diff}               & Show the cumulative diff of changes Claude has made \\
+\texttt{/cost}               & Show token usage and cost for this session \\
+\texttt{/status}             & Diagnostic: which model, auth, MCP servers are active \\
+\texttt{/doctor}             & Health check the local Claude Code installation \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{notebox}
+Not every command appears for every user. Availability depends on your
+platform, plan, and environment (e.g.\ \texttt{/desktop} only appears on
+macOS and Windows with a Claude subscription; \texttt{/upgrade} only on
+Pro and Max plans). Run \texttt{/help} to see the exact set available in
+your current session.
+\end{notebox}
 
 \section{Exercises}
 \label{sec:command-exercises}
@@ -190,6 +302,11 @@ These exercises continue from the code-review skill in
         member gets the same workflows.
   \item Use \texttt{disable-model-invocation: true} for commands with
         side-effects that should only run when explicitly invoked.
+  \item Built-in commands come in two flavors: \textbf{fixed-logic}
+        commands like \texttt{/help} and \texttt{/compact}, and
+        \textbf{bundled skills} like \texttt{/code-review} and
+        \texttt{/debug} that are prompt-driven and can be overridden by
+        defining a same-named skill in your project.
 \end{itemize}
 \end{summarybox}
 
