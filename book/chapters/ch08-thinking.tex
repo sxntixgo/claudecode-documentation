@@ -1,3 +1,208 @@
-% Stub
-\chapter{ch08-thinking}
-\label{ch:ch08-thinking}
+% book/chapters/ch08-thinking.tex
+\chapter{Thinking Modes}
+\label{ch:thinking}
+
+\index{thinking modes}
+
+Thinking modes let you control how deeply Claude reasons before responding.
+Internally this is implemented through Anthropic's \emph{extended thinking}
+API: the model produces a sequence of \texttt{thinking} content blocks before
+the final answer. In Claude Code you trigger it with natural-language
+keywords (\texttt{"think"}, \texttt{"think hard"}, \texttt{"ultrathink"}) —
+no API plumbing required.
+
+\begin{warningbox}
+The API surface for extended thinking has changed between Claude~4 model
+generations. On Claude Opus~4.7 the legacy \texttt{type: "enabled"} mode with
+manual \texttt{budget\_tokens} is no longer accepted; use \emph{adaptive
+thinking} (\texttt{type: "adaptive"}) instead. Sonnet~4.6 and Haiku~4.5 still
+accept both. See \cref{ch:models} for model-by-model capabilities.
+\end{warningbox}
+
+\section{Normal Mode vs.\ Thinking Mode}
+\label{sec:thinking-overview}
+
+\begin{table}[ht]
+\centering
+\caption{Normal mode vs.\ thinking mode}
+\label{tab:thinking-modes}
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+                  & \textbf{Normal} & \textbf{Thinking} \\
+\midrule
+Reasoning         & Implicit, fast             & Explicit, step-by-step \\
+Tokens used       & Low                        & Medium to high \\
+Latency           & Fastest                    & Higher (proportional to budget) \\
+Output structure  & Direct answer              & \texttt{thinking} block(s), then answer \\
+Best for          & Simple, well-defined tasks & Multi-step or ambiguous tasks \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Thinking Keywords}
+\label{sec:thinking-keywords}
+
+\index{thinking modes!keywords}
+
+Claude Code recognises three escalating intensities of natural-language
+keywords. They map to progressively larger thinking budgets on models that
+expose the underlying control.
+
+\begin{table}[ht]
+\centering
+\caption{Thinking keywords and their approximate effect}
+\label{tab:thinking-keywords}
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+\textbf{Intensity} & \textbf{Keywords} & \textbf{Relative tokens} \\
+\midrule
+Basic   & \texttt{think}, \texttt{reason}, \texttt{consider}, \texttt{analyze}
+        & $\approx 1.5\times$ \\
+Deep    & \texttt{think hard}, \texttt{carefully}, \texttt{thoroughly}, \texttt{deeply}
+        & $\approx 2\times$ \\
+Maximum & \texttt{ultrathink}, \texttt{deeply analyze}, \texttt{comprehensively evaluate}
+        & $\approx 2.5\text{--}3\times$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{lstlisting}[language=bash,caption={Sample prompts at each intensity}]
+# Basic
+"Think about the best way to refactor this module"
+
+# Deep
+"Think hard about the security implications of this auth flow"
+
+# Maximum
+"Ultrathink: design the migration strategy for moving 50M rows
+ to a partitioned schema without downtime"
+\end{lstlisting}
+
+\section{Adaptive vs.\ Manual Thinking}
+\label{sec:thinking-adaptive}
+
+\index{thinking modes!adaptive}
+
+The Claude~4 family supports two thinking modes at the API level:
+
+\begin{itemize}
+  \item \textbf{Adaptive} (\texttt{type: "adaptive"}). The model decides
+        how much to reason based on task complexity. This is the only
+        supported mode on \textbf{Opus~4.7} and is the recommended mode on
+        Sonnet~4.6 and Haiku~4.5.
+  \item \textbf{Manual} (\texttt{type: "enabled"} with
+        \texttt{budget\_tokens}). You set a hard upper bound. Deprecated on
+        Opus~4.7; still supported on Sonnet~4.6 and Haiku~4.5.
+\end{itemize}
+
+In Claude Code, the keywords in \cref{tab:thinking-keywords} translate to
+the right mode automatically — on Opus you get adaptive depth, on Sonnet and
+Haiku the keyword raises the manual budget.
+
+\begin{lstlisting}[language=bash,caption={Equivalent API call for Sonnet 4.6}]
+curl https://api.anthropic.com/v1/messages \
+  -H "x-api-key: $ANTHROPIC_API_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "model": "claude-sonnet-4-6",
+    "max_tokens": 16000,
+    "thinking": { "type": "enabled", "budget_tokens": 10000 },
+    "messages": [{ "role": "user",
+                   "content": "Think hard about ..." }]
+  }'
+\end{lstlisting}
+
+\section{Output Format}
+\label{sec:thinking-output}
+
+\index{thinking modes!output}
+
+On Claude~4 models the API returns \textbf{summarised} thinking by default:
+the response includes a condensed view of the model's reasoning, while the
+full reasoning is still billed against the input. The structure of a
+thinking response is:
+
+\begin{lstlisting}[language=json,caption={Response structure with extended thinking}]
+{
+  "content": [
+    {
+      "type": "thinking",
+      "thinking": "Let me consider three approaches: ...",
+      "signature": "WaUjzkypQ2mUEVM36O2TxuC06KN8x..."
+    },
+    {
+      "type": "text",
+      "text": "Based on that analysis, the best approach is ..."
+    }
+  ]
+}
+\end{lstlisting}
+
+For backend workflows that never display the reasoning, set
+\texttt{display: "omitted"} to stop emitting thinking text in the stream —
+the response starts arriving faster, and you still pay for the thinking
+tokens because they shape the final answer.
+
+\section{When to Use Each Intensity}
+\label{sec:thinking-when}
+
+\index{thinking modes!decision framework}
+
+\begin{itemize}
+  \item \textbf{Normal} — formatting, renaming, single-line bug fixes,
+        finding a file. The simplest tasks. Adding thinking here costs
+        3--5× more for the same output.
+  \item \textbf{Think} — bug investigation, code review, refactoring,
+        unfamiliar code. Worth the modest extra cost.
+  \item \textbf{Think hard} — security-sensitive code, performance
+        optimisation, migration design, anything where a wrong answer is
+        expensive.
+  \item \textbf{Ultrathink} — production architecture decisions, deep
+        security audits, system redesigns. Reserve for high-stakes
+        decisions where 10--20× the cost is justified.
+\end{itemize}
+
+\textbf{Rule of thumb}: start without thinking. If the answer is shallow,
+re-prompt with \texttt{think} or \texttt{think hard}. Climbing the ladder
+on demand is cheaper than starting at the top.
+
+\section{Combining Thinking with Model Choice}
+\label{sec:thinking-models}
+
+\begin{table}[ht]
+\centering
+\caption{Recommended model + thinking combinations}
+\label{tab:thinking-combos}
+\begin{tabularx}{\textwidth}{lllX}
+\toprule
+\textbf{Task} & \textbf{Model} & \textbf{Thinking} & \textbf{Reason} \\
+\midrule
+Format / rename   & Haiku 4.5   & None        & Trivial work \\
+Routine feature   & Sonnet 4.6  & None        & Sonnet is fast enough \\
+Tricky bug        & Sonnet 4.6  & Think       & Modest reasoning helps \\
+Refactor          & Sonnet 4.6  & Think hard  & Cross-file impact \\
+Security audit    & Opus 4.7    & Adaptive    & Opus chooses depth automatically \\
+Architecture      & Opus 4.7    & Adaptive    & Highest-quality reasoning \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+%% ---------------------------------------------------------------
+\begin{summarybox}
+\begin{itemize}
+  \item Thinking modes wrap Anthropic's extended-thinking API; in Claude
+        Code you trigger them with natural-language keywords
+        (\texttt{think}, \texttt{think hard}, \texttt{ultrathink}).
+  \item Opus~4.7 supports only \emph{adaptive} thinking; Sonnet~4.6 and
+        Haiku~4.5 also accept manual \texttt{budget\_tokens}.
+  \item The response stream contains \texttt{thinking} blocks followed by
+        the final answer; \texttt{display: "omitted"} suppresses the
+        rendered reasoning while preserving its effect.
+  \item Start at \emph{Normal} and escalate only when the first answer is
+        shallow. Reserve \texttt{ultrathink} for high-stakes decisions.
+  \item Cross-reference \cref{ch:models} for model capabilities and the
+        cost of each thinking intensity.
+\end{itemize}
+\end{summarybox}
+
+\printbibliography[heading=subbibliography,title={References}]
