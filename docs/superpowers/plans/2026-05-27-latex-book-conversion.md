@@ -95,7 +95,70 @@ For **every** chapter and appendix, the worker must follow this sequence before 
 4. Write the LaTeX chapter incorporating any corrections.
 5. Write the `\chapter*{Summary}` section based on the verified, updated content.
 6. Write the `.bib` file — validate each URL listed in the source Markdown, add new references from the Anthropic docs, remove dead links.
-7. Commit.
+7. Add `\begin{exercisebox}` … `\end{exercisebox}` blocks at the end of each major section (Task 11a covers retrofit for chapters already written).
+8. Commit.
+
+---
+
+## Project-Wide Conventions
+
+These rules apply to **every** chapter, .bib file, and frontmatter file.
+
+### Language: American English
+
+Use American English spelling throughout. Examples (do/don't):
+
+| Use (American)    | Don't use (British) |
+|-------------------|---------------------|
+| optimization      | optimisation        |
+| summarize         | summarise           |
+| organize          | organise            |
+| recognize         | recognise           |
+| analyze           | analyse             |
+| specialized       | specialised         |
+| behavior          | behaviour           |
+| authorization     | authorisation       |
+| color             | colour              |
+| catalog           | catalogue           |
+| center            | centre              |
+
+LaTeX option names follow the same rule (e.g.\ `\usepackage[capitalize]{cleveref}`, not `[capitalise]`).
+
+### Chapter Labels
+
+Every chapter declares `\label{ch:<topic>}` matching its filename topic (without the `chNN-` prefix). Cross-references in other chapters use `\cref{ch:<topic>}`. **Stub files must be updated to this form before the chapter that references them is committed.**
+
+| File                          | Label                       |
+|-------------------------------|-----------------------------|
+| ch01-plugin-ecosystem.tex     | `ch:plugin-ecosystem`       |
+| ch02-mcp-servers.tex          | `ch:mcp-servers`            |
+| ch03-prompt-basics.tex        | `ch:prompt-basics`          |
+| ch04-agents.tex               | `ch:agents`                 |
+| ch05-skills.tex               | `ch:skills`                 |
+| ch06-commands.tex             | `ch:commands`               |
+| ch07-models.tex               | `ch:models`                 |
+| ch08-thinking.tex             | `ch:thinking`               |
+| ch09-context.tex              | `ch:context`                |
+| ch10-keywords.tex             | `ch:keywords`               |
+| ch11-hooks.tex                | `ch:hooks`                  |
+| ch12-advanced-prompting.tex   | `ch:advanced-prompting`     |
+| ch13-optimization.tex         | `ch:optimization`           |
+| ch14-security.tex             | `ch:security`               |
+| ch15-examples.tex             | `ch:examples`               |
+
+### Box Environments
+
+| Environment   | Defined in         | When to use                                       |
+|---------------|--------------------|---------------------------------------------------|
+| `note`        | gimenezocano.sty   | Side note (blue admonition)                       |
+| `tip`         | gimenezocano.sty   | Tip (green)                                       |
+| `important`   | gimenezocano.sty   | Important (purple)                                |
+| `warning`     | gimenezocano.sty   | Warning (amber)                                   |
+| `caution`     | gimenezocano.sty   | Caution (red)                                     |
+| `summarybox`  | preamble.tex       | End-of-chapter summary, exactly one per chapter   |
+| `exercisebox` | preamble.tex       | End-of-section exercises, optional title argument |
+
+Older chapters use `notebox` / `warningbox`; rename when you touch them.
 
 ---
 

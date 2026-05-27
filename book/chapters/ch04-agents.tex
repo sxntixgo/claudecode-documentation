@@ -4,7 +4,7 @@
 
 \index{agents}\index{subagents}
 
-Claude Code can delegate subtasks to \emph{subagents} — specialised assistants
+Claude Code can delegate subtasks to \emph{subagents} — specialized assistants
 that run in their own isolated context windows. A subagent explores files,
 reviews code, or executes a multi-step procedure without consuming tokens in
 your main conversation. When it finishes, it returns a summary and the work is
@@ -22,7 +22,7 @@ for your own domain.
         your main session.
   \item \textbf{Tool restriction.} A read-only subagent cannot accidentally
         modify files.
-  \item \textbf{Cost optimisation.} Lightweight tasks can be routed to a
+  \item \textbf{Cost optimization.} Lightweight tasks can be routed to a
         faster, cheaper model (e.g.\ Haiku).
   \item \textbf{Reuse.} A custom subagent defined once is available across
         all projects.
@@ -88,7 +88,7 @@ model: opus
 ---
 You are a senior security engineer. Review code for:
 - Injection vulnerabilities (SQL, XSS, command injection)
-- Authentication and authorisation flaws
+- Authentication and authorization flaws
 - Hardcoded secrets or credentials
 - Insecure data handling and storage
 

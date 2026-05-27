@@ -14,7 +14,7 @@ let knowledge persist across sessions:
         your corrections, then re-reads in future sessions.
 \end{itemize}
 
-This chapter covers both, plus the rule files and import system that organise
+This chapter covers both, plus the rule files and import system that organize
 larger projects.
 
 \section{CLAUDE.md Hierarchy}
@@ -37,7 +37,7 @@ user-level ones on conflict.
 Managed policy & \texttt{/etc/claude-code/CLAUDE.md} (Linux/WSL)\newline
                  \texttt{/Library/Application Support/ClaudeCode/CLAUDE.md} (macOS)\newline
                  \texttt{C:\textbackslash{}Program Files\textbackslash{}ClaudeCode\textbackslash{}CLAUDE.md} (Windows)
-               & Organisation-wide standards deployed by IT \\
+               & Organization-wide standards deployed by IT \\
 User           & \texttt{\textasciitilde/.claude/CLAUDE.md}
                & Personal preferences across every project \\
 Project        & \texttt{./CLAUDE.md} or \texttt{./.claude/CLAUDE.md}
@@ -55,7 +55,7 @@ only when Claude reads a file in that subdirectory.
 
 \begin{notebox}
 Run \texttt{/init} in a new project to generate a starting \texttt{CLAUDE.md}.
-Claude analyses your codebase and proposes build commands, test instructions,
+Claude analyzes your codebase and proposes build commands, test instructions,
 and conventions. If a \texttt{CLAUDE.md} already exists, \texttt{/init}
 suggests refinements rather than overwriting.
 \end{notebox}
@@ -216,16 +216,16 @@ environment without the accumulated notes.
 \index{compaction}
 
 When the active context window approaches its limit, Claude Code automatically
-\emph{compacts}: it summarises older turns to free space while preserving
+\emph{compacts}: it summarizes older turns to free space while preserving
 the key code, files, and decisions. You can also trigger it manually:
 
 \begin{itemize}
   \item \texttt{/clear} — full reset; nothing from the previous turns survives.
-  \item \texttt{/compact} — summarise the entire conversation.
-  \item \texttt{/compact <instructions>} — summarise with a focus, e.g.\
+  \item \texttt{/compact} — summarize the entire conversation.
+  \item \texttt{/compact <instructions>} — summarize with a focus, e.g.\
         \texttt{/compact focus on the API changes}.
   \item \texttt{Esc}, \texttt{Esc} — open the rewind menu, pick a message,
-        and either restore from that point or summarise around it.
+        and either restore from that point or summarize around it.
 \end{itemize}
 
 \begin{notebox}

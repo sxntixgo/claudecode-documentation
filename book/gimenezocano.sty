@@ -1,0 +1,505 @@
+%% gimenezocano.sty
+%%
+%% Visual style mimicking gimenezocano.com markdown rendering.
+%% Light theme only.  Provides:
+%%   * Serif body (XCharter) + monospace (Inconsolata), matching the
+%%     Argentina theme on gimenezocano.com.
+%%   * GitHub-flavoured admonitions (note, tip, important, warning,
+%%     caution).
+%%   * A listings style that renders code blocks as a soft-grey rounded
+%%     card matching the page's `.code-block-content` look.
+%%
+%% Usage:
+%%   \usepackage{gimenezocano}            % full colour, screen / web PDF
+%%   \usepackage[print]{gimenezocano}     % print-friendly: white admonition
+%%                                          backgrounds, dark-grey rules,
+%%                                          black bold labels
+%%
+%% Admonitions:
+%%   \begin{note}      ... \end{note}
+%%   \begin{tip}       ... \end{tip}
+%%   \begin{important} ... \end{important}
+%%   \begin{warning}   ... \end{warning}
+%%   \begin{caution}   ... \end{caution}
+%%
+%% The package activates the `ghcode' lstlisting style automatically;
+%% existing \begin{lstlisting}[caption=...]{} blocks pick it up with no
+%% per-call style argument needed.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{gimenezocano}[2026/05/02 v1.2
+  GitHub-flavoured admonitions, code style, fonts, light theme;
+  optional print mode]
+
+%% --------------------------------------------------------------------
+%% Options.  `print' switches admonitions to a white-background, dark-rule,
+%% black-label rendering that prints cleanly on monochrome output and uses
+%% no coloured ink.
+%% --------------------------------------------------------------------
+\newif\ifgimenezprint
+\gimenezprintfalse
+\DeclareOption{print}{\gimenezprinttrue}
+\ProcessOptions\relax
+
+\RequirePackage{xcolor}
+\RequirePackage[most]{tcolorbox}
+\RequirePackage{listings}
+\RequirePackage{enumitem}
+\RequirePackage{titlesec}
+\RequirePackage{tikz}
+\RequirePackage{booktabs}
+\RequirePackage{colortbl}
+\RequirePackage{etoolbox}
+\RequirePackage{xparse}
+\RequirePackage{framed}
+
+%% --------------------------------------------------------------------
+%% Glossary support is intentionally NOT loaded here.  The book project
+%% uses `glossaries-extra' (loaded from preamble.tex), which conflicts
+%% with the older `glossaries' package.  Do not re-add a `glossaries'
+%% \RequirePackage call here.
+%% --------------------------------------------------------------------
+
+%% --------------------------------------------------------------------
+%% Fonts.
+%% The source page (Argentina theme on gimenezocano.com) uses a serif
+%% body (`ui-serif, Georgia, Cambria, Times New Roman, Times, serif').
+%% Closest portable LaTeX equivalents:
+%%   * XCharter for the serif body --- close in feel to Georgia: chunky,
+%%     highly readable on screen, blog-flavoured rather than academic.
+%%   * Inconsolata for monospace --- close to SF Mono / Consolas.
+%% Charter is the default body; the math stack stays Computer Modern.
+%% --------------------------------------------------------------------
+\RequirePackage[T1]{fontenc}
+\RequirePackage{XCharter}
+\RequirePackage[charter,scaled=1.0]{newtxmath}  % match math glyphs to Charter body
+\RequirePackage[scaled=0.95]{inconsolata}
+
+%% --------------------------------------------------------------------
+%% Spacing.  More breathing room: slightly increased line spacing for
+%% the new sans body, and a wider parskip than `parskip` package's default.
+%% --------------------------------------------------------------------
+\linespread{1.12}
+\setlength{\parskip}{0.8em plus 0.25em minus 0.1em}
+
+%% --------------------------------------------------------------------
+%% Palette.  Light-theme oklch values from the source page, rounded to
+%% nearest sRGB hex (these match GitHub's admonition colours).
+%% --------------------------------------------------------------------
+\definecolor{ghnote}{HTML}{1F6FEB}      % blue
+\definecolor{ghtip}{HTML}{1A7F37}       % green
+\definecolor{ghimportant}{HTML}{8250DF} % purple
+\definecolor{ghwarning}{HTML}{9A6700}   % amber
+\definecolor{ghcaution}{HTML}{CF222E}   % red
+
+%% Neutral palette for code blocks and inline tints --- approximates
+%% the page's `--color-muted` (oklch(0.97 0 0)) blended at low opacity.
+\definecolor{ghmuted}{HTML}{F6F8FA}     % code-block fill
+\definecolor{ghmutedrule}{HTML}{D0D7DE} % code-block edge / inline border
+\definecolor{ghforeground}{HTML}{1F2328} % body text-ish
+
+%% Print-mode neutral.  A dark grey that prints as solid black on a
+%% monochrome printer, used for admonition rules and labels in [print].
+\definecolor{ghprintrule}{HTML}{1F2328}
+
+%% Argentina palette --- mirrors the deck's beamerthemegimenezocano.sty
+%% so the article and the slides share accent colours.  In the article,
+%% Primary is used for itemize/enumerate markers and section numbers;
+%% the rest are available but not applied by default.
+\definecolor{Primary}{HTML}{4A90E2}     % sky blue --- main accent
+\definecolor{Secondary}{HTML}{2C5F8A}   % dark blue
+\definecolor{Accent}{HTML}{6BADE4}      % light blue
+\definecolor{DarkBg}{HTML}{1A1A1A}      % near-black
+\definecolor{LightBg}{HTML}{F5F5F5}     % light grey card
+\definecolor{GrayText}{HTML}{6B7280}    % muted text
+
+%% Every "light blue" surface in the document --- listings background,
+%% table header, table first-column fill, etc. --- is derived from the
+%% single `Accent` hue above, so the whole document reads as one colour
+%% family.  Only the opacity changes:
+%%   * PaleBlue (Accent at 25%) for soft backgrounds.
+%%   * MidBlue  (Accent at 40%) for slightly stronger surfaces.
+\colorlet{PaleBlue}{Accent!25!white}
+\colorlet{MidBlue}{Accent!40!white}
+
+%% --------------------------------------------------------------------
+%% List markers.
+%%   * itemize: Primary-blue bullets, two levels deep.
+%%   * enumerate: filled Primary-blue circle with white numeral inside,
+%%     mirroring the blog's `.prose ol li::before` rendering.
+%%   * description: term on its own line with a small Primary-blue dot,
+%%     content on the next line with left padding, mirroring the blog's
+%%     `dl/dt/dd` rendering.
+%% Print mode keeps default black markers and the standard description
+%% layout (term inline with content).
+%% --------------------------------------------------------------------
+\newcommand{\gocircledenum}[1]{%
+  \protect\tikz[baseline=(num.base)]{%
+    \protect\node[circle,fill=Accent,text=white,inner sep=0pt,minimum size=1.4em,
+                 font=\bfseries\footnotesize](num){#1};%
+  }%
+}
+
+%% Declare the description-list bar flag at the top level, *before* any
+%% \ifgimenezprint branching.  If we leave \newif inside the \else
+%% branch, TeX's \if-skipping in print mode does not recognise the
+%% subsequent \ifgh@descbaropen tokens inside the \newcommand bodies,
+%% miscounts nesting, and prematurely closes the outer \ifgimenezprint
+%% --- causing the rest of the file to execute even in print mode.
+\newif\ifgh@descbaropen
+\gh@descbaropenfalse
+
+%% Grey vertical left rule for description content, using `framed`'s
+%% \MakeFramed primitive.  The rule is drawn via \rlap so it has zero
+%% natural width --- that keeps \MakeFramed's \width at 0 and leaves
+%% the description's labels and content at their original horizontal
+%% positions.  The rule visually sits 1.4em into the frame, which lands
+%% between the bold term (at the list's left edge) and the indented
+%% content (after the list's `leftmargin`).
+\newenvironment{ghleftbar}{%
+  \def\FrameCommand{\rlap{\hspace*{1.4em}{\color{ghmutedrule}\vrule width 1.5pt}}}%
+  \MakeFramed{\advance\hsize-\width \FrameRestore}%
+}{\endMakeFramed}
+
+\ifgimenezprint
+  % keep default black markers in print mode
+\else
+  \setlist[itemize,1]{label={\color{Primary}\textbullet}}
+  \setlist[itemize,2]{label={\color{Primary}\textendash}}
+  \setlist[enumerate,1]{label={\gocircledenum{\arabic*}}, leftmargin=2.2em, labelsep=0.6em}
+  %% Description lists: term on its own line with a Primary bullet +
+  %% bold black label; content on the next line, indented, with a thin
+  %% grey rule running down its left side.  Implementation: wrap the
+  %% whole `description' in `ghleftbar' (one rule spans the entire list)
+  %% and push each label left by `\hspace*{-14pt}` so the blue dot +
+  %% term sit OUTSIDE the rule's content column.  Per-item rules
+  %% require hijacking \item, which breaks both mdframed's \trivlist
+  %% and tcolorbox's mode handling --- so this whole-list wrap is the
+  %% robust path.  Vertical breathing room comes from `itemsep`/`topsep`
+  %% on the list and from ghleftbar's own \MakeFramed padding.
+  \setlist[description]{
+    style=nextline,
+    leftmargin=1.5em,
+    labelindent=0pt,
+    labelsep=0.5em,
+    font={\textcolor{Primary}{\textbullet}\enspace\normalfont\bfseries},
+    itemsep=10pt,
+  }
+  \let\goorigdescription\description
+  \let\goorigenddescription\enddescription
+  \renewenvironment{description}
+    {\begin{ghleftbar}\goorigdescription}
+    {\goorigenddescription\end{ghleftbar}}
+\fi
+
+%% --------------------------------------------------------------------
+%% Section headings.  Mirrors the blog's hugo-narrow rendering:
+%%   * h1 / \section      --- short light-blue line under the title
+%%   * h2 / \subsection   --- vertical light-blue bar to the left
+%%   * h3+ / deeper       --- plain (no decoration)
+%% Number prefix in Primary blue across all levels.  Print mode strips
+%% colour and decorations and falls back to the LaTeX defaults.
+%% --------------------------------------------------------------------
+\ifgimenezprint
+  % keep default black section numbers and no decorations in print mode
+\else
+  \titleformat{\section}
+    {\normalfont\Large\bfseries}
+    {\color{Primary}\thesection}{1em}{}
+    [\vspace{-18pt}{\color{Accent}\rule{3em}{2.5pt}}]
+  \titleformat{\subsection}[hang]
+    {\normalfont\large\bfseries}
+    {\textcolor{Accent}{\rule[-0.15em]{4pt}{1.05em}}\hspace{0.6em}\color{Primary}\thesubsection}{0.75em}{}
+  \titleformat{\subsubsection}
+    {\normalfont\normalsize\bfseries}
+    {\color{Primary}\thesubsubsection}{1em}{}
+\fi
+
+%% --------------------------------------------------------------------
+%% Shared admonition geometry.
+%% Rounded corners, no top/right/bottom rule, thick accent rule on the
+%% left.  Background fill is set per-admonition: a 10% tint of the
+%% accent colour in colour mode, white in [print] mode.
+%% --------------------------------------------------------------------
+\tcbset{
+  ghadmonition/.style={
+    enhanced,
+    breakable,
+    boxrule=0.5pt,
+    colframe=ghmutedrule,
+    arc=0pt,
+    outer arc=0pt,
+    sharp corners,
+    left=14pt,
+    right=12pt,
+    top=10pt,
+    bottom=10pt,
+    fontupper=\small,
+    before skip=12pt,
+    after skip=12pt,
+  }
+}
+
+\ifgimenezprint
+  %% Print mode.  All admonitions render with a white background, a
+  %% dark-grey left rule, and a black bold label.  The five levels are
+  %% distinguished by their label text alone --- no colour required.
+  \newtcolorbox{note}{
+    ghadmonition,
+    colback=white, colframe=ghprintrule,
+    before upper={\textbf{Note}\par\vspace{2pt}}
+  }
+  \newtcolorbox{tip}{
+    ghadmonition,
+    colback=white, colframe=ghprintrule,
+    before upper={\textbf{Tip}\par\vspace{2pt}}
+  }
+  \newtcolorbox{important}{
+    ghadmonition,
+    colback=white, colframe=ghprintrule,
+    before upper={\textbf{Important}\par\vspace{2pt}}
+  }
+  \newtcolorbox{warning}{
+    ghadmonition,
+    colback=white, colframe=ghprintrule,
+    before upper={\textbf{Warning}\par\vspace{2pt}}
+  }
+  \newtcolorbox{caution}{
+    ghadmonition,
+    colback=white, colframe=ghprintrule,
+    before upper={\textbf{Caution}\par\vspace{2pt}}
+  }
+\else
+  %% Colour mode.  Each admonition gets a thin grey frame on all four
+  %% edges, a tinted background, square edges, and a black bold label.
+  \newtcolorbox{note}{
+    ghadmonition,
+    colback=ghnote!8!white,
+    before upper={\textbf{Note}\par\vspace{2pt}}
+  }
+  \newtcolorbox{tip}{
+    ghadmonition,
+    colback=ghtip!8!white,
+    before upper={\textbf{Tip}\par\vspace{2pt}}
+  }
+  \newtcolorbox{important}{
+    ghadmonition,
+    colback=ghimportant!8!white,
+    before upper={\textbf{Important}\par\vspace{2pt}}
+  }
+  \newtcolorbox{warning}{
+    ghadmonition,
+    colback=ghwarning!10!white,
+    before upper={\textbf{Warning}\par\vspace{2pt}}
+  }
+  \newtcolorbox{caution}{
+    ghadmonition,
+    colback=ghcaution!8!white,
+    before upper={\textbf{Caution}\par\vspace{2pt}}
+  }
+\fi
+
+%% --------------------------------------------------------------------
+%% Listings (code blocks).
+%% The page renders code in a soft-grey rounded card with monospace at
+%% ~0.875rem, no border, generous padding, no line numbers.  Reproduce:
+%%   * Background: ghmuted (very light grey, like #F6F8FA).
+%%   * Padding via tcolorbox wrapper for rounded corners.
+%%   * Inconsolata monospace at \small.
+%%   * Caption styling: small, muted, centred under the block.
+%% --------------------------------------------------------------------
+\ifgimenezprint
+  %% Print mode: the language-specific styles (keywordstyle, commentstyle,
+  %% stringstyle, literate) defined inside \lstdefinelanguage{yaml/json}
+  %% read these four colour names.  Redefining them to black silences all
+  %% syntax highlighting without touching the language definitions.
+  \definecolor{lstcomment}{HTML}{000000}
+  \definecolor{lstkeyword}{HTML}{000000}
+  \definecolor{lststring}{HTML}{000000}
+  \definecolor{lstkey}{HTML}{000000}
+\else
+  \definecolor{lstcomment}{HTML}{6E7781}  % muted grey for comments
+  \definecolor{lstkeyword}{HTML}{CF222E}  % red-ish for keywords (matches GH theme)
+  \definecolor{lststring}{HTML}{0A3069}   % deep blue for strings
+  \definecolor{lstkey}{HTML}{8250DF}      % purple for YAML/JSON keys
+\fi
+
+%% YAML language definition (listings does not ship with one).  Highlights
+%% structural delimiters, common scalars, and a few writeup-specific keys.
+%% Listings has no native ``key:'' anchor, so we list the keys we actually
+%% use in the writeup as keywords and colour them with `lstkey'.  Generic
+%% scalars (true / false / null / etc.) get the standard keyword colour.
+\lstdefinelanguage{yaml}{
+  morekeywords=[1]{name,description,allowed-tools,disable-model-invocation,when_to_use},
+  keywordstyle=[1]\color{lstkey}\bfseries,
+  morekeywords=[2]{true,false,null,yes,no,on,off,~},
+  keywordstyle=[2]\color{lstkeyword}\bfseries,
+  morecomment=[l]{\#},
+  commentstyle=\color{lstcomment}\itshape,
+  morestring=[b]',
+  morestring=[b]",
+  stringstyle=\color{lststring},
+  moredelim=[is][\color{lstcomment}]{---}{---},
+  sensitive=true,
+  showstringspaces=false,
+  literate={:}{{{\color{lstcomment}:}}}{1}
+           {-}{{{\color{lstcomment}-}}}{1},
+}
+
+%% JSON (treat as a stripped YAML for simple highlighting).
+\lstdefinelanguage{json}{
+  morekeywords={true,false,null},
+  keywordstyle=\color{lstkeyword}\bfseries,
+  morecomment=[l]{//},
+  commentstyle=\color{lstcomment}\itshape,
+  morestring=[b]",
+  stringstyle=\color{lststring},
+  sensitive=true,
+  showstringspaces=false,
+}
+
+\lstdefinestyle{ghcode}{
+  basicstyle=\ttfamily\small\color{ghforeground},
+  backgroundcolor=\color{PaleBlue},
+  keywordstyle=\color{lstkeyword}\bfseries,
+  commentstyle=\color{lstcomment}\itshape,
+  stringstyle=\color{lststring},
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true,
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  rulecolor=\color{ghmutedrule},
+  framerule=0.5pt,
+  framesep=10pt,
+  xleftmargin=10pt,
+  xrightmargin=10pt,
+  aboveskip=12pt,
+  belowskip=8pt,
+  numbers=none,
+  captionpos=b,
+  abovecaptionskip=4pt,
+}
+\ifgimenezprint
+  %% Print mode: drop the pale-blue fill and grey border so code blocks
+  %% render as bare monospace on a white background.
+  \lstdefinestyle{ghcode}{
+    basicstyle=\ttfamily\small\color{black},
+    backgroundcolor=\color{white},
+    frame=none,
+    framesep=0pt,
+    xleftmargin=12pt,
+    xrightmargin=12pt,
+    aboveskip=12pt,
+    belowskip=8pt,
+    numbers=none,
+    captionpos=b,
+    abovecaptionskip=4pt,
+  }
+\fi
+\lstset{style=ghcode}
+
+%% --------------------------------------------------------------------
+%% Tables.
+%% Mirrors the blog's `.prose table` rendering: every row in the body
+%% gets a pale-blue fill; the header row (the one between \toprule and
+%% \midrule) gets a slightly darker blue.  The header colouring is
+%% injected automatically by redefining \toprule, so existing booktabs
+%% tables pick it up without per-table changes.
+%% Print mode leaves tables monochrome.
+%% --------------------------------------------------------------------
+%% Tables.  Mirrors the blog's `.prose table` rendering: transparent body
+%% rows, a subtle pale-blue header, and soft grey horizontal rules between
+%% every body row (the blog's `td { border-bottom: 1px solid ... }`).
+%% Implementation:
+%%   * `\arrayrulecolor` + `\arrayrulewidth` soften every booktabs rule.
+%%   * Inside each `tabular`, `\\` is locally redefined to also draw a
+%%     thin grey rule, so the user does not need to add `\midrule`
+%%     between body rows by hand.  The original `\\` is restored at the
+%%     start so `\rowcolor{...} \\` still works.
+%% In print mode, the colour overrides are dropped and \rowcolor's
+%% PaleBlue is silently turned into white so printed tables stay
+%% monochrome without changing the writeup source.
+\ifgimenezprint
+  \colorlet{PaleBlue}{white}
+  \colorlet{MidBlue}{white}
+\else
+  \arrayrulecolor{ghmutedrule}
+  \setlength{\arrayrulewidth}{0.5pt}
+  %% Booktabs adds vertical breathing room (\aboverulesep ≈ \belowrulesep
+  %% ≈ 0.65ex) above and below every rule.  Inside a coloured header
+  %% row this shows up as a white gap between the row's colour fill and
+  %% the rule.  Zero them so the fill butts directly against the rule.
+  \setlength{\aboverulesep}{0pt}
+  \setlength{\belowrulesep}{0pt}
+\fi
+
+%% NOTE for the book project: the original style aliased \toprule,
+%% \midrule, and \bottomrule to \hline so all rules in the writeup were
+%% identical hairlines.  The book uses booktabs the way the package
+%% intends --- a thicker top/bottom and a thinner mid --- so the
+%% aliasing has been removed.  If you want the flat-hairline look back,
+%% re-add the three \let lines below this comment.
+
+%% --------------------------------------------------------------------
+%% Book extras: chapter-summary and exercises boxes.
+%% Co-located with the GitHub admonitions so all coloured boxes are
+%% defined in one place.  Style mirrors the GitHub admonitions: thin
+%% grey frame, tinted background, bold black title.
+%% --------------------------------------------------------------------
+\ifgimenezprint
+  \newtcolorbox{summarybox}{
+    ghadmonition,
+    colback=white, colframe=ghprintrule,
+    before upper={\textbf{Chapter Summary}\par\vspace{2pt}}
+  }
+  \newtcolorbox{exercisebox}[1][Exercises]{
+    ghadmonition,
+    colback=white, colframe=ghprintrule,
+    before upper={\textbf{#1}\par\vspace{2pt}}
+  }
+\else
+  \newtcolorbox{summarybox}{
+    ghadmonition,
+    colback=ghnote!8!white,
+    before upper={\textbf{Chapter Summary}\par\vspace{2pt}}
+  }
+  \newtcolorbox{exercisebox}[1][Exercises]{
+    ghadmonition,
+    colback=ghtip!10!white,
+    before upper={\textbf{#1}\par\vspace{2pt}}
+  }
+\fi
+
+%% Backwards-compatible aliases: chapters written before the style
+%% integration use `notebox' and `warningbox'.  These map to the new
+%% GitHub-style `note' and `warning'.  `notebox' supports an optional
+%% custom title (e.g.\ \begin{notebox}[Security note]) which the bare
+%% `note' env does not --- so we keep notebox as its own definition.
+\newtcolorbox{notebox}[1][Note]{
+  ghadmonition,
+  colback=ghnote!8!white,
+  before upper={\textbf{#1}\par\vspace{2pt}}
+}
+\newtcolorbox{warningbox}[1][Warning]{
+  ghadmonition,
+  colback=ghwarning!10!white,
+  before upper={\textbf{#1}\par\vspace{2pt}}
+}
+\ifgimenezprint
+  %% In print mode, override the colour fills so they match the rest
+  %% of the print-mode admonitions.
+  \renewtcolorbox{notebox}[1][Note]{
+    ghadmonition,
+    colback=white, colframe=ghprintrule,
+    before upper={\textbf{#1}\par\vspace{2pt}}
+  }
+  \renewtcolorbox{warningbox}[1][Warning]{
+    ghadmonition,
+    colback=white, colframe=ghprintrule,
+    before upper={\textbf{#1}\par\vspace{2pt}}
+  }
+\fi
+
+\endinput
