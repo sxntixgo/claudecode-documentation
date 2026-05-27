@@ -1,3 +1,227 @@
-% Stub
-\chapter{ch10-keywords}
-\label{ch:ch10-keywords}
+% book/chapters/ch10-keywords.tex
+\chapter{Keywords and References}
+\label{ch:keywords}
+
+\index{keywords}\index{at-references}
+
+Keywords are the small textual cues that shift Claude's behaviour without
+opening a configuration file. You have already seen two families of them:
+the thinking keywords from \cref{ch:thinking} (\texttt{think},
+\texttt{ultrathink}) and the slash commands from \cref{ch:commands}
+(\texttt{/code-review}, \texttt{/deploy}). This chapter completes the set
+with two more: \textbf{@-references} that pull content into context, and
+\textbf{auto-invocation} that lets Claude decide which skill applies based
+on what you type.
+
+\section{The @-Reference Syntax}
+\label{sec:at-references}
+
+\index{at-references}
+
+Prefix a path, directory, or MCP resource with \texttt{@} to inject it
+into the current message before Claude responds:
+
+\begin{table}[ht]
+\centering
+\caption{Forms of the \texttt{@} reference}
+\label{tab:at-references}
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+\textbf{Form} & \textbf{Example} & \textbf{Effect} \\
+\midrule
+File          & \texttt{@src/auth.ts}
+              & Reads the file and includes its contents \\
+Directory     & \texttt{@src/components}
+              & Lists files (not contents) \\
+Home-relative & \texttt{@\textasciitilde/.claude/CLAUDE.md}
+              & Resolves against your home directory \\
+MCP resource  & \texttt{@github:repos/org/repo/issues}
+              & Fetches structured data from an MCP server \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{lstlisting}[caption={Using \texttt{@} references in a prompt}]
+Explain the logic in @src/utils/auth.js and compare it to the
+session-handling code in @src/server/sessions.ts.
+\end{lstlisting}
+
+Two things happen when Claude resolves an \texttt{@}-reference:
+
+\begin{enumerate}
+  \item The file contents (or directory listing) are added to context.
+  \item Any \texttt{CLAUDE.md} in the referenced file's directory \emph{or}
+        any parent directory is also loaded. \texttt{@}-references are the
+        primary mechanism by which nested \texttt{CLAUDE.md} files are
+        pulled into a session.
+\end{enumerate}
+
+\begin{notebox}
+Use \texttt{@} when you know exactly which file matters. Ask Claude to
+``search for'' or ``find files about\ldots'' when you don't, so Claude
+can use Grep or the Explore subagent instead of you blindly attaching
+candidates. \texttt{@} is precise but consumes tokens up-front.
+\end{notebox}
+
+\section{Auto-Invocation of Skills}
+\label{sec:auto-invocation}
+
+\index{skills!auto-invocation}\index{keywords!auto-triggers}
+
+A skill's \texttt{description} field is the trigger phrase for
+auto-invocation. When your message matches the description, Claude loads
+the skill automatically — no slash command required.
+
+\begin{lstlisting}[caption={A skill that auto-invokes on PR-review language}]
+---
+name: code-review
+description: Run a security and quality review on the current diff.
+             Invoke automatically when the user asks to review a
+             pull request, check a diff, or audit changes.
+---
+
+1. Run `git diff main...HEAD`
+2. For each changed file, check:
+   - SQL injection risks
+   - Hardcoded secrets
+   - Missing error handling
+3. Report findings rated Critical / Major / Minor.
+\end{lstlisting}
+
+Any of the following phrases will load the skill above:
+
+\begin{itemize}
+  \item ``Review my pull request''
+  \item ``Check this diff before I merge''
+  \item ``Audit these changes for security''
+\end{itemize}
+
+To \emph{prevent} auto-invocation — useful for skills with side effects —
+set \texttt{disable-model-invocation: true} in the frontmatter; the skill
+then runs only when invoked explicitly via \texttt{/code-review}.
+
+\begin{warningbox}
+The \texttt{description} field is the only thing Claude reads when deciding
+whether to invoke a skill. A vague description like
+\emph{``Helps with code''} matches almost nothing reliably. Write the
+description as if it were the first line of a Stack Overflow answer:
+specific, action-oriented, and naming the inputs.
+\end{warningbox}
+
+\section{Built-In Keyboard Keywords}
+\label{sec:builtin-keys}
+
+\index{keyboard shortcuts}
+
+Several keys and key-combinations modify the current interactive session:
+
+\begin{table}[ht]
+\centering
+\caption{Built-in keyboard keywords in interactive sessions}
+\label{tab:built-in-keys}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Key(s)} & \textbf{Effect} \\
+\midrule
+\texttt{Shift+Tab}   & Toggle between default mode and plan mode \\
+\texttt{Esc}         & Interrupt Claude mid-action; preserve context \\
+\texttt{Esc}, \texttt{Esc}
+                     & Open the rewind menu (restore or summarise to a previous checkpoint) \\
+\texttt{Ctrl+G}      & Open the current plan in your editor \\
+\texttt{Ctrl+V} (CLI)& Paste an image into the prompt
+                       (note: not \texttt{Cmd+V} on macOS) \\
+\texttt{!\,<cmd>}    & Execute a shell command in the current session;
+                       its output is captured into context \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{The Special Variable \$ARGUMENTS}
+\label{sec:arguments-variable}
+
+You met \texttt{\$ARGUMENTS} in \cref{ch:commands}; it deserves one more
+mention as a keyword. Inside any command or skill, \texttt{\$ARGUMENTS}
+is replaced by the text typed after the command name. It is the only
+templating primitive — there are no conditionals, loops, or other
+substitutions.
+
+\begin{lstlisting}[caption={A skill using \$ARGUMENTS for dynamic input}]
+---
+name: explain-file
+description: Explain what a file does, line-by-line if asked.
+---
+
+Read $ARGUMENTS and explain its purpose and key functions.
+
+If $ARGUMENTS contains "--deep", walk through the file
+line-by-line and explain each non-trivial block.
+\end{lstlisting}
+
+\section{Combining Keyword Families}
+\label{sec:keyword-combos}
+
+The four keyword families compose:
+
+\begin{lstlisting}[caption={A prompt that uses every keyword family}]
+think hard: review @src/auth.ts and @src/server/sessions.ts
+for the issues we saw in @github:repos/org/api/issues/42
+\end{lstlisting}
+
+This single prompt:
+\begin{itemize}
+  \item raises the thinking budget (\texttt{think hard}),
+  \item pulls two local files into context (\texttt{@src/...}),
+  \item fetches issue \#42 from GitHub via the MCP resource reference,
+  \item and — if a \texttt{code-review} skill exists with a matching
+        \texttt{description} — auto-invokes that skill on top of all the
+        above.
+\end{itemize}
+
+\begin{exercisebox}[Exercises — keywords, references, and auto-invocation]
+These exercises continue from \cref{ch:context}.
+
+\begin{enumerate}
+  \item Pick a file in your running project and ask Claude
+        \emph{``Explain @<that-file>''} without using a slash command.
+        Confirm in the response that Claude read the file (look for the
+        contents, not just a guess at what it might contain).
+  \item Reference a directory: \emph{``What's in @src/?''}. Note that
+        the response is a listing, not file contents. Compare this with
+        \emph{``Read every file in @src/''} — the latter consumes far
+        more tokens.
+  \item Open the \texttt{/review-pr} command you created in
+        \cref{ch:commands}. Convert it into a skill in
+        \texttt{.claude/skills/review-pr/SKILL.md} with a precise
+        \texttt{description}. Verify auto-invocation by typing
+        \emph{``Review my pull request''} (without slash) and
+        confirming the skill activates.
+  \item In an interactive session, press \texttt{Esc}, \texttt{Esc},
+        select a message a few turns back, and choose \emph{Summarise
+        from here}. Continue working and confirm the older detail is
+        gone but the most recent edits remain.
+\end{enumerate}
+\end{exercisebox}
+
+%% ---------------------------------------------------------------
+\begin{summarybox}
+\begin{itemize}
+  \item Four keyword families exist in Claude Code:
+        \textbf{thinking keywords} (\cref{ch:thinking}),
+        \textbf{slash commands} (\cref{ch:commands}),
+        \textbf{@-references} (this chapter), and
+        \textbf{auto-invocation} (this chapter).
+  \item \texttt{@path}, \texttt{@dir}, \texttt{@\textasciitilde/...}, and
+        \texttt{@server:resource} all inject context up front; use them
+        when you know exactly what is needed.
+  \item Skills auto-invoke when the user's message matches the skill's
+        \texttt{description}. Set \texttt{disable-model-invocation: true}
+        to require an explicit slash invocation.
+  \item Keyboard keywords (\texttt{Shift+Tab}, \texttt{Esc}\,\texttt{Esc},
+        \texttt{Ctrl+G}, \texttt{!\,<cmd>}) modify the active session.
+  \item All four families compose: a single prompt can raise thinking,
+        attach files, fetch MCP data, and trigger a skill at the same
+        time.
+\end{itemize}
+\end{summarybox}
+
+\printbibliography[heading=subbibliography,title={References}]

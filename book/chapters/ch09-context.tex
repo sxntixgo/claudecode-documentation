@@ -1,3 +1,324 @@
-% Stub
-\chapter{ch09-context}
-\label{ch:ch09-context}
+% book/chapters/ch09-context.tex
+\chapter{Context Management}
+\label{ch:context}
+
+\index{context}\index{CLAUDE.md}
+
+Every Claude Code session starts with a fresh context window. Two mechanisms
+let knowledge persist across sessions:
+
+\begin{itemize}
+  \item \textbf{CLAUDE.md files} — instructions you write that Claude reads on
+        every session start.
+  \item \textbf{Auto memory} — notes that Claude writes for itself based on
+        your corrections, then re-reads in future sessions.
+\end{itemize}
+
+This chapter covers both, plus the rule files and import system that organise
+larger projects.
+
+\section{CLAUDE.md Hierarchy}
+\label{sec:claude-md-scopes}
+
+\index{CLAUDE.md!scopes}
+
+CLAUDE.md files load in order, from broadest scope to most specific. Later
+files appear later in context, so project-level instructions override
+user-level ones on conflict.
+
+\begin{table}[ht]
+\centering
+\caption{CLAUDE.md locations and scope}
+\label{tab:claude-md-scopes}
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Scope} & \textbf{Location} & \textbf{Use case} \\
+\midrule
+Managed policy & \texttt{/etc/claude-code/CLAUDE.md} (Linux/WSL)\newline
+                 \texttt{/Library/Application Support/ClaudeCode/CLAUDE.md} (macOS)\newline
+                 \texttt{C:\textbackslash{}Program Files\textbackslash{}ClaudeCode\textbackslash{}CLAUDE.md} (Windows)
+               & Organisation-wide standards deployed by IT \\
+User           & \texttt{\textasciitilde/.claude/CLAUDE.md}
+               & Personal preferences across every project \\
+Project        & \texttt{./CLAUDE.md} or \texttt{./.claude/CLAUDE.md}
+               & Team-shared, committed to version control \\
+Local          & \texttt{./CLAUDE.local.md}
+               & Personal project notes; add to \texttt{.gitignore} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+When Claude Code starts in a subdirectory, it walks up the directory tree and
+loads every \texttt{CLAUDE.md} it finds along the way. \texttt{CLAUDE.md}
+files in subdirectories \emph{below} the working directory load on demand —
+only when Claude reads a file in that subdirectory.
+
+\begin{notebox}
+Run \texttt{/init} in a new project to generate a starting \texttt{CLAUDE.md}.
+Claude analyses your codebase and proposes build commands, test instructions,
+and conventions. If a \texttt{CLAUDE.md} already exists, \texttt{/init}
+suggests refinements rather than overwriting.
+\end{notebox}
+
+\subsection{Size Targets}
+
+Aim for under \textbf{200 lines per CLAUDE.md file}. The file is loaded into
+context at every session start, so every kilobyte costs tokens forever.
+Longer files also reduce adherence — when the file gets too long, Claude
+starts ignoring lines further from the top.
+
+\begin{lstlisting}[caption={A focused CLAUDE.md (\textasciitilde 30 lines)}]
+# Code style
+- Use ES modules (import/export), not CommonJS (require)
+- 2-space indentation, double quotes for strings
+- Prefer functional components with hooks
+
+# Workflow
+- Typecheck after a series of edits: `npm run typecheck`
+- Run a single failing test, not the whole suite, during iteration
+- Open the PR with `gh pr create` once tests pass
+
+# Don't
+- Don't add comments that just restate the code
+- Don't introduce new dependencies without asking
+\end{lstlisting}
+
+\subsection{Imports and Composition}
+
+\index{CLAUDE.md!imports}
+
+CLAUDE.md files can import other Markdown using \texttt{@path/to/file}
+syntax. Imports expand at session start (up to a depth of four hops).
+
+\begin{lstlisting}[caption={Importing related files into CLAUDE.md}]
+See @README.md for the project overview and @package.json
+for the available scripts.
+
+# Additional instructions
+- Git workflow: @docs/git-instructions.md
+- Personal overrides: @~/.claude/my-project-instructions.md
+\end{lstlisting}
+
+For private, machine-local notes, create \texttt{CLAUDE.local.md} at the
+project root and add it to \texttt{.gitignore}.
+
+\begin{exercisebox}[Exercises — building your project's CLAUDE.md]
+These exercises continue the running project introduced in earlier chapters.
+You should have a \texttt{.claude/} directory at your project root.
+
+\begin{enumerate}
+  \item Run \texttt{/init} inside the project. Inspect the generated
+        \texttt{CLAUDE.md}: how many lines does it produce, and which
+        instructions did Claude infer from your codebase?
+  \item Trim the generated file to under 100 lines. Remove anything that
+        Claude could derive by reading the code (file-by-file
+        descriptions, language conventions, etc.). Keep only build
+        commands, project-specific rules, and ``don'ts.''
+  \item Add a \texttt{CLAUDE.local.md} with one private preference (e.g.,
+        a sandbox URL or a per-developer dev port). Confirm
+        \texttt{git status} does \emph{not} list it as untracked — i.e.,
+        it is already in your \texttt{.gitignore}.
+  \item Start a new session and run \texttt{/memory}. Verify that both
+        \texttt{CLAUDE.md} and \texttt{CLAUDE.local.md} are listed as
+        loaded.
+\end{enumerate}
+\end{exercisebox}
+
+\section{Path-Scoped Rules}
+\label{sec:claude-rules}
+
+\index{CLAUDE.md!rules}
+
+Once a CLAUDE.md grows past 200 lines, split topical instructions out into
+\texttt{.claude/rules/}. Rules can be scoped to specific file paths via YAML
+frontmatter so they only load when Claude works on matching files:
+
+\begin{lstlisting}[language=bash,caption={Layout of \texttt{.claude/rules/}}]
+.claude/
+  CLAUDE.md                # baseline project instructions
+  rules/
+    api-design.md          # always-loaded
+    frontend/
+      react-conventions.md # scoped to src/components/**
+    backend/
+      sql-style.md         # scoped to db/migrations/**
+\end{lstlisting}
+
+\begin{lstlisting}[caption={A path-scoped rule}]
+---
+paths:
+  - "src/api/**/*.ts"
+  - "src/api/**/*.tsx"
+---
+
+# API conventions
+
+- Validate every request body with a Zod schema
+- Wrap handlers in `asyncHandler` for error propagation
+- Return `{ success, data?, error? }` from every endpoint
+\end{lstlisting}
+
+A rule without a \texttt{paths} field loads unconditionally alongside
+\texttt{CLAUDE.md}.
+
+\section{Auto Memory}
+\label{sec:auto-memory}
+
+\index{auto memory}
+
+Auto memory lets Claude accumulate notes between sessions without you writing
+anything. When you correct Claude, fix a misunderstanding, or teach it a
+build command, Claude decides whether the lesson is worth keeping; if so, it
+writes a Markdown file in:
+
+\begin{lstlisting}[language=bash,caption={Auto-memory storage location}]
+~/.claude/projects/<project>/memory/
+  MEMORY.md          # concise index, loaded into every session
+  debugging.md       # detailed notes Claude wrote
+  api-conventions.md
+  ...
+\end{lstlisting}
+
+Only the first 200 lines (or 25\,KB) of \texttt{MEMORY.md} load at session
+start. Topic files load on demand. The directory is per git repository and
+is shared across worktrees on the same machine.
+
+\subsection{Inspecting and Editing Memory}
+
+Run \texttt{/memory} in a session to:
+\begin{itemize}
+  \item see which CLAUDE.md and rule files are currently loaded,
+  \item toggle auto memory on or off,
+  \item open the memory directory in your editor.
+\end{itemize}
+
+Memory files are plain Markdown — edit or delete them with no special tooling.
+
+\subsection{Disabling Auto Memory}
+
+Auto memory is on by default. To turn it off:
+
+\begin{lstlisting}[language=json,caption={Disabling auto memory in \texttt{.claude/settings.json}}]
+{ "autoMemoryEnabled": false }
+\end{lstlisting}
+
+Or set \texttt{CLAUDE\_CODE\_DISABLE\_AUTO\_MEMORY=1} in your environment.
+
+\begin{warningbox}
+Auto memory is machine-local: it is \emph{not} synced across machines,
+laptops, or cloud sandboxes. If you change machines, Claude starts the new
+environment without the accumulated notes.
+\end{warningbox}
+
+\section{Compaction and What Survives}
+\label{sec:compaction}
+
+\index{compaction}
+
+When the active context window approaches its limit, Claude Code automatically
+\emph{compacts}: it summarises older turns to free space while preserving
+the key code, files, and decisions. You can also trigger it manually:
+
+\begin{itemize}
+  \item \texttt{/clear} — full reset; nothing from the previous turns survives.
+  \item \texttt{/compact} — summarise the entire conversation.
+  \item \texttt{/compact <instructions>} — summarise with a focus, e.g.\
+        \texttt{/compact focus on the API changes}.
+  \item \texttt{Esc}, \texttt{Esc} — open the rewind menu, pick a message,
+        and either restore from that point or summarise around it.
+\end{itemize}
+
+\begin{notebox}
+Project-root \texttt{CLAUDE.md} \emph{is} re-injected after compaction.
+Nested \texttt{CLAUDE.md} files in subdirectories are \emph{not} — they
+reload the next time Claude reads a file in that subdirectory. If an
+instruction needs to persist across compactions, put it in the root
+\texttt{CLAUDE.md}, not in a nested one.
+\end{notebox}
+
+\section{Monorepos and Excludes}
+\label{sec:monorepos}
+
+In a large monorepo, ancestor \texttt{CLAUDE.md} files from other teams may
+be irrelevant or even contradict your team's conventions. Exclude them with
+\texttt{claudeMdExcludes}:
+
+\begin{lstlisting}[language=json,caption={Excluding ancestor CLAUDE.md files}]
+{
+  "claudeMdExcludes": [
+    "**/monorepo/CLAUDE.md",
+    "/home/me/monorepo/other-team/.claude/rules/**"
+  ]
+}
+\end{lstlisting}
+
+Add this to \texttt{.claude/settings.local.json} so the exclusion stays
+on your machine. Managed-policy \texttt{CLAUDE.md} files cannot be excluded.
+
+\begin{exercisebox}[Exercises — rules, memory, compaction]
+These exercises build on the previous set.
+
+\begin{enumerate}
+  \item Take a 100-line section of your trimmed \texttt{CLAUDE.md} that
+        applies to \emph{only} one subdirectory (e.g.\ \texttt{src/api/}
+        or \texttt{tests/}). Move it into a path-scoped rule under
+        \texttt{.claude/rules/}, with a \texttt{paths:} pattern matching
+        that subdirectory. Confirm \texttt{/memory} only lists the rule
+        when you reference a file inside that directory.
+  \item Provoke an auto-memory write: in a session, correct Claude on a
+        consistent project convention twice in a row (e.g.\
+        ``always use pnpm, not npm''). End the session. Open the
+        \texttt{\textasciitilde/.claude/projects/<project>/memory/}
+        directory and inspect what was written. Edit or delete entries
+        that aren't useful.
+  \item In a long session, run \texttt{/compact focus on the auth
+        changes}. Verify the next message still has access to the auth
+        files; ask Claude to list which files it remembers editing.
+  \item In a monorepo, add a \texttt{claudeMdExcludes} entry to
+        \texttt{.claude/settings.local.json} that filters out one other
+        team's directory. Confirm \texttt{/memory} no longer lists files
+        from that path.
+\end{enumerate}
+\end{exercisebox}
+
+\section{AGENTS.md Compatibility}
+\label{sec:agents-md}
+
+If your repository already has an \texttt{AGENTS.md} for another agent
+(Cursor, Continue, etc.), Claude Code does \emph{not} read it directly — but
+you can import it from your \texttt{CLAUDE.md}:
+
+\begin{lstlisting}[caption={Sharing instructions between agents}]
+@AGENTS.md
+
+## Claude Code
+
+Use plan mode for changes under `src/billing/`.
+\end{lstlisting}
+
+A symlink (\texttt{ln -s AGENTS.md CLAUDE.md}) also works on macOS and
+Linux. On Windows, use the \texttt{@AGENTS.md} import — symlinks require
+Administrator privileges or Developer Mode.
+
+%% ---------------------------------------------------------------
+\begin{summarybox}
+\begin{itemize}
+  \item Persistent instructions live in \texttt{CLAUDE.md} at four scopes:
+        \textbf{managed}, \textbf{user}, \textbf{project}, and \textbf{local};
+        every level loads, with later levels overriding earlier ones on
+        conflict.
+  \item Target \textbf{under 200 lines} per CLAUDE.md. Use
+        \texttt{@path/to/file} imports for composition and
+        \texttt{.claude/rules/} for path-scoped topical instructions.
+  \item \textbf{Auto memory} is enabled by default. Claude writes per-project
+        notes to
+        \texttt{\textasciitilde/.claude/projects/<project>/memory/}; the first
+        200 lines of \texttt{MEMORY.md} load every session.
+  \item Project-root \texttt{CLAUDE.md} survives \texttt{/compact};
+        nested ones reload on demand. \texttt{/clear} discards everything.
+  \item In monorepos, use \texttt{claudeMdExcludes} to skip other teams'
+        files. Managed-policy CLAUDE.md cannot be excluded.
+\end{itemize}
+\end{summarybox}
+
+\printbibliography[heading=subbibliography,title={References}]

@@ -1216,6 +1216,97 @@ git commit -m "feat: add appendices A/B and full glossary"
 
 ---
 
+## Task 11a: Add Per-Section Exercises to Every Chapter
+
+**Goal:** every chapter should reinforce its concepts with practical, hands-on
+exercises placed at the end of each major section. Exercises within a chapter
+build on each other; where it makes sense, the running "Chapter Project"
+carries across chapters so the reader ends Part II with a working
+team-style configuration.
+
+**Files:**
+- Modify: `book/preamble.tex` (add `exercisebox` environment)
+- Modify: every `book/chapters/ch*.tex` (insert exercise blocks)
+
+- [ ] **Step 1: Add an `exercisebox` environment to `book/preamble.tex`**
+
+```latex
+\newtcolorbox{exercisebox}[1][Exercises]{
+  enhanced,
+  title=#1,
+  colback=green!5!white,
+  colframe=green!40!black,
+  fonttitle=\bfseries,
+  breakable,
+  before upper={\parindent0pt}
+}
+```
+
+- [ ] **Step 2: Decide on a Running Project**
+
+Throughout chapters 1–7 the exercises build a single hypothetical project —
+the team-collaboration setup for a small Node.js service:
+
+1. **Ch 1** — scaffold a `.claude/` directory for the project.
+2. **Ch 2** — add the GitHub MCP server (HTTP transport, project scope).
+3. **Ch 3** — write three prompts using the seven patterns (CREATE, FIX, REVIEW)
+   against the scaffolded project.
+4. **Ch 4** — define a `security-reviewer` custom subagent.
+5. **Ch 5** — package a `code-review` skill that uses the GitHub MCP server.
+6. **Ch 6** — expose the skill as a `/review-pr` slash command.
+7. **Ch 7** — annotate the skill and subagent with `model:` fields.
+
+From chapter 8 onward, exercises become topical (per-feature) rather than
+building a single artefact, since later chapters cover orthogonal concerns
+(thinking, hooks, security, etc.).
+
+- [ ] **Step 3: Add exercises to ch01–ch10 (already written)**
+
+For each chapter, insert `\begin{exercisebox}` ... `\end{exercisebox}`
+immediately before the chapter's `\begin{summarybox}`. The block contains a
+short header naming what the exercises practice, then an `enumerate` of 2–4
+concrete tasks. Provide expected output, commands to run, or files to create
+so the reader can self-check.
+
+Example skeleton (place at end of ch02):
+
+```latex
+\section{Exercises}
+\label{sec:mcp-exercises}
+
+\begin{exercisebox}
+These exercises continue the running project from chapter 1. They assume you
+have created the \texttt{.claude/} scaffold.
+
+\begin{enumerate}
+  \item Install the GitHub MCP server at project scope. Use the HTTP
+        transport. Verify with \texttt{claude mcp list} that it appears
+        with scope \texttt{project}.
+  \item Open \texttt{.mcp.json} in your editor and confirm the URL is
+        present but \emph{no} secret is stored literally. Confirm your
+        environment exports \texttt{GITHUB\_PAT}.
+  \item Start a Claude Code session and run \texttt{/mcp}. Complete the
+        OAuth flow if prompted. Ask Claude: \emph{``List the most recent
+        five issues on this repository''} and confirm Claude calls the
+        GitHub tool rather than asking you for a browser URL.
+\end{enumerate}
+\end{exercisebox}
+```
+
+- [ ] **Step 4: Add exercises to ch11–ch15 as they are written**
+
+Write the exercise block as part of the same task that authors the chapter,
+not as a separate pass. This avoids re-reading content for context.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add book/preamble.tex book/chapters/
+git commit -m "feat: add per-section exercises to all chapters"
+```
+
+---
+
 ## Task 11: Final Integration and Compile
 
 **Files:**
