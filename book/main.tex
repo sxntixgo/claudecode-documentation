@@ -1,0 +1,84 @@
+% book/main.tex — master document for Mastering Claude Code
+\documentclass[12pt,twoside,openright]{book}
+\input{preamble}
+
+% Bibliography resources — one .bib per chapter/appendix
+\addbibresource{bibliography/ch01.bib}
+\addbibresource{bibliography/ch02.bib}
+\addbibresource{bibliography/ch03.bib}
+\addbibresource{bibliography/ch04.bib}
+\addbibresource{bibliography/ch05.bib}
+\addbibresource{bibliography/ch06.bib}
+\addbibresource{bibliography/ch07.bib}
+\addbibresource{bibliography/ch08.bib}
+\addbibresource{bibliography/ch09.bib}
+\addbibresource{bibliography/ch10.bib}
+\addbibresource{bibliography/ch11.bib}
+\addbibresource{bibliography/ch12.bib}
+\addbibresource{bibliography/ch13.bib}
+\addbibresource{bibliography/ch14.bib}
+\addbibresource{bibliography/ch15.bib}
+\addbibresource{bibliography/app-a.bib}
+\addbibresource{bibliography/app-b.bib}
+
+% Load glossary entries (defined in backmatter/glossary.tex)
+\input{backmatter/glossary}
+\makeglossaries
+
+\begin{document}
+
+%%----------------------------------------------------------------
+%% Front Matter
+%%----------------------------------------------------------------
+\frontmatter
+\input{frontmatter/halftitle}
+\input{frontmatter/titlepage}
+\input{frontmatter/copyright}
+\tableofcontents
+\listoffigures
+\listoftables
+\input{frontmatter/preface}
+
+%%----------------------------------------------------------------
+%% Main Matter
+%%----------------------------------------------------------------
+\mainmatter
+
+\part{Getting Started with Claude Code}
+\input{chapters/ch01-plugin-ecosystem}
+\input{chapters/ch02-mcp-servers}
+\input{chapters/ch03-prompt-basics}
+
+\part{Core Components}
+\input{chapters/ch04-agents}
+\input{chapters/ch05-skills}
+\input{chapters/ch06-commands}
+\input{chapters/ch07-models}
+
+\part{Advanced Features}
+\input{chapters/ch08-thinking}
+\input{chapters/ch09-context}
+\input{chapters/ch10-keywords}
+\input{chapters/ch11-hooks}
+\input{chapters/ch12-advanced-prompting}
+
+\part{Optimization and Production}
+\input{chapters/ch13-optimization}
+\input{chapters/ch14-security}
+\input{chapters/ch15-examples}
+
+%%----------------------------------------------------------------
+%% Appendices
+%%----------------------------------------------------------------
+\appendix
+\input{appendices/app-a-reference}
+\input{appendices/app-b-community}
+
+%%----------------------------------------------------------------
+%% Back Matter
+%%----------------------------------------------------------------
+\backmatter
+\printglossaries
+\printindex
+
+\end{document}
