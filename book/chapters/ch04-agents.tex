@@ -56,8 +56,13 @@ claude-code-guide         & Haiku            & Web search
 \end{table}
 
 \begin{notebox}
-Subagents cannot spawn other subagents (no nesting). The Plan subagent skips
-\texttt{CLAUDE.md} files for speed; all other subagents load them.
+A subagent can delegate to other subagents only if its \texttt{tools}
+field explicitly includes the \texttt{Agent} tool (with or without an
+allowlist of permitted children, e.g.\
+\texttt{tools: Agent(researcher, worker), Read}). When \texttt{Agent} is
+omitted from the \texttt{tools} field, the subagent cannot spawn other
+subagents. The Plan subagent skips \texttt{CLAUDE.md} files for speed;
+all other subagents load them.
 \end{notebox}
 
 Claude automatically routes tasks to the appropriate subagent. You can also
@@ -106,10 +111,19 @@ Do not suggest changes unrelated to security.
 \toprule
 \textbf{Field} & \textbf{Required} & \textbf{Description} \\
 \midrule
-\texttt{name}         & Yes & Identifier used for delegation \\
-\texttt{description}  & Yes & Natural-language description; Claude reads this to decide when to delegate \\
-\texttt{tools}        & No  & Comma-separated tool list (omit to inherit all parent tools) \\
-\texttt{model}        & No  & Model override: \texttt{haiku}, \texttt{sonnet}, \texttt{opus} \\
+\texttt{name}             & Yes & Identifier used for delegation \\
+\texttt{description}      & Yes & Natural-language; Claude uses this to decide when to delegate \\
+\texttt{tools}            & No  & Allowlist; omit to inherit all parent tools.
+                                  Use \texttt{Agent(child1, child2)} to permit a specific set of sub-subagents \\
+\texttt{disallowedTools}  & No  & Denylist; opposite of \texttt{tools} \\
+\texttt{model}            & No  & \texttt{haiku}, \texttt{sonnet}, \texttt{opus} \\
+\texttt{memory}           & No  & \texttt{user}, \texttt{project}, or \texttt{local} — enables persistent memory (see below) \\
+\texttt{permissionMode}   & No  & Restrict the subagent's permission mode \\
+\texttt{mcpServers}       & No  & Scope a server (e.g.\ Playwright) to a single subagent \\
+\texttt{skills}           & No  & Skills to preload into the subagent \\
+\texttt{maxTurns}         & No  & Hard cap on tool-call turns \\
+\texttt{isolation}        & No  & \texttt{worktree} gives the subagent its own git worktree \\
+\texttt{color}            & No  & Display color in agent listings \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -121,6 +135,41 @@ Do not suggest changes unrelated to security.
   \item \texttt{\textasciitilde/.claude/agents/} — personal scope; available
         across all your projects
 \end{itemize}
+
+\subsection{Persistent Subagent Memory}
+\label{sec:agent-memory}
+
+\index{subagents!persistent memory}
+
+Set \texttt{memory: user}, \texttt{memory: project}, or
+\texttt{memory: local} in a subagent's frontmatter and Claude Code grants
+it a dedicated directory that survives across conversations:
+
+\begin{table}[ht]
+\centering
+\caption{Subagent memory scopes}
+\label{tab:agent-memory}
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Scope} & \textbf{Directory} & \textbf{Use} \\
+\midrule
+\texttt{user}    & \texttt{\textasciitilde/.claude/agent-memory/<name>/}
+                 & Learnings that apply across all projects \\
+\texttt{project} & \texttt{.claude/agent-memory/<name>/}
+                 & Project-specific; commit to share with the team \\
+\texttt{local}   & \texttt{.claude/agent-memory-local/<name>/}
+                 & Project-specific but \texttt{.gitignore}'d \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+When memory is enabled, the subagent's system prompt is extended with
+read/write instructions for its memory directory, and the first 200 lines
+(or 25\,KB) of \texttt{MEMORY.md} are loaded on every invocation. The
+subagent's Read, Write, and Edit tools are enabled automatically so it can
+manage its own files. Memory is the subagent equivalent of the
+\emph{auto memory} feature from \cref{ch:context} — the same mechanism,
+scoped to one specialist.
 
 \section{Forking the Current Conversation}
 \label{sec:agent-fork}

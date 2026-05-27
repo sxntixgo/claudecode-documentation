@@ -120,18 +120,31 @@ Analyse and fix the GitHub issue: $ARGUMENTS
 \toprule
 \textbf{Field} & \textbf{Required} & \textbf{Description} \\
 \midrule
-\texttt{name}                     & Yes & Identifier; becomes the \texttt{/name} slash command \\
 \texttt{description}              & Yes & When Claude auto-invokes this skill \\
+\texttt{name}                     & No  & Display label in skill listings; the slash command itself comes from the directory name \\
 \texttt{model}                    & No  & \texttt{haiku}, \texttt{sonnet}, or \texttt{opus} \\
 \texttt{disable-model-invocation} & No  & \texttt{true} requires explicit slash-command invocation \\
+\texttt{allowed-tools}            & No  & Tools the skill may call without prompting for permission while it is active \\
+\texttt{arguments}                & No  & Named positional arguments, e.g.\ \texttt{[issue, branch]}; substituted in the body as \texttt{\$issue} and \texttt{\$branch} \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\subsection{The \$ARGUMENTS Variable}
+\begin{notebox}
+The slash command name comes from the skill's \emph{directory} name, not
+from the \texttt{name} field. A skill at
+\texttt{.claude/skills/fix-issue/SKILL.md} is invoked with
+\texttt{/fix-issue} regardless of what \texttt{name:} contains. The one
+exception is a plugin-root \texttt{SKILL.md} (a single-skill plugin),
+where \texttt{name:} \emph{does} set the command.
+\end{notebox}
 
-\texttt{\$ARGUMENTS} captures everything typed after the skill name when invoked
-with a slash command:
+\subsection{Arguments and Substitutions}
+
+\index{skills!arguments}
+
+\texttt{\$ARGUMENTS} captures everything typed after the skill name when
+invoked with a slash command:
 
 \begin{lstlisting}[caption={Invoking a skill with arguments}]
 /fix-issue 1234
@@ -140,6 +153,28 @@ with a slash command:
 /code-review --deep src/auth.ts
 # $ARGUMENTS = "--deep src/auth.ts"
 \end{lstlisting}
+
+For skills that take multiple positional inputs, declare them in
+frontmatter and reference each by name:
+
+\begin{lstlisting}[caption={Named arguments via the \texttt{arguments} field}]
+---
+name: migrate
+description: Migrate a component from one framework to another.
+arguments: [source, target]
+---
+
+Migrate the component at $source to follow the conventions in $target.
+\end{lstlisting}
+
+Other useful substitutions:
+
+\begin{itemize}
+  \item \texttt{\$\{CLAUDE\_SKILL\_DIR\}} — the directory containing
+        \texttt{SKILL.md}. Use it to reference supporting files
+        regardless of the user's working directory.
+  \item \texttt{\$\{CLAUDE\_PROJECT\_DIR\}} — the project root.
+\end{itemize}
 
 \section{Invoking Skills}
 \label{sec:skill-invoke}
@@ -175,6 +210,36 @@ model: haiku
 ---
 \end{lstlisting}
 
+\section{Bundled Skills}
+\label{sec:bundled-skills}
+
+\index{skills!bundled}
+
+Claude Code ships with prompt-based skills that are available in every
+session without installation:
+
+\begin{table}[ht]
+\centering
+\caption{Bundled skills (always available)}
+\label{tab:bundled-skills}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Command} & \textbf{Purpose} \\
+\midrule
+\texttt{/code-review}  & Review the current diff for bugs and quality issues \\
+\texttt{/debug}        & Walk through a debugging session systematically \\
+\texttt{/batch}        & Apply the same operation across many files \\
+\texttt{/loop}         & Iterative self-pacing for long-running tasks \\
+\texttt{/claude-api}   & Help building applications on the Claude API \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Unlike built-in commands (\texttt{/help}, \texttt{/compact}), bundled
+skills are prompt-driven: Claude orchestrates them using its tools. You
+can read their \texttt{SKILL.md} files to see the prompts, and you can
+override them by defining a skill of the same name in your project.
+
 \section{Installing Marketplace Skills}
 \label{sec:skill-marketplace}
 
@@ -188,8 +253,10 @@ production-ready skills for common workflows:
 /reload-plugins
 \end{lstlisting}
 
-After installation, skills such as \texttt{/code-review}, \texttt{/test-driven-development},
-and \texttt{/writing-plans} are available immediately.
+After installation, skills such as \texttt{/superpowers:test-driven-development}
+and \texttt{/superpowers:writing-plans} are available immediately. Plugin
+skills are always namespaced (\texttt{/plugin-name:skill-name}) to avoid
+conflicts with your project skills.
 
 \section{Exercises}
 \label{sec:skill-exercises}

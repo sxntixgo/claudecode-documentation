@@ -12,10 +12,34 @@ runs it consistently. The plugin ecosystem is how you add those capabilities.
 \index{plugin ecosystem}
 \index{extension types}
 
-\section{What Is the Plugin Ecosystem?}
+\section{Extensions vs.\ Plugins}
+\label{sec:extensions-vs-plugins}
+
+Two words appear repeatedly in Claude Code's documentation and they mean
+different things:
+
+\begin{itemize}
+  \item \textbf{Extension types} are the four primitives that change what
+        Claude can do: \emph{MCP servers}, \emph{skills}, \emph{hooks}, and
+        \emph{slash commands}. Each lives in \texttt{.claude/} in your
+        project. This chapter — and most of the book — is about these.
+  \item \textbf{Plugins} are \emph{installable bundles} that package one or
+        more of those extensions (plus optional LSP servers, background
+        monitors, and bin executables) behind a single
+        \texttt{plugin.json} manifest. You install a plugin in one
+        command and uninstall it the same way.
+\end{itemize}
+
+You can build everything described in this book without ever creating a
+plugin; the standalone \texttt{.claude/} directory is sufficient. Plugins
+matter when you want to \emph{share} a configuration with your team or the
+community.
+
+\section{The Four Extension Types}
+\label{sec:four-types}
 
 Think of Claude Code as a smartphone: capable out of the box, but transformative
-once you install the right apps. Plugins are those apps. They let you:
+once you install the right apps. The four extension types are the apps.
 
 \begin{itemize}
   \item \textbf{Connect to external tools} — GitHub, databases, APIs —
@@ -33,7 +57,7 @@ Each type solves a distinct class of problem.
 
 \begin{table}[ht]
 \centering
-\caption{The four Claude Code plugin types}
+\caption{The four Claude Code extension types}
 \label{tab:plugin-types}
 \begin{tabularx}{\textwidth}{llXl}
 \toprule
@@ -50,9 +74,6 @@ Slash Command & Quick shortcut      & One-command invocation of saved workflows
 \bottomrule
 \end{tabularx}
 \end{table}
-
-\section{The Four Extension Types}
-\label{sec:four-types}
 
 \subsection{MCP Servers}
 \index{MCP Server}
@@ -164,16 +185,65 @@ variable references such as \texttt{\$\{GITHUB\_TOKEN\}} so that sensitive
 values are read at runtime and never committed to version control.
 \end{notebox}
 
+\section{Plugins: Installable Bundles}
+\label{sec:plugin-bundles}
+
+\index{plugins!bundles}\index{plugin marketplaces}
+
+A plugin is a directory containing a \texttt{.claude-plugin/plugin.json}
+manifest plus any combination of:
+
+\begin{itemize}
+  \item \texttt{skills/}, \texttt{commands/}, \texttt{agents/},
+        \texttt{hooks/} — same files you would put in
+        \texttt{.claude/}, but bundled;
+  \item \texttt{.mcp.json}, \texttt{.lsp.json} — MCP and LSP server
+        configurations;
+  \item \texttt{monitors/}, \texttt{bin/}, \texttt{settings.json} —
+        background monitors, executables, and default settings.
+\end{itemize}
+
+When you install a plugin, all of its skills become available as
+namespaced commands (\texttt{/plugin-name:skill-name}), agents appear in
+\texttt{/agents}, hooks register, and any bundled MCP servers start.
+
+\subsection{Marketplaces}
+
+Anthropic maintains two public marketplaces:
+
+\begin{itemize}
+  \item \texttt{claude-plugins-official} — curated by Anthropic, always
+        available in every Claude Code installation.
+  \item \texttt{claude-community} — community submissions reviewed before
+        listing. Add it with
+        \texttt{/plugin marketplace add anthropics/claude-plugins-community}.
+\end{itemize}
+
+\begin{lstlisting}[language=bash,caption={Installing a plugin from the official marketplace}]
+# Browse and install interactively
+/plugin
+
+# Install a specific plugin
+/plugin install superpowers@claude-plugins-official
+/reload-plugins
+\end{lstlisting}
+
+For local development you can load a plugin directly without installing:
+\texttt{claude --plugin-dir ./my-plugin} or
+\texttt{claude --plugin-url https://example.com/my-plugin.zip}.
+
 \section{Plugin Discovery}
 \label{sec:plugin-discovery}
 
 \textbf{Official sources}
 
 \begin{itemize}
-  \item \textbf{MCP servers}: The official registry at
-        \url{https://github.com/modelcontextprotocol/servers} contains
-        curated, maintained server implementations for common services.
-  \item \textbf{Skills}: The community superpowers collection at
+  \item \textbf{Plugins}: browse \texttt{claude-plugins-official} from
+        inside Claude Code with \texttt{/plugin}.
+  \item \textbf{MCP servers}: the Anthropic Directory at
+        \url{https://claude.ai/directory} catalogs reviewed connectors,
+        each installable with \texttt{claude mcp add}.
+  \item \textbf{Skills}: the community superpowers collection at
         \url{https://github.com/obra/superpowers} provides production-ready
         skills for common workflows. Install with
         \texttt{/plugin install superpowers@claude-plugins-official}.
@@ -258,18 +328,23 @@ extend it.
 %% ---------------------------------------------------------------
 \begin{summarybox}
 \begin{itemize}
-  \item Claude Code has four plugin types: \textbf{MCP Servers} (external
-        tool connectors), \textbf{Skills} (workflow definitions),
+  \item Claude Code has four \textbf{extension types}: \textbf{MCP Servers}
+        (external tool connectors), \textbf{Skills} (workflow definitions),
         \textbf{Hooks} (automation triggers), and \textbf{Slash Commands}
         (quick shortcuts).
-  \item All configuration lives under \texttt{.claude/} via
-        \texttt{settings.json}, Markdown files, or both.
-  \item The four types are complementary: combine them to build consistent,
-        automated, team-wide workflows.
+  \item A \textbf{plugin} is something different: an installable bundle
+        (\texttt{.claude-plugin/plugin.json}) that packages one or more
+        extensions together for sharing. Plugins are the path to team-wide
+        and community distribution.
+  \item All standalone extension configuration lives under
+        \texttt{.claude/} via \texttt{settings.json}, Markdown files, or
+        both.
   \item Secrets must never be hardcoded; always use environment variable
         references (\texttt{\$\{VAR\}}).
-  \item Official plugins are discoverable via the MCP server registry and
-        community collections such as the superpowers skill set.
+  \item Anthropic maintains two marketplaces:
+        \texttt{claude-plugins-official} (always available) and
+        \texttt{claude-community} (added with
+        \texttt{/plugin marketplace add anthropics/claude-plugins-community}).
 \end{itemize}
 \end{summarybox}
 

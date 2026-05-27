@@ -287,6 +287,80 @@ server.setRequestHandler('tools/call', async (req) => {
 await server.connect(new StdioServerTransport());
 \end{lstlisting}
 
+\section{MCP Tool Search}
+\label{sec:mcp-tool-search}
+
+\index{MCP!tool search}
+
+By default, every connected MCP server's tool definitions load into context
+at session start, which is expensive once you have more than a handful of
+servers. \textbf{Tool Search} defers them: only tool \emph{names} load up
+front, and Claude searches for relevant tools on demand. Tool Search is on
+by default on first-party API endpoints; control it with the
+\texttt{ENABLE\_TOOL\_SEARCH} environment variable:
+
+\begin{table}[ht]
+\centering
+\caption{\texttt{ENABLE\_TOOL\_SEARCH} values}
+\label{tab:tool-search}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Value} & \textbf{Behavior} \\
+\midrule
+unset / \texttt{true} & All MCP tools deferred; Claude searches on demand \\
+\texttt{auto}        & Load upfront if tools fit in 10\,\% of context; defer the rest \\
+\texttt{auto:N}      & Threshold mode with custom percentage \texttt{N} (0--100) \\
+\texttt{false}       & Load all MCP tools upfront — the pre-Tool-Search behavior \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+To exempt a specific server from deferral (its tools should always be
+loaded), set \texttt{alwaysLoad: true} in that server's entry in
+\texttt{.mcp.json}.
+
+\begin{notebox}
+Tool Search requires a model that supports \texttt{tool\_reference} blocks:
+Sonnet 4 / Opus 4 and later. Haiku models do \emph{not} support Tool
+Search and ignore the deferral.
+\end{notebox}
+
+\section{Output Limits}
+\label{sec:mcp-output}
+
+\index{MCP!output limits}
+
+Claude Code shows a warning when an MCP tool's output exceeds
+\textbf{10,000 tokens} and caps the per-tool result at \textbf{25,000
+tokens} by default. Increase the cap with the
+\texttt{MAX\_MCP\_OUTPUT\_TOKENS} environment variable:
+
+\begin{lstlisting}[language=bash,caption={Raising the MCP output limit}]
+export MAX_MCP_OUTPUT_TOKENS=50000
+claude
+\end{lstlisting}
+
+For tools that intrinsically return large payloads (database schemas, file
+trees), the server author can annotate the tool with
+\texttt{\_meta["anthropic/maxResultSizeChars"]} up to 500\,000 characters.
+This persists results to disk and replaces them with a file reference,
+sparing your context.
+
+\section{Connectors from claude.ai}
+\label{sec:claudeai-connectors}
+
+\index{MCP!claude.ai connectors}
+
+If you log into Claude Code with a Claude.ai account, MCP servers
+configured at
+\url{https://claude.ai/customize/connectors} are automatically available in
+Claude Code. They show in \texttt{/mcp} with an indicator that they came
+from claude.ai. To disable them, set
+\texttt{ENABLE\_CLAUDEAI\_MCP\_SERVERS=false} in your environment.
+
+A server you configure directly in Claude Code (any scope) takes precedence
+over a claude.ai connector that points at the same URL.
+
 \section{Best Practices}
 \label{sec:mcp-best-practices}
 
@@ -303,6 +377,9 @@ await server.connect(new StdioServerTransport());
         content can expose you to prompt-injection attacks.
   \item \textbf{Use the Anthropic Directory} (\url{https://claude.ai/directory})
         as your primary discovery source — servers there have been reviewed.
+  \item \textbf{Leave Tool Search on} when you have more than a couple of
+        servers; only set \texttt{ENABLE\_TOOL\_SEARCH=false} if you need
+        the older upfront-load behavior.
   \item \textbf{Set appropriate output limits.} If an MCP tool returns large
         results, set \texttt{MAX\_MCP\_OUTPUT\_TOKENS} or annotate individual
         tools with \texttt{anthropic/maxResultSizeChars}.
