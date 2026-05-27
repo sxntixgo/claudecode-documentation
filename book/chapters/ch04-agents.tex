@@ -1,3 +1,176 @@
-% Stub
-\chapter{ch04-agents}
-\label{ch:ch04-agents}
+% book/chapters/ch04-agents.tex
+\chapter{Agents and Subagents}
+\label{ch:agents}
+
+\index{agents}\index{subagents}
+
+Claude Code can delegate subtasks to \emph{subagents} — specialised assistants
+that run in their own isolated context windows. A subagent explores files,
+reviews code, or executes a multi-step procedure without consuming tokens in
+your main conversation. When it finishes, it returns a summary and the work is
+done.
+
+Three built-in subagents ship with Claude Code; you can also define custom ones
+for your own domain.
+
+\section{Why Use Subagents?}
+\label{sec:agent-why}
+
+\begin{itemize}
+  \item \textbf{Context isolation.} A codebase search can read hundreds of
+        files. Running it in a subagent keeps those token-heavy reads out of
+        your main session.
+  \item \textbf{Tool restriction.} A read-only subagent cannot accidentally
+        modify files.
+  \item \textbf{Cost optimisation.} Lightweight tasks can be routed to a
+        faster, cheaper model (e.g.\ Haiku).
+  \item \textbf{Reuse.} A custom subagent defined once is available across
+        all projects.
+\end{itemize}
+
+\section{Built-In Subagents}
+\label{sec:built-in-agents}
+
+\index{Explore agent}\index{Plan agent}\index{General-purpose agent}
+
+\begin{table}[ht]
+\centering
+\caption{Built-in subagents in Claude Code}
+\label{tab:built-in-agents}
+\begin{tabularx}{\textwidth}{llXl}
+\toprule
+\textbf{Subagent} & \textbf{Model} & \textbf{Tools} & \textbf{Purpose} \\
+\midrule
+\textbf{Explore}          & Haiku            & Read-only
+  & Fast file search and codebase understanding \\
+\textbf{Plan}             & Inherits parent  & Read-only
+  & Context gathering during plan mode \\
+\textbf{General-purpose}  & Inherits parent  & All tools
+  & Complex multi-step tasks requiring read and write \\
+statusline-setup          & Sonnet           & Read, Edit
+  & Configuring the status line (\texttt{/statusline}) \\
+claude-code-guide         & Haiku            & Web search
+  & Answering questions about Claude Code features \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{notebox}
+Subagents cannot spawn other subagents (no nesting). The Plan subagent skips
+\texttt{CLAUDE.md} files for speed; all other subagents load them.
+\end{notebox}
+
+Claude automatically routes tasks to the appropriate subagent. You can also
+delegate explicitly:
+
+\begin{lstlisting}[caption={Explicit subagent delegation}]
+"Use a subagent to review the auth module for edge cases"
+"Use a subagent to investigate how token refresh is handled"
+\end{lstlisting}
+
+\section{Creating Custom Subagents}
+\label{sec:custom-agents}
+
+\index{agents!custom}
+
+Custom subagents are defined as Markdown files in \texttt{.claude/agents/}
+(project scope) or \texttt{\textasciitilde/.claude/agents/} (personal scope).
+
+\subsection{File Format}
+
+\begin{lstlisting}[caption={Custom subagent definition: \texttt{.claude/agents/security-reviewer.md}}]
+---
+name: security-reviewer
+description: Reviews code for security vulnerabilities. Use when asked to
+             audit code, check for injection flaws, or review auth logic.
+tools: Read, Grep, Glob, Bash
+model: opus
+---
+You are a senior security engineer. Review code for:
+- Injection vulnerabilities (SQL, XSS, command injection)
+- Authentication and authorisation flaws
+- Hardcoded secrets or credentials
+- Insecure data handling and storage
+
+Provide specific line references and concrete suggested fixes.
+Do not suggest changes unrelated to security.
+\end{lstlisting}
+
+\subsection{Frontmatter Fields}
+
+\begin{table}[ht]
+\centering
+\caption{Custom subagent frontmatter fields}
+\label{tab:agent-frontmatter}
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Field} & \textbf{Required} & \textbf{Description} \\
+\midrule
+\texttt{name}         & Yes & Identifier used for delegation \\
+\texttt{description}  & Yes & Natural-language description; Claude reads this to decide when to delegate \\
+\texttt{tools}        & No  & Comma-separated tool list (omit to inherit all parent tools) \\
+\texttt{model}        & No  & Model override: \texttt{haiku}, \texttt{sonnet}, \texttt{opus} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Scope}
+
+\begin{itemize}
+  \item \texttt{.claude/agents/} — project scope; commit to share with the team
+  \item \texttt{\textasciitilde/.claude/agents/} — personal scope; available
+        across all your projects
+\end{itemize}
+
+\section{Forking the Current Conversation}
+\label{sec:agent-fork}
+
+\index{agents!fork}
+
+You can fork the current session into a subagent that inherits full context so
+far, then let it explore a risky or exploratory path without affecting your
+main conversation:
+
+\begin{lstlisting}[caption={Forking a session for an exploratory investigation}]
+"Fork the conversation and use a subagent to experiment with
+ the cache invalidation approach; report back what works"
+\end{lstlisting}
+
+\section{Background Agents and Agent Teams}
+\label{sec:background-agents}
+
+\index{background agents}\index{agent teams}
+
+For workloads larger than a single session:
+
+\begin{itemize}
+  \item \textbf{Background agents} (\texttt{/agent-view}) run multiple
+        Claude Code sessions in parallel, each in its own git worktree, and
+        let you monitor them from one screen.
+  \item \textbf{Agent teams} coordinate multiple sessions with shared tasks,
+        messaging, and a designated lead agent. They can loop autonomously
+        across many tasks while you spot-check recorded findings.
+\end{itemize}
+
+Both are covered in the official documentation at
+\url{https://code.claude.com/docs/en/agent-teams}.
+
+%% ---------------------------------------------------------------
+\begin{summarybox}
+\begin{itemize}
+  \item Subagents run in their own context windows, preserving tokens in your
+        main conversation and enabling tool restriction and model routing.
+  \item Three built-in subagents: \textbf{Explore} (Haiku, read-only),
+        \textbf{Plan} (read-only, inherits model), and \textbf{General-purpose}
+        (all tools, inherits model).
+  \item Custom subagents are Markdown files in \texttt{.claude/agents/} with
+        YAML frontmatter specifying \texttt{name}, \texttt{description},
+        \texttt{tools}, and optionally \texttt{model}.
+  \item The \texttt{description} field is how Claude decides when to delegate
+        automatically — write it clearly.
+  \item Subagents cannot spawn other subagents. For parallel multi-session
+        workflows, use background agents or agent teams.
+\end{itemize}
+\end{summarybox}
+
+\printbibliography[heading=subbibliography,title={References}]

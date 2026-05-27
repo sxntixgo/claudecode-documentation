@@ -1,3 +1,213 @@
-% Stub
-\chapter{ch05-skills}
-\label{ch:ch05-skills}
+% book/chapters/ch05-skills.tex
+\chapter{Skills}
+\label{ch:skills}
+
+\index{skills}
+
+A skill is a reusable instruction set stored in a \texttt{SKILL.md} file.
+Where a subagent defines \emph{who} does a task (specialised model, restricted
+tools), a skill defines \emph{how} a task is done — the checklist, workflow,
+or procedure Claude should follow.
+
+Claude Code skills follow the \textbf{Agent Skills open standard}
+(\url{https://agentskills.io}), which means skill files created here can work
+across multiple AI tools that implement the same standard.
+
+\section{Skills vs.\ CLAUDE.md vs.\ Subagents}
+\label{sec:skill-comparison}
+
+\begin{table}[ht]
+\centering
+\caption{Choosing between CLAUDE.md, Skills, and Subagents}
+\label{tab:skill-vs}
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+\textbf{Mechanism} & \textbf{Best for} & \textbf{Loads} \\
+\midrule
+\texttt{CLAUDE.md}    & Persistent facts and conventions every session needs
+                      & Every session, always \\
+Skill                 & Procedures and workflows triggered only sometimes
+                      & On demand (no cost until invoked) \\
+Subagent              & Isolated task execution with its own context window
+                      & On demand \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The key advantage of skills over \texttt{CLAUDE.md} content: skill bodies load
+\emph{only when invoked}, so long reference material costs almost nothing until
+needed.
+
+\section{Skill Storage and Scopes}
+\label{sec:skill-scopes}
+
+\index{skills!scopes}
+
+\begin{table}[ht]
+\centering
+\caption{Skill storage locations}
+\label{tab:skill-scopes}
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Scope} & \textbf{Path} & \textbf{Applies to} \\
+\midrule
+Enterprise & Managed settings & All users in the organisation \\
+Personal   & \texttt{\textasciitilde/.claude/skills/<name>/SKILL.md}
+           & All your projects \\
+Project    & \texttt{.claude/skills/<name>/SKILL.md}
+           & This project only \\
+Plugin     & \texttt{<plugin>/skills/<name>/SKILL.md}
+           & Where plugin is enabled (namespaced) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+When skill names conflict, enterprise overrides personal, which overrides
+project. Plugin skills are namespaced (\texttt{plugin:skill}) and never
+conflict.
+
+\begin{notebox}
+Files in \texttt{.claude/commands/} still work and create the same
+\texttt{/command} shortcuts. Skills supersede commands when both share a name,
+and skills support additional features (supporting files, invocation control,
+subagent execution).
+\end{notebox}
+
+\section{Creating a Skill}
+\label{sec:skill-create}
+
+\index{skills!creating}
+\index{SKILL.md}
+
+Each skill is a directory containing a \texttt{SKILL.md} file plus optional
+supporting files:
+
+\begin{lstlisting}[language=bash,caption={Skill directory structure}]
+.claude/skills/fix-issue/
+  SKILL.md          # main instructions (required)
+  examples/
+    sample-output.md
+  scripts/
+    run-tests.sh
+\end{lstlisting}
+
+\subsection{SKILL.md Frontmatter}
+
+\begin{lstlisting}[caption={Example \texttt{SKILL.md} with frontmatter}]
+---
+name: fix-issue
+description: Fixes a GitHub issue end-to-end. Claude invokes automatically
+             when asked to fix or resolve a GitHub issue.
+model: sonnet
+disable-model-invocation: false
+---
+
+Analyse and fix the GitHub issue: $ARGUMENTS
+
+1. Run `gh issue view $ARGUMENTS` to read the issue
+2. Search the codebase for relevant files
+3. Implement the fix
+4. Write a failing test that reproduces the issue, then verify it passes
+5. Ensure linting and type checks pass
+6. Create a descriptive commit and open a PR with `gh pr create`
+\end{lstlisting}
+
+\begin{table}[ht]
+\centering
+\caption{SKILL.md frontmatter fields}
+\label{tab:skill-frontmatter}
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Field} & \textbf{Required} & \textbf{Description} \\
+\midrule
+\texttt{name}                     & Yes & Identifier; becomes the \texttt{/name} slash command \\
+\texttt{description}              & Yes & When Claude auto-invokes this skill \\
+\texttt{model}                    & No  & \texttt{haiku}, \texttt{sonnet}, or \texttt{opus} \\
+\texttt{disable-model-invocation} & No  & \texttt{true} requires explicit slash-command invocation \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{The \$ARGUMENTS Variable}
+
+\texttt{\$ARGUMENTS} captures everything typed after the skill name when invoked
+with a slash command:
+
+\begin{lstlisting}[caption={Invoking a skill with arguments}]
+/fix-issue 1234
+# $ARGUMENTS = "1234"
+
+/code-review --deep src/auth.ts
+# $ARGUMENTS = "--deep src/auth.ts"
+\end{lstlisting}
+
+\section{Invoking Skills}
+\label{sec:skill-invoke}
+
+\index{skills!invocation}
+
+Skills can be invoked in three ways:
+
+\begin{enumerate}
+  \item \textbf{Slash command}: type \texttt{/skill-name} (with optional
+        arguments) in any session.
+  \item \textbf{Natural language}: Claude auto-invokes the skill when the
+        request matches the \texttt{description} field, unless
+        \texttt{disable-model-invocation: true} is set.
+  \item \textbf{Programmatic}: \texttt{claude -p "/fix-issue 1234"} in
+        non-interactive mode.
+\end{enumerate}
+
+\section{Running Skills in a Subagent}
+\label{sec:skill-subagent}
+
+\index{skills!subagent execution}
+
+A skill can be executed inside a subagent to isolate its context from the main
+conversation. Specify this in the frontmatter:
+
+\begin{lstlisting}[caption={Running a skill in a subagent (frontmatter option)}]
+---
+name: heavy-analysis
+description: Deep analysis that reads many files
+run-in-subagent: true
+model: haiku
+---
+\end{lstlisting}
+
+\section{Installing Marketplace Skills}
+\label{sec:skill-marketplace}
+
+\index{skills!marketplace}
+
+The superpowers collection (\url{https://github.com/obra/superpowers}) provides
+production-ready skills for common workflows:
+
+\begin{lstlisting}[language=bash,caption={Installing the official superpowers plugin}]
+/plugin install superpowers@claude-plugins-official
+/reload-plugins
+\end{lstlisting}
+
+After installation, skills such as \texttt{/code-review}, \texttt{/test-driven-development},
+and \texttt{/writing-plans} are available immediately.
+
+%% ---------------------------------------------------------------
+\begin{summarybox}
+\begin{itemize}
+  \item A skill is a \texttt{SKILL.md} file that defines \emph{how} a task
+        is done; it loads only when invoked, unlike \texttt{CLAUDE.md} which
+        loads every session.
+  \item Skills follow the Agent Skills open standard (\url{https://agentskills.io})
+        and can work across multiple AI tools.
+  \item Skills are stored in \texttt{.claude/skills/<name>/SKILL.md} (project)
+        or \texttt{\textasciitilde/.claude/skills/<name>/SKILL.md} (personal).
+  \item The \texttt{name} field becomes a \texttt{/name} slash command;
+        the \texttt{description} field controls auto-invocation; \texttt{model}
+        routes to a specific Claude model; \texttt{\$ARGUMENTS} captures
+        command-line input.
+  \item Custom commands (\texttt{.claude/commands/}) are still supported and
+        behave identically to skills.
+\end{itemize}
+\end{summarybox}
+
+\printbibliography[heading=subbibliography,title={References}]
