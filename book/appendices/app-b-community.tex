@@ -1,3 +1,138 @@
-% Stub
+% book/appendices/app-b-community.tex
 \chapter{Community Resources}
 \label{app:community}
+
+Claude Code's ecosystem extends well beyond the official documentation.
+This appendix points at the resources most worth following — official
+references first, then community.
+
+\section{Official Anthropic Resources}
+\label{app:official}
+
+\begin{table}[ht]
+\centering
+\caption{Authoritative documentation}
+\label{tab:app-official}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Resource} & \textbf{URL} \\
+\midrule
+Claude Code overview      & \url{https://docs.anthropic.com/en/docs/claude-code/overview} \\
+Claude Code docs hub      & \url{https://code.claude.com/docs/en/} \\
+Models overview           & \url{https://docs.anthropic.com/en/docs/about-claude/models/overview} \\
+What's new in Opus 4.7    & \url{https://docs.anthropic.com/en/docs/about-claude/models/whats-new-claude-4-7} \\
+Migration guide           & \url{https://docs.anthropic.com/en/docs/about-claude/models/migration-guide} \\
+Best practices            & \url{https://code.claude.com/docs/en/best-practices} \\
+Common workflows          & \url{https://code.claude.com/docs/en/common-workflows} \\
+Prompting best practices  & \url{https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/claude-prompting-best-practices} \\
+Anthropic Trust Center    & \url{https://trust.anthropic.com} \\
+Anthropic Directory (MCP) & \url{https://claude.ai/directory} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Plugin Marketplaces}
+\label{app:marketplaces}
+
+\begin{table}[ht]
+\centering
+\caption{Plugin marketplaces}
+\label{tab:app-marketplaces}
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Name} & \textbf{Add command} & \textbf{Curation} \\
+\midrule
+\texttt{claude-plugins-official}
+  & \emph{always available}
+  & Curated by Anthropic. Includes \texttt{superpowers}, \texttt{mcp-server-dev}, and other first-party plugins \\
+\texttt{claude-community}
+  & \texttt{/plugin marketplace add anthropics/claude-plugins-community}
+  & Community submissions reviewed before listing. Pin-commit-SHA distribution \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Submit a community plugin via the in-app forms at
+\url{https://claude.ai/settings/plugins/submit} or
+\url{https://platform.claude.com/plugins/submit}. The review pipeline runs
+\texttt{claude plugin validate} plus automated safety screening.
+
+\section{Standards and Specifications}
+\label{app:standards}
+
+\begin{table}[ht]
+\centering
+\caption{Open standards Claude Code participates in}
+\label{tab:app-standards}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Standard} & \textbf{URL} \\
+\midrule
+Model Context Protocol specification & \url{https://modelcontextprotocol.io/specification} \\
+MCP server registry (community)      & \url{https://github.com/modelcontextprotocol/servers} \\
+Agent Skills open standard           & \url{https://agentskills.io} \\
+AGENTS.md (cross-agent instruction)  & \url{https://agentsmd.org} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Community Skills and Plugins}
+\label{app:community-plugins}
+
+\begin{itemize}
+  \item \textbf{Superpowers} (\url{https://github.com/obra/superpowers}) —
+        production-ready skills bundle covering plan-writing,
+        test-driven development, brainstorming, and more. Install via
+        \texttt{/plugin install superpowers@claude-plugins-official}.
+  \item \textbf{awesome-claude-code}
+        (\url{https://github.com/hesreallyhim/awesome-claude-code}) — a
+        curated link list of tools, skills, hooks, and articles.
+\end{itemize}
+
+\section{Tutorials and Talks}
+\label{app:tutorials}
+
+\begin{table}[ht]
+\centering
+\caption{Tutorials worth working through}
+\label{tab:app-tutorials}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Resource} & \textbf{URL} \\
+\midrule
+GitHub prompt-engineering interactive tutorial
+  & \url{https://github.com/anthropics/prompt-eng-interactive-tutorial} \\
+Google Sheets prompt-engineering tutorial
+  & \url{https://docs.google.com/spreadsheets/d/19jzLgRruG9kjUQNKtCg1ZjdD6l6weA6qRXG5zLIAhC8} \\
+Run \texttt{/powerup} inside Claude Code
+  & Interactive in-session lessons with animated demos \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Reporting Issues and Feedback}
+\label{app:feedback}
+
+\begin{itemize}
+  \item \textbf{In a session:} \texttt{/feedback} sends a report
+        directly to Anthropic.
+  \item \textbf{Bugs in Claude Code itself:}
+        \url{https://github.com/anthropics/claude-code/issues}.
+  \item \textbf{Security vulnerabilities:} the HackerOne program linked
+        from \url{https://code.claude.com/docs/en/security}. Do not
+        disclose publicly.
+\end{itemize}
+
+\section{Following Anthropic Releases}
+\label{app:releases}
+
+Claude Code evolves fast. Two ways to stay current:
+
+\begin{itemize}
+  \item Anthropic news: \url{https://www.anthropic.com/news} — model
+        announcements, feature launches.
+  \item In-session: \texttt{/release-notes} prints recent Claude Code
+        changes.
+\end{itemize}
+
+\printbibliography[heading=subbibliography,title={References}]

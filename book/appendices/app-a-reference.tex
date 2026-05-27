@@ -1,3 +1,172 @@
-% Stub
+% book/appendices/app-a-reference.tex
 \chapter{Reference Documentation}
 \label{app:reference}
+
+This appendix consolidates the cheat sheets and lookup tables that earlier
+chapters reference. Verified against current Anthropic documentation as of
+2026-05-27.
+
+\section{Model Quick Reference}
+\label{app:model-ref}
+
+\begin{table}[ht]
+\centering
+\caption{Claude 4 models — quick reference}
+\label{tab:app-models}
+\begin{tabularx}{\textwidth}{Xlll}
+\toprule
+                       & \textbf{Opus 4.7}              & \textbf{Sonnet 4.6}             & \textbf{Haiku 4.5} \\
+\midrule
+API ID                 & \texttt{claude-opus-4-7}       & \texttt{claude-sonnet-4-6}      & \texttt{claude-haiku-4-5-20251001} \\
+Context window         & 1M                              & 1M                              & 200K \\
+Max output             & 128K                            & 64K                             & 64K \\
+Input \$/MTok          & \$5                             & \$3                             & \$1 \\
+Output \$/MTok         & \$25                            & \$15                            & \$5 \\
+Extended thinking      & Adaptive only                   & Yes                             & Yes \\
+Relative latency       & Moderate                        & Fast                            & Fastest \\
+Best for               & Architecture, security audits   & Most coding work                 & Search, format, lookups \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Deprecated.} Sonnet~4 (\texttt{claude-sonnet-4-20250514}) and Opus~4
+(\texttt{claude-opus-4-20250514}) retire on \textbf{2026-06-15}. Migrate to
+4.6 and 4.7 respectively.
+
+\section{Command-Line Cheat Sheet}
+\label{app:cli-cheat}
+
+\begin{table}[ht]
+\centering
+\caption{Most-used \texttt{claude} CLI invocations}
+\label{tab:app-cli}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Invocation} & \textbf{What it does} \\
+\midrule
+\texttt{claude}                                  & Start an interactive session in the current directory \\
+\texttt{claude --model claude-opus-4-7}          & Override the session's model \\
+\texttt{claude --permission-mode plan}           & Start in plan mode (read-only) \\
+\texttt{claude --permission-mode auto}           & Auto mode — classifier-gated approvals \\
+\texttt{claude --continue}                       & Resume the most recent session in this directory \\
+\texttt{claude --resume}                         & Open the session picker \\
+\texttt{claude --from-pr <N>}                    & Resume the session associated with a PR \\
+\texttt{claude --worktree <name>}                & Open a session in a named git worktree \\
+\texttt{claude --add-dir <path>}                 & Grant file access to an additional directory \\
+\texttt{claude --plugin-dir ./<plugin>}          & Load a local plugin for this session \\
+\texttt{claude --plugin-url <zip-url>}           & Load a plugin from a zip URL \\
+\texttt{claude --append-system-prompt "<text>"}  & Append to the system prompt \\
+\texttt{claude -p "<prompt>"}                    & Non-interactive (headless) mode \\
+\texttt{claude -p "..." --output-format json}    & Headless with structured output \\
+\texttt{claude mcp add --transport http <n> <u>} & Add an HTTP MCP server \\
+\texttt{claude mcp add -- <command>}             & Add a stdio MCP server \\
+\texttt{claude mcp list}                         & List configured MCP servers \\
+\texttt{claude mcp serve}                        & Run Claude Code itself as an MCP server \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Slash Command Index}
+\label{app:slash-index}
+
+For the full table, see \cref{ch:commands}. The 25 commands you will reach
+for daily:
+
+\begin{itemize}
+  \item \textbf{Context}: \texttt{/help}, \texttt{/clear},
+        \texttt{/compact [hint]}, \texttt{/context}, \texttt{/rewind},
+        \texttt{/undo}, \texttt{/resume}, \texttt{/continue},
+        \texttt{/fork}, \texttt{/btw <question>}
+  \item \textbf{Setup}: \texttt{/init}, \texttt{/memory}, \texttt{/mcp},
+        \texttt{/agents}, \texttt{/hooks}, \texttt{/permissions},
+        \texttt{/plugin}, \texttt{/reload-plugins}, \texttt{/skills}
+  \item \textbf{In-flight}: \texttt{/plan}, \texttt{/model},
+        \texttt{/effort}, \texttt{/sandbox}
+  \item \textbf{Bundled skills}: \texttt{/code-review},
+        \texttt{/security-review}, \texttt{/debug}, \texttt{/batch},
+        \texttt{/loop}, \texttt{/claude-api}
+  \item \textbf{Parallel/background}: \texttt{/background},
+        \texttt{/tasks}
+  \item \textbf{Diagnostics}: \texttt{/cost}, \texttt{/usage},
+        \texttt{/status}, \texttt{/doctor}
+\end{itemize}
+
+\section{Settings File Quick Reference}
+\label{app:settings-files}
+
+\begin{table}[ht]
+\centering
+\caption{Settings file locations and purposes}
+\label{tab:app-settings}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{File} & \textbf{Purpose} \\
+\midrule
+\texttt{managed-settings.json}                   & Organization-wide, deployed by IT. Cannot be overridden by users \\
+\texttt{\textasciitilde/.claude/settings.json}   & User-level. Applies to every project for this OS user \\
+\texttt{.claude/settings.json}                   & Project-level. Commit to share with the team \\
+\texttt{.claude/settings.local.json}             & Personal project notes. Add to \texttt{.gitignore} \\
+\texttt{\textasciitilde/.claude.json}            & MCP local- and user-scoped server entries (auto-generated) \\
+\texttt{.mcp.json}                               & Project-scoped MCP servers. Commit to share \\
+\texttt{managed-mcp.json}                        & Enterprise-pinned MCP server set \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Environment Variable Reference}
+\label{app:env-vars}
+
+\begin{table}[ht]
+\centering
+\caption{Environment variables that change Claude Code behavior}
+\label{tab:app-env}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Variable} & \textbf{Effect} \\
+\midrule
+\texttt{ANTHROPIC\_API\_KEY}                     & API key for the Claude API \\
+\texttt{ANTHROPIC\_AUTH\_TOKEN}                  & Alternative auth token \\
+\texttt{ANTHROPIC\_BASE\_URL}                    & Override the API endpoint \\
+\texttt{CLAUDE\_PROJECT\_DIR}                    & Set in spawned MCP server and hook environments \\
+\texttt{CLAUDE\_SKILL\_DIR}                      & Set in skill execution; the skill's directory \\
+\texttt{CLAUDE\_CODE\_DISABLE\_AUTO\_MEMORY}     & \texttt{1} disables auto memory globally \\
+\texttt{ENABLE\_TOOL\_SEARCH}                    & \texttt{true}, \texttt{auto}, \texttt{auto:N}, or \texttt{false} \\
+\texttt{ENABLE\_CLAUDEAI\_MCP\_SERVERS}          & \texttt{false} disables import of claude.ai connectors \\
+\texttt{MAX\_MCP\_OUTPUT\_TOKENS}                & Cap per-tool MCP output (default 25,000) \\
+\texttt{MAX\_THINKING\_TOKENS}                   & Cap extended-thinking budget on Sonnet/Haiku \\
+\texttt{MCP\_TIMEOUT}                            & MCP server startup timeout (ms) \\
+\texttt{MCP\_TOOL\_TIMEOUT}                      & Default per-tool execution timeout (ms) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Troubleshooting Quick Reference}
+\label{app:trouble}
+
+\begin{table}[ht]
+\centering
+\caption{Common symptoms and likely fixes}
+\label{tab:app-trouble}
+\begin{tabularx}{\textwidth}{Xl}
+\toprule
+\textbf{Symptom} & \textbf{Likely cause / fix} \\
+\midrule
+Claude ignores a CLAUDE.md rule
+  & File over 200 lines — split into rules; rule too vague; check \texttt{/memory} \\
+A hook isn't firing
+  & Run \texttt{/hooks} — if not listed, JSON failed to parse \\
+An MCP server says ``not authenticated''
+  & Run \texttt{/mcp} and complete the OAuth flow \\
+\texttt{/cost} shows a session ballooning
+  & Run \texttt{/context}; usually a long CLAUDE.md or many open files \\
+A skill won't auto-invoke
+  & \texttt{description} field too vague; \texttt{disable-model-invocation} may be \texttt{true} \\
+Cross-reference shows \texttt{??}
+  & Label mismatch; run \texttt{biber} then \texttt{pdflatex} twice \\
+Subagent loses important state
+  & Enable persistent memory: \texttt{memory: project} in the frontmatter \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\printbibliography[heading=subbibliography,title={References}]

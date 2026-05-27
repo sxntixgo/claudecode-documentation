@@ -1,2 +1,199 @@
-% book/backmatter/glossary.tex — stub, populated in Task 10
-% Entries use \newglossaryentry and \newacronym
+% book/backmatter/glossary.tex — Mastering Claude Code glossary
+%
+% Entries use \newglossaryentry; acronyms use \newacronym.
+% Values are verified against current Anthropic documentation
+% (code.claude.com and docs.anthropic.com) as of 2026-05-27.
+
+%% ---------------- Acronyms ----------------
+\newacronym{api}{API}{Application Programming Interface}
+\newacronym{cli}{CLI}{Command-Line Interface}
+\newacronym{ci}{CI}{Continuous Integration}
+\newacronym{cd}{CD}{Continuous Delivery}
+\newacronym{lsp}{LSP}{Language Server Protocol}
+\newacronym{mcp}{MCP}{Model Context Protocol}
+\newacronym{pat}{PAT}{Personal Access Token}
+\newacronym{rpm}{RPM}{Requests Per Minute}
+\newacronym{tpm}{TPM}{Tokens Per Minute}
+\newacronym{ttl}{TTL}{Time To Live}
+\newacronym{tdd}{TDD}{Test-Driven Development}
+\newacronym{ui}{UI}{User Interface}
+\newacronym{url}{URL}{Uniform Resource Locator}
+\newacronym{vm}{VM}{Virtual Machine}
+\newacronym{yaml}{YAML}{YAML Ain't Markup Language}
+
+%% ---------------- Core terms ----------------
+
+\newglossaryentry{agent-skills}{
+  name={Agent Skills standard},
+  description={An open standard for cross-tool skill definitions hosted at \url{https://agentskills.io}. Claude Code skills follow it, which means a \texttt{SKILL.md} written for Claude Code is portable to any other compliant tool}
+}
+
+\newglossaryentry{adaptive-thinking}{
+  name={adaptive thinking},
+  description={A reasoning mode on Claude Opus 4.7 in which the model chooses thinking depth automatically based on task complexity. The legacy \texttt{type: enabled} with manual \texttt{budget\_tokens} is no longer supported on Opus 4.7}
+}
+
+\newglossaryentry{auto-memory}{
+  name={auto memory},
+  description={A per-project, per-machine notes directory at \texttt{\textasciitilde/.claude/projects/<project>/memory/} that Claude writes to autonomously, capturing learnings across sessions. Disable with \texttt{autoMemoryEnabled: false}}
+}
+
+\newglossaryentry{auto-mode}{
+  name={auto mode (permissions)},
+  description={A permission mode in which a classifier model reviews each tool call and blocks only what looks risky, letting routine work proceed without prompts. Enable with \texttt{--permission-mode auto}}
+}
+
+\newglossaryentry{background-agent}{
+  name={background agent},
+  description={A Claude Code session running detached from your terminal. Started with \texttt{/background}; managed via the agent view (\texttt{/agent-view}). Distinct from a \emph{subagent}, which runs within a single session}
+}
+
+\newglossaryentry{bundled-skill}{
+  name={bundled skill},
+  description={A prompt-driven skill shipped with Claude Code that is available in every session without installation. Examples: \texttt{/code-review}, \texttt{/debug}, \texttt{/batch}, \texttt{/loop}, \texttt{/claude-api}. Can be overridden by defining a same-named project skill}
+}
+
+\newglossaryentry{claude-md}{
+  name={CLAUDE.md},
+  description={A Markdown file containing persistent instructions for Claude, loaded at every session start. Lives at four scopes: managed (org-wide), user (\texttt{\textasciitilde/.claude/}), project (root or \texttt{.claude/}), and local (\texttt{CLAUDE.local.md})}
+}
+
+\newglossaryentry{compaction}{
+  name={compaction},
+  description={Automatic or manual summarization of older conversation turns to free context-window space. Triggered automatically near context limit or manually with \texttt{/compact [hint]}. The project-root CLAUDE.md is re-injected after compaction; nested ones reload on demand}
+}
+
+\newglossaryentry{context-window}{
+  name={context window},
+  description={The maximum number of tokens Claude can process in a single request. Claude Opus 4.7 and Sonnet 4.6 have 1M-token windows; Haiku 4.5 has 200K. The window holds your prompt, files Claude has read, tool outputs, and conversation history}
+}
+
+\newglossaryentry{effort-level}{
+  name={effort level},
+  description={The Claude Opus 4.7 equivalent of the older \texttt{budget\_tokens} for extended thinking. Values: \texttt{low}, \texttt{medium}, \texttt{high}, \texttt{xhigh}. In Claude Code, set with \texttt{/effort} or implied by the thinking keyword}
+}
+
+\newglossaryentry{elicitation}{
+  name={elicitation},
+  description={An MCP feature in which a server requests structured input mid-task. Claude Code shows an interactive dialog and passes the response back to the server}
+}
+
+\newglossaryentry{extension-types}{
+  name={extension types},
+  description={The four primitives Claude Code can be extended with: MCP servers, skills, hooks, and slash commands. Distinct from \emph{plugins}, which are installable bundles containing one or more extensions}
+}
+
+\newglossaryentry{extended-thinking}{
+  name={extended thinking},
+  description={A capability of the Claude 4 family in which the model produces explicit \texttt{thinking} content blocks before its final answer. In Claude Code, triggered by natural-language keywords (\texttt{think}, \texttt{think hard}, \texttt{ultrathink}); on the API, via the \texttt{thinking} parameter}
+}
+
+\newglossaryentry{hook}{
+  name={hook},
+  description={A shell command that Claude Code runs deterministically at a specific lifecycle event (\texttt{PreToolUse}, \texttt{PostToolUse}, \texttt{Notification}, etc.). Configured in \texttt{settings.json}; exit code 2 blocks the action}
+}
+
+\newglossaryentry{managed-settings}{
+  name={managed settings},
+  description={Organization-deployed configuration in \texttt{managed-settings.json} that overrides user and project settings. Used by IT to enforce security policies, login methods, and approved MCP servers}
+}
+
+\newglossaryentry{matcher}{
+  name={matcher (hooks)},
+  description={A regex over the tool name (or event-specific criteria) in a hook entry. \texttt{"Write|Edit"} matches only file-modifying tools; \texttt{""} matches every tool}
+}
+
+\newglossaryentry{mcp}{
+  name={Model Context Protocol},
+  description={An open standard (\url{https://modelcontextprotocol.io}) for connecting AI assistants to external tools and data via JSON-RPC 2.0. Supports HTTP (recommended), stdio, and SSE (deprecated) transports}
+}
+
+\newglossaryentry{mcp-resource}{
+  name={MCP resource},
+  description={A piece of data an MCP server exposes for Claude to read on demand. Referenced from a prompt with \texttt{@server:protocol://resource/path}}
+}
+
+\newglossaryentry{mcp-scope}{
+  name={MCP scope},
+  description={Where an MCP server's configuration lives. Three values: \texttt{local} (default, in \texttt{\textasciitilde/.claude.json}), \texttt{project} (in \texttt{.mcp.json} at the project root, committed to share), and \texttt{user} (in \texttt{\textasciitilde/.claude.json}, all your projects)}
+}
+
+\newglossaryentry{permission-mode}{
+  name={permission mode},
+  description={The session-wide policy for approving Claude's tool calls. Values: \texttt{default}, \texttt{plan}, \texttt{acceptEdits}, \texttt{auto}, \texttt{bypassPermissions}}
+}
+
+\newglossaryentry{plan-mode}{
+  name={plan mode},
+  description={A read-only mode in which Claude reads files and proposes a plan but makes no edits until you approve. Toggle with \texttt{Shift+Tab} or \texttt{--permission-mode plan}}
+}
+
+\newglossaryentry{plugin}{
+  name={plugin},
+  description={An installable bundle (\texttt{.claude-plugin/plugin.json} manifest plus optional skills, agents, hooks, MCP servers, LSP servers, monitors) that distributes extensions for sharing. Installed via \texttt{/plugin install}}
+}
+
+\newglossaryentry{plugin-marketplace}{
+  name={plugin marketplace},
+  description={A catalog of installable plugins. Two are public: \texttt{claude-plugins-official} (Anthropic-curated, always available) and \texttt{claude-community} (community submissions; add with \texttt{/plugin marketplace add anthropics/claude-plugins-community})}
+}
+
+\newglossaryentry{prompt-cache}{
+  name={prompt caching},
+  description={An API feature that caches stable prefixes of a request so repeat calls are cheaper. Default TTL is 5 minutes; a 1-hour TTL is available for long-running tasks. Caches invalidate when content above the cached region changes}
+}
+
+\newglossaryentry{prompt-injection}{
+  name={prompt injection},
+  description={An attack in which adversarial instructions are inserted into content Claude reads (a webpage, an issue body, a log line) so the model treats them as commands. Claude Code mitigates with isolated web-fetch context, permission gating, and trust dialogs, but no single defense is complete}
+}
+
+\newglossaryentry{rules}{
+  name={rules},
+  description={Topical instruction files under \texttt{.claude/rules/}, optionally path-scoped via the \texttt{paths:} frontmatter field. A way to split a large CLAUDE.md into focused, load-on-demand pieces}
+}
+
+\newglossaryentry{sandbox}{
+  name={sandbox},
+  description={OS-level isolation that restricts Bash commands' filesystem and network access. Enable with \texttt{/sandbox} or \texttt{sandbox.enabled} in managed settings}
+}
+
+\newglossaryentry{skill}{
+  name={skill},
+  description={A reusable instruction set in a \texttt{SKILL.md} file. Defines \emph{how} a task is done. Loads on demand (unlike CLAUDE.md, which loads every session). The skill's directory name becomes the slash command}
+}
+
+\newglossaryentry{slash-command}{
+  name={slash command},
+  description={A Markdown prompt template in \texttt{.claude/commands/} (or a same-named skill in \texttt{.claude/skills/}). Invoked with \texttt{/name [args]}. \texttt{\$ARGUMENTS} captures everything after the name}
+}
+
+\newglossaryentry{subagent}{
+  name={subagent},
+  description={A specialized assistant that runs in its own context window with a custom system prompt, tool list, and (optionally) model. Built-in subagents include Explore, Plan, and General-purpose; custom subagents live in \texttt{.claude/agents/}}
+}
+
+\newglossaryentry{subagent-memory}{
+  name={subagent memory},
+  description={A persistent directory that survives across conversations, enabled with \texttt{memory: user|project|local} in a subagent's frontmatter. The subagent reads and writes Markdown files there to accumulate domain knowledge}
+}
+
+\newglossaryentry{tool-search}{
+  name={MCP Tool Search},
+  description={A context-saving feature that defers MCP tool definitions; only tool names load at session start, and Claude searches for relevant tools on demand. Controlled by \texttt{ENABLE\_TOOL\_SEARCH}. Requires Sonnet 4 or Opus 4 and later}
+}
+
+\newglossaryentry{transport}{
+  name={transport (MCP)},
+  description={The wire protocol used by an MCP server. Three values: \texttt{http} (recommended, also accepts \texttt{streamable-http} in JSON), \texttt{stdio} (local processes), and \texttt{sse} (deprecated)}
+}
+
+\newglossaryentry{trust-dialog}{
+  name={trust dialog},
+  description={The interactive prompt Claude Code shows the first time it runs in a new directory, or when a new MCP server is configured. Trust acceptance is saved per directory; the prompt does not appear again until the configuration changes}
+}
+
+\newglossaryentry{worktree}{
+  name={git worktree},
+  description={A separate checkout of the same git repository on its own branch. Claude Code uses worktrees to run parallel sessions without edits colliding. Open one with \texttt{claude --worktree <name>}}
+}
