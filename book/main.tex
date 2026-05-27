@@ -21,9 +21,9 @@
 \addbibresource{bibliography/app-a.bib}
 \addbibresource{bibliography/app-b.bib}
 
-% Load glossary entries (defined in backmatter/glossary.tex)
-\input{backmatter/glossary}
+% Load glossary: \makeglossaries must come BEFORE the entry definitions
 \makeglossaries
+\input{backmatter/glossary}
 
 \begin{document}
 
@@ -78,6 +78,7 @@
 %% Back Matter
 %%----------------------------------------------------------------
 \backmatter
+\glsaddall  % include every defined glossary and acronym entry
 \printglossaries
 \printindex
 

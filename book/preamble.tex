@@ -9,6 +9,30 @@
 %   \usepackage[print]{gimenezocano}
 \usepackage{gimenezocano}
 
+% Unicode input — required for em-dashes (—), curly quotes, etc., that
+% appear in source text and inside lstlisting blocks. The book uses
+% pdflatex; without this, characters outside Latin-1 cause compile errors.
+\usepackage[utf8]{inputenc}
+
+% The `listings' package (loaded by gimenezocano.sty) does not handle UTF-8
+% in code blocks unless told to. Map the common non-ASCII characters that
+% appear inside our lstlisting blocks.
+\lstset{
+  extendedchars=true,
+  inputencoding=utf8,
+  literate=%
+    {—}{{---}}1 % em-dash
+    {–}{{--}}1  % en-dash
+    {’}{{\textquoteright}}1
+    {‘}{{\textquoteleft}}1
+    {“}{{\textquotedblleft}}1
+    {”}{{\textquotedblright}}1
+    {…}{{\ldots}}1
+    {→}{{$\rightarrow$}}1
+    {≈}{{$\approx$}}1
+    {×}{{$\times$}}1
+}
+
 % Page geometry — book class, slightly wider inner margin for binding
 \usepackage[a4paper, margin=2.5cm, inner=3cm]{geometry}
 

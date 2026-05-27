@@ -10,7 +10,7 @@
 \newacronym{ci}{CI}{Continuous Integration}
 \newacronym{cd}{CD}{Continuous Delivery}
 \newacronym{lsp}{LSP}{Language Server Protocol}
-\newacronym{mcp}{MCP}{Model Context Protocol}
+\newacronym[description={An open standard (\texttt{modelcontextprotocol.io}) for connecting AI assistants to external tools and data via JSON-RPC 2.0. Supports HTTP (recommended), stdio, and SSE (deprecated) transports}]{mcp}{MCP}{Model Context Protocol}
 \newacronym{pat}{PAT}{Personal Access Token}
 \newacronym{rpm}{RPM}{Requests Per Minute}
 \newacronym{tpm}{TPM}{Tokens Per Minute}
@@ -25,7 +25,7 @@
 
 \newglossaryentry{agent-skills}{
   name={Agent Skills standard},
-  description={An open standard for cross-tool skill definitions hosted at \url{https://agentskills.io}. Claude Code skills follow it, which means a \texttt{SKILL.md} written for Claude Code is portable to any other compliant tool}
+  description={An open standard for cross-tool skill definitions hosted at \texttt{agentskills.io}. Claude Code skills follow it, which means a \texttt{SKILL.md} written for Claude Code is portable to any other compliant tool}
 }
 
 \newglossaryentry{adaptive-thinking}{
@@ -103,11 +103,6 @@
   description={A regex over the tool name (or event-specific criteria) in a hook entry. \texttt{"Write|Edit"} matches only file-modifying tools; \texttt{""} matches every tool}
 }
 
-\newglossaryentry{mcp}{
-  name={Model Context Protocol},
-  description={An open standard (\url{https://modelcontextprotocol.io}) for connecting AI assistants to external tools and data via JSON-RPC 2.0. Supports HTTP (recommended), stdio, and SSE (deprecated) transports}
-}
-
 \newglossaryentry{mcp-resource}{
   name={MCP resource},
   description={A piece of data an MCP server exposes for Claude to read on demand. Referenced from a prompt with \texttt{@server:protocol://resource/path}}
@@ -115,7 +110,7 @@
 
 \newglossaryentry{mcp-scope}{
   name={MCP scope},
-  description={Where an MCP server's configuration lives. Three values: \texttt{local} (default, in \texttt{\textasciitilde/.claude.json}), \texttt{project} (in \texttt{.mcp.json} at the project root, committed to share), and \texttt{user} (in \texttt{\textasciitilde/.claude.json}, all your projects)}
+  description={Where an MCP server's configuration lives. Three values: \texttt{local} (default, stored under your home directory), \texttt{project} (stored in \texttt{.mcp.json} at the project root and committed to share), and \texttt{user} (stored under your home directory and available across all your projects)}
 }
 
 \newglossaryentry{permission-mode}{
