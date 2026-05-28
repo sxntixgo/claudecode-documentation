@@ -30,13 +30,14 @@ user-level ones on conflict.
 \centering
 \caption{CLAUDE.md locations and scope}
 \label{tab:claude-md-scopes}
-\begin{tabularx}{\textwidth}{llX}
+\small
+\begin{tabularx}{\textwidth}{l>{\raggedright\arraybackslash}XX}
 \toprule
 \textbf{Scope} & \textbf{Location} & \textbf{Use case} \\
 \midrule
-Managed policy & \texttt{/etc/claude-code/CLAUDE.md} (Linux/WSL)\newline
-                 \texttt{/Library/Application Support/ClaudeCode/CLAUDE.md} (macOS)\newline
-                 \texttt{C:\textbackslash{}Program Files\textbackslash{}ClaudeCode\textbackslash{}CLAUDE.md} (Windows)
+Managed policy & Linux/WSL: \texttt{/etc/claude-code/CLAUDE.md} \newline
+                 macOS: \texttt{/Library/Application\allowbreak\ Support/Claude\allowbreak Code/CLAUDE.md} \newline
+                 Windows: \texttt{C:\textbackslash{}Program\allowbreak\ Files\textbackslash{}Claude\allowbreak Code\textbackslash{}CLAUDE.md}
                & Organization-wide standards deployed by IT \\
 User           & \texttt{\textasciitilde/.claude/CLAUDE.md}
                & Personal preferences across every project \\
