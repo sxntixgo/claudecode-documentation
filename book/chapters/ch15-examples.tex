@@ -203,8 +203,39 @@ callbacks to async/await. Run npm test after each.
         checklist.
 \end{enumerate}
 
-This is the canonical Claude Code parallel pattern: explore $\to$ plan
-$\to$ fan-out $\to$ adversarial review $\to$ ship.
+This is the canonical Claude Code parallel pattern, shown in
+\cref{fig:parallel-pattern}.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[font=\small\sffamily, node distance=0.6cm and 0.5cm]
+  \node[cc] (explore) {Explore\\\footnotesize plan mode};
+  \node[cc, right=of explore] (plan)    {Plan\\\footnotesize \texttt{PLAN.md}};
+  \node[cc, right=of plan]    (fanout)  {Fan out\\\footnotesize \texttt{/batch}};
+  \node[cc, right=of fanout]  (review)  {Adversarial\\review};
+  \node[cc, right=of review]  (ship)    {Ship\\\footnotesize PR per service};
+
+  \draw[ccflow] (explore) -- (plan);
+  \draw[ccflow] (plan)    -- (fanout);
+  \draw[ccflow] (fanout)  -- (review);
+  \draw[ccflow] (review)  -- (ship);
+
+  % parallel sub-tasks under fan-out
+  \node[ccext, below=0.8cm of fanout] (t2) {worktree};
+  \node[ccext, left=0.15cm of t2]     (t1) {worktree};
+  \node[ccext, right=0.15cm of t2]    (t3) {worktree};
+
+  \draw[ccsoft] (fanout.south) -- (t1.north);
+  \draw[ccsoft] (fanout.south) -- (t2.north);
+  \draw[ccsoft] (fanout.south) -- (t3.north);
+  \draw[ccsoft] (t1.east) -- (t2.west);
+  \draw[ccsoft] (t2.east) -- (t3.west);
+\end{tikzpicture}
+\caption{The explore $\to$ plan $\to$ fan-out $\to$ adversarial-review
+$\to$ ship pattern. \texttt{/batch} (or manual worktrees) splits the
+work into independent units that run in parallel.}
+\label{fig:parallel-pattern}
+\end{figure}
 
 \section{Example 4: Code Review Pipeline}
 \label{sec:ex-review}

@@ -54,8 +54,38 @@ once you install the right apps. The four extension types are the apps.
         \emph{Slash Commands}.
 \end{itemize}
 
-Each type solves a distinct class of problem.
-\Cref{tab:plugin-types} summarizes them side by side.
+\Cref{fig:extension-map} shows the four types branching out from
+Claude Code and the kinds of external systems they reach for; the table
+that follows summarizes them side by side.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[node distance=1.4cm and 2.6cm]
+  \node[cchub] (cc) {Claude Code};
+  \node[cc, above left=of cc]  (mcp)  {MCP\\Server};
+  \node[cc, above right=of cc] (skl)  {Skill};
+  \node[cc, below left=of cc]  (hk)   {Hook};
+  \node[cc, below right=of cc] (cmd)  {Slash\\Command};
+
+  \node[ccext, above=0.2cm of mcp]  (gh)   {GitHub / Postgres / Sentry};
+  \node[ccext, above=0.2cm of skl]  (wf)   {team workflow};
+  \node[ccext, below=0.2cm of hk]   (ev)   {file save / tool use / stop};
+  \node[ccext, below=0.2cm of cmd]  (user) {teammate types \texttt{/...}};
+
+  \draw[ccflow] (cc) -- (mcp);
+  \draw[ccflow] (cc) -- (skl);
+  \draw[ccflow] (cc) -- (hk);
+  \draw[ccflow] (cc) -- (cmd);
+
+  \draw[ccsoft] (mcp)  -- (gh);
+  \draw[ccsoft] (skl)  -- (wf);
+  \draw[ccsoft] (hk)   -- (ev);
+  \draw[ccsoft] (cmd)  -- (user);
+\end{tikzpicture}
+\caption{The four extension types and the kinds of external systems
+or signals each one connects Claude Code to.}
+\label{fig:extension-map}
+\end{figure}
 
 \begin{table}[ht]
 \centering

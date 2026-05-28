@@ -47,7 +47,79 @@ usage as a percentage. See
 
 \index{cost!context management}
 
-Context-window content is the single biggest cost driver. Three habits:
+Context-window content is the single biggest cost driver. Before
+trimming, look at where the tokens are going.
+\Cref{fig:context-composition} shows a typical mid-session breakdown
+of a 1M-token window — every byte in the colored regions is billed on
+every subsequent message until you clear or compact.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[font=\footnotesize\sffamily]
+  % Total bar 13cm wide
+  \def\bar{13}
+  \def\h{0.7}
+
+  % Segments: width, color, label
+  \def\sysw{0.6}
+  \def\clmdw{1.4}
+  \def\rulesw{0.8}
+  \def\mcpw{0.5}
+  \def\msgsw{4.5}
+  \def\filesw{2.6}
+  \def\toolw{1.2}
+  \def\availw{1.4}
+
+  % Draw each segment
+  \draw[draw=ghmutedrule, fill=ghmuted]
+        (0,0) rectangle (\sysw,\h)
+        node[midway, font=\scriptsize\sffamily] {sys};
+  \draw[draw=Primary, fill=Accent!50!white]
+        (\sysw,0) rectangle (\sysw+\clmdw,\h)
+        node[midway, font=\scriptsize\sffamily\bfseries] {CLAUDE.md};
+  \draw[draw=Primary, fill=Accent!30!white]
+        (\sysw+\clmdw,0) rectangle (\sysw+\clmdw+\rulesw,\h)
+        node[midway, font=\scriptsize\sffamily] {rules};
+  \draw[draw=ghnote, fill=ghnote!12!white]
+        (\sysw+\clmdw+\rulesw,0) rectangle (\sysw+\clmdw+\rulesw+\mcpw,\h)
+        node[midway, font=\scriptsize\sffamily] {MCP};
+  \draw[draw=Primary, fill=PaleBlue]
+        (\sysw+\clmdw+\rulesw+\mcpw,0) rectangle (\sysw+\clmdw+\rulesw+\mcpw+\msgsw,\h)
+        node[midway, font=\scriptsize\sffamily\bfseries] {conversation history};
+  \draw[draw=ghwarning, fill=ghwarning!12!white]
+        (\sysw+\clmdw+\rulesw+\mcpw+\msgsw,0)
+        rectangle (\sysw+\clmdw+\rulesw+\mcpw+\msgsw+\filesw,\h)
+        node[midway, font=\scriptsize\sffamily\bfseries] {file reads};
+  \draw[draw=ghwarning, fill=ghwarning!8!white]
+        (\sysw+\clmdw+\rulesw+\mcpw+\msgsw+\filesw,0)
+        rectangle (\sysw+\clmdw+\rulesw+\mcpw+\msgsw+\filesw+\toolw,\h)
+        node[midway, font=\scriptsize\sffamily] {tool outputs};
+  \draw[draw=ghmutedrule, fill=white]
+        (\sysw+\clmdw+\rulesw+\mcpw+\msgsw+\filesw+\toolw,0)
+        rectangle (\bar,\h)
+        node[midway, font=\scriptsize\sffamily\itshape, text=GrayText] {free};
+
+  % Scale labels
+  \node[font=\scriptsize\sffamily\itshape, text=GrayText, below=2pt] at (0,0) {0};
+  \node[font=\scriptsize\sffamily\itshape, text=GrayText, below=2pt] at (\bar,0) {1M tokens};
+
+  % Action labels above
+  \node[font=\scriptsize\sffamily, above=4pt, text=GrayText, align=left]
+        at (\sysw+\clmdw/2, \h)
+        {\textbf{trim} (Level 3)};
+  \node[font=\scriptsize\sffamily, above=4pt, text=GrayText, align=left]
+        at (\sysw+\clmdw+\rulesw+\mcpw+\msgsw/2, \h)
+        {\texttt{/clear} (Level 1)};
+  \node[font=\scriptsize\sffamily, above=4pt, text=GrayText, align=left]
+        at (\sysw+\clmdw+\rulesw+\mcpw+\msgsw+\filesw/2, \h)
+        {hooks / subagents (Level 5)};
+\end{tikzpicture}
+\caption{Where the tokens go in a typical mid-session 1M context
+window, and which lever in this chapter shrinks each segment.}
+\label{fig:context-composition}
+\end{figure}
+
+Three habits:
 
 \begin{itemize}
   \item \textbf{\texttt{/clear} between unrelated tasks.} Stale context

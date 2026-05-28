@@ -54,6 +54,41 @@ loads every \texttt{CLAUDE.md} it finds along the way. \texttt{CLAUDE.md}
 files in subdirectories \emph{below} the working directory load on demand —
 only when Claude reads a file in that subdirectory.
 
+\Cref{fig:claude-md-hierarchy} shows the four scopes stacked from
+broadest (managed) to narrowest (local). At each level the file's
+content is appended to the context; on conflict, later levels win.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[font=\small\sffamily, node distance=0.25cm]
+  \node[draw=ghimportant, fill=ghimportant!8!white, rounded corners=3pt,
+        minimum width=10cm, minimum height=0.9cm, align=left, inner xsep=12pt]
+        (managed) {\textbf{Managed policy} \hfill org-deployed, cannot be overridden};
+  \node[draw=ghnote, fill=ghnote!8!white, rounded corners=3pt,
+        minimum width=10cm, minimum height=0.9cm, align=left, inner xsep=12pt,
+        below=of managed]
+        (user)    {\textbf{User} \hfill \texttt{\textasciitilde/.claude/CLAUDE.md}};
+  \node[draw=ghtip, fill=ghtip!8!white, rounded corners=3pt,
+        minimum width=10cm, minimum height=0.9cm, align=left, inner xsep=12pt,
+        below=of user]
+        (project) {\textbf{Project} \hfill \texttt{./CLAUDE.md} or \texttt{./.claude/CLAUDE.md}};
+  \node[draw=ghwarning, fill=ghwarning!10!white, rounded corners=3pt,
+        minimum width=10cm, minimum height=0.9cm, align=left, inner xsep=12pt,
+        below=of project]
+        (local)   {\textbf{Local} \hfill \texttt{./CLAUDE.local.md} (gitignored)};
+
+  % precedence arrow on the side
+  \draw[ccflow, line width=1.2pt]
+        ([xshift=12pt]managed.east) -- node[right, cclabel, align=left]
+            {\\ later levels\\override earlier ones\\on conflict}
+        ([xshift=12pt]local.east);
+\end{tikzpicture}
+\caption{The four CLAUDE.md scopes. Every level present on the
+machine loads; conflicting instructions are resolved in favor of the
+narrower scope.}
+\label{fig:claude-md-hierarchy}
+\end{figure}
+
 \begin{notebox}
 Run \texttt{/init} in a new project to generate a starting \texttt{CLAUDE.md}.
 Claude analyzes your codebase and proposes build commands, test instructions,

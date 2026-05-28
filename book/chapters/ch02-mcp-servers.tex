@@ -57,6 +57,49 @@ An MCP server exposes:
 \end{enumerate}
 
 This happens automatically — no custom scripting required on your part.
+\Cref{fig:mcp-sequence} traces the same five steps as a sequence
+diagram.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[font=\small\sffamily, node distance=2.6cm]
+  % lifelines (four columns)
+  \node[cc, minimum width=2.2cm] (you)  {You};
+  \node[cc, minimum width=2.2cm, right=of you] (cl)   {Claude Code};
+  \node[cc, minimum width=2.2cm, right=of cl]  (srv)  {MCP server};
+  \node[cc, minimum width=2.2cm, right=of srv] (ext)  {External\\system};
+
+  % vertical lifelines down
+  \foreach \n in {you, cl, srv, ext} {
+    \draw[dashed, draw=ghmutedrule] (\n.south) -- ++(0,-5.2);
+  }
+
+  % arrows
+  \draw[ccflow] ($(you.south)+(0,-0.4)$) -- ($(cl.south)+(0,-0.4)$)
+        node[midway, above, cclabel] {1. plain-language ask};
+
+  \draw[ccflow] ($(cl.south)+(0,-1.4)$) -- ++(0,-0.4) -- ++(-0.6,0)
+        node[midway, above, cclabel] {2. pick tool} -- ++(0.6,0.4);
+
+  \draw[ccflow] ($(cl.south)+(0,-2.0)$) -- ($(srv.south)+(0,-2.0)$)
+        node[midway, above, cclabel] {3. JSON-RPC request};
+
+  \draw[ccflow] ($(srv.south)+(0,-3.0)$) -- ($(ext.south)+(0,-3.0)$)
+        node[midway, above, cclabel] {4. tool execution};
+
+  \draw[ccsoft] ($(ext.south)+(0,-3.6)$) -- ($(srv.south)+(0,-3.6)$)
+        node[midway, above, cclabel] {structured result};
+
+  \draw[ccsoft] ($(srv.south)+(0,-4.2)$) -- ($(cl.south)+(0,-4.2)$);
+
+  \draw[ccflow] ($(cl.south)+(0,-4.8)$) -- ($(you.south)+(0,-4.8)$)
+        node[midway, above, cclabel] {5. natural-language answer};
+\end{tikzpicture}
+\caption{An MCP tool call. Solid arrows are requests Claude Code
+initiates; dashed are the structured responses returned back through
+the chain.}
+\label{fig:mcp-sequence}
+\end{figure}
 
 \subsection{Request and Response Example}
 

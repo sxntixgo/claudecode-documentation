@@ -86,6 +86,63 @@ The full list (including \texttt{Setup}, \texttt{UserPromptExpansion},
 \texttt{PostCompact}, \texttt{Elicitation}, \texttt{ElicitationResult}) is at
 \url{https://code.claude.com/docs/en/hooks}.
 
+\Cref{fig:hook-lifecycle} arranges the most common events on the
+lifecycle they fire from.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[font=\footnotesize\sffamily, node distance=0.6cm]
+  % Main timeline rail
+  \draw[line width=1.4pt, draw=Primary, -{Stealth[length=3mm]}]
+        (0,0) -- (13,0);
+
+  % Event markers along the rail
+  \foreach \x/\name in {
+      0.3/{SessionStart},
+      2.6/{UserPromptSubmit},
+      5.0/{PreToolUse},
+      7.4/{PostToolUse},
+      9.8/{Stop},
+     12.3/{SessionEnd}
+  } {
+    \draw[draw=Primary, line width=0.6pt] (\x,-0.18) -- (\x,0.18);
+    \node[font=\scriptsize\sffamily\bfseries, above=0.15cm] at (\x,0.18) {\name};
+  }
+
+  % Phase labels under the rail
+  \node[font=\scriptsize\sffamily\itshape, text=GrayText, below=0.25cm]
+        at (1.3,0) {(launch)};
+  \node[font=\scriptsize\sffamily\itshape, text=GrayText, below=0.25cm]
+        at (3.7,0) {(your prompt)};
+  \node[font=\scriptsize\sffamily\itshape, text=GrayText, below=0.25cm]
+        at (6.2,0) {(tool runs)};
+  \node[font=\scriptsize\sffamily\itshape, text=GrayText, below=0.25cm]
+        at (8.6,0) {(Claude answers)};
+  \node[font=\scriptsize\sffamily\itshape, text=GrayText, below=0.25cm]
+        at (11.0,0) {(turn ends)};
+
+  % Side events that can fire anywhere
+  \node[draw=ghmutedrule, fill=ghmuted, rounded corners=3pt,
+        minimum width=6cm, font=\footnotesize\sffamily, align=left,
+        inner sep=4pt, below=1.4cm] (anytime)
+        at (3.0,-1.2)
+        {Fire any time during a session:\\[2pt]
+         \texttt{Notification} \hfill \texttt{InstructionsLoaded}\\
+         \texttt{FileChanged} \hfill \texttt{PreCompact}};
+  \node[draw=ghmutedrule, fill=ghmuted, rounded corners=3pt,
+        minimum width=4.8cm, font=\footnotesize\sffamily, align=left,
+        inner sep=4pt] (subagent)
+        at (10.0,-2.2)
+        {When a subagent runs:\\[2pt]
+         \texttt{SubagentStart}\\
+         \texttt{SubagentStop}};
+\end{tikzpicture}
+\caption{Hook events along a session's lifecycle. The top rail shows
+the five most-used events in order; the boxes below collect events
+that fire on subagent activity or independently of the main flow.}
+\label{fig:hook-lifecycle}
+\end{figure}
+
 \section{Hook Configuration}
 \label{sec:hook-config}
 

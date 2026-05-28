@@ -28,6 +28,49 @@ ones for your own domain.
         all projects.
 \end{itemize}
 
+\Cref{fig:subagent-context} illustrates the context-isolation
+mechanic: the subagent's hundreds of file reads stay inside its own
+context window; only a short summary crosses back to the main session.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[font=\small\sffamily, node distance=0.4cm]
+  % Main session
+  \node[draw=Primary, fill=PaleBlue, rounded corners=4pt,
+        minimum width=5.0cm, minimum height=4.5cm, align=center,
+        label={[font=\bfseries\sffamily, anchor=north]north:Main session context}]
+        (main) {};
+  \node[ccext, minimum width=4.4cm, anchor=north]
+        at ([yshift=-0.5cm]main.north) (m1) {your prompt};
+  \node[ccext, minimum width=4.4cm, below=of m1.south, anchor=north] (m2) {prior assistant turns};
+  \node[ccext, minimum width=4.4cm, below=of m2.south, anchor=north,
+        fill=ghtip!15!white] (m3) {\textbf{summary returned}};
+  \node[ccext, minimum width=4.4cm, below=of m3.south, anchor=north] (m4) {next turn};
+
+  % Subagent context (to the right)
+  \node[draw=Primary, dashed, fill=Accent!15!white, rounded corners=4pt,
+        minimum width=5.0cm, minimum height=4.5cm, align=center, right=2.0cm of main,
+        label={[font=\bfseries\sffamily, anchor=north]north:Subagent context}]
+        (sub) {};
+  \node[ccext, minimum width=4.4cm, anchor=north]
+        at ([yshift=-0.5cm]sub.north) (s1) {subagent system prompt};
+  \node[ccext, minimum width=4.4cm, below=of s1.south, anchor=north] (s2) {file 1, file 2, \ldots};
+  \node[ccext, minimum width=4.4cm, below=of s2.south, anchor=north] (s3) {grep / glob results};
+  \node[ccext, minimum width=4.4cm, below=of s3.south, anchor=north] (s4) {tool outputs};
+
+  % Arrows between
+  \draw[ccflow] (main.east|-m2.east) -- node[above, cclabel] {delegate}
+                                       node[below, cclabel] {(task)}
+        (sub.west|-s1.west);
+  \draw[ccsoft, draw=ghtip] (sub.west|-s4.west) -- node[below, cclabel] {only the summary returns}
+        (main.east|-m3.east);
+\end{tikzpicture}
+\caption{Main-session vs.\ subagent contexts. The subagent absorbs the
+high-token reads (files, grep, tool outputs); the main session only
+sees the delegate request going out and a short summary coming back.}
+\label{fig:subagent-context}
+\end{figure}
+
 \section{Built-In Subagents}
 \label{sec:built-in-agents}
 

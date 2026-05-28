@@ -115,3 +115,31 @@
 \usepackage{float}
 \usepackage{caption}
 \captionsetup{font=small, labelfont=bf}
+
+% TikZ libraries — gimenezocano.sty loads tikz itself; we extend with
+% the libraries used by the in-chapter diagrams.
+\usetikzlibrary{
+  shapes.geometric,
+  shapes.misc,
+  arrows.meta,
+  positioning,
+  fit,
+  calc,
+  backgrounds,
+  decorations.pathreplacing,
+  chains
+}
+
+% Shared TikZ styles used by the chapter diagrams. Defined here so each
+% diagram can reuse them without redeclaring.
+\tikzset{
+  cc/.style={draw=Primary, fill=PaleBlue, rounded corners=4pt,
+             minimum width=2.4cm, minimum height=0.9cm, align=center,
+             font=\small\sffamily, thick},
+  cchub/.style={cc, fill=Accent!50!white, minimum width=3cm, minimum height=1.2cm,
+                font=\bfseries\sffamily},
+  ccext/.style={cc, fill=ghmuted, draw=ghmutedrule, font=\footnotesize\sffamily},
+  cclabel/.style={font=\footnotesize\sffamily\itshape, text=GrayText},
+  ccflow/.style={-{Stealth[length=2.4mm]}, thick, draw=Primary},
+  ccsoft/.style={-{Stealth[length=2.4mm]}, draw=ghmutedrule, dashed, thick}
+}
