@@ -897,7 +897,7 @@ Learn about skills - reusable instruction sets that leverage agents for specific
 
 ### Related Topics
 - [Creating Custom Skills](../04-skills/3-creating-skills.md) - Build on agents with reusable skills
-- [Slash Commands](../10-keywords/3-slash-commands.md) - Trigger agents with custom commands
+- [Slash Commands](../10-keywords/2-slash-commands.md) - Trigger agents with custom commands
 
 ---
 
