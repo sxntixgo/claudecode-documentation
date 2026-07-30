@@ -508,6 +508,11 @@ Additional instructions revealed on demand.
 Real usage examples.
 ```
 
+**How the trigger works**: `description` *is* the trigger — Claude reads it to decide when to
+invoke the skill on its own. `when_to_use` is appended to the description and holds extra trigger
+phrasings or example requests. Add `paths` globs when the skill should only activate while working
+with matching files. There are no regex patterns and no confidence scores.
+
 ---
 
 ## When to Create a Custom Skill

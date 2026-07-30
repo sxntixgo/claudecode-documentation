@@ -539,7 +539,7 @@ When executing this skill:
 # Required Fields
 name: string                    # Skill identifier (kebab-case)
 version: string                 # Semantic version (1.0.0)
-description: string             # Short description (< 100 chars)
+description: string             # What it does AND when to use it — this is the trigger
 
 # Optional Metadata
 author: string                  # Author name <email>
@@ -554,15 +554,15 @@ model: "haiku" | "sonnet" | "opus"  # Default model
 maxTokens: number               # Max tokens for skill execution
 temperature: number             # Model temperature (0.0-1.0)
 
-# Auto-Triggering
-autoTrigger:
-  patterns: string[]            # Regex patterns to match
-  confidence: number            # Match threshold (0.0-1.0)
-  enabled: boolean              # Enable auto-trigger
+# Auto-Invocation (Claude reads these and decides — no regex, no confidence score)
+when_to_use: string             # Extra trigger phrases; appended to description
+paths: string[]                 # Globs; activate only when working with matching files
+disable-model-invocation: boolean  # true = never auto-load, manual /name only
+user-invocable: boolean         # false = hide from the / menu (background knowledge)
 
-# Slash Command
-slashCommand: string            # Slash command (e.g., /code-review)
-aliases: string[]               # Command aliases
+# Slash command name
+# Not a field — it comes from the directory name:
+# .claude/skills/code-review/SKILL.md  ->  /code-review
 
 # Options/Flags
 options:
@@ -711,15 +711,10 @@ Additional performance-specific instructions
 ---
 name: tdd-workflow
 version: 2.0.0
-description: Test-Driven Development workflow with strict enforcement
+description: Guides a strict red-green-refactor Test-Driven Development cycle for a new feature.
+when_to_use: TDD, test-driven, write the test first, red green refactor
 model: sonnet
 category: testing
-autoTrigger:
-  patterns:
-    - "tdd.*"
-    - "test.*driven"
-  confidence: 0.9
-slashCommand: /tdd
 options:
   - name: coverage
     type: number
