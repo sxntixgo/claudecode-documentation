@@ -485,8 +485,6 @@ graph LR
 name: code-review
 description: Reviews code for security, logic, and style issues, at a configurable depth.
 when_to_use: review my code, check this PR, look over my changes
-version: 1.0.0
-author: Your Name
 model: sonnet  # Default model for this skill
 \```
 
