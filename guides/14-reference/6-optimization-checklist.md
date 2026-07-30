@@ -54,7 +54,7 @@ Complete this BEFORE starting a project or new feature.
 - [ ] **Update CLAUDE.md** - Keep it fresh as project evolves
   - [ ] Remove outdated information
   - [ ] Add recent learnings
-  - [ ] Keep under 300 lines
+  - [ ] Keep under 200 lines — longer files reduce adherence
 
 ---
 
@@ -85,13 +85,16 @@ Set up your `.claude/` directory correctly.
   Built-in agents (Explore, Plan, general-purpose) have no file, so their models cannot be
   reassigned. Define your own when you need a model pinned.
 
-- [ ] **Set default model** - Should be Haiku
-  - [ ] `"defaultModel": "haiku"` in config
-
-- [ ] **Configure agent permissions** - Restrict file access
-  - [ ] Frontend agent: only `src/components/**`, `src/pages/**`
-  - [ ] Backend agent: only `src/api/**`, `src/services/**`
-  - [ ] All agents: deny `.env*`, `**/*.secret.*`
+- [ ] **Restrict tool and file access** — two real mechanisms, no `allowedPaths` field
+  - [ ] Limit a subagent's tools with `tools:` in its own frontmatter
+  - [ ] Deny paths globally with `permissions` in `.claude/settings.json`:
+  ```json
+  {
+    "permissions": {
+      "deny": ["Read(./.env*)", "Read(./**/*.secret.*)"]
+    }
+  }
+  ```
 
 ### Skill Configuration
 
@@ -156,14 +159,16 @@ Use this while working with Claude Code.
   Difference: 20% cost savings
   ```
 
-- [ ] **Save context to memory** - Reuse across sessions
-  - [ ] Save key decisions
-  - [ ] Document discovered patterns
-  - [ ] Record architectural choices
+- [ ] **Let auto memory accumulate learnings** — Claude writes these itself
+  - Stored per repository at `~/.claude/projects/<project>/memory/`
+  - `MEMORY.md` is the index; its first 200 lines or 25KB load every session
+  - Browse or edit it with `/memory`
+  - Durable decisions you want guaranteed in context belong in CLAUDE.md instead
 
-- [ ] **Clear memory between unrelated tasks**
-  - Prevents irrelevant context overhead
+- [ ] **`/clear` between unrelated tasks**
+  - Prevents irrelevant context overhead and stops you paying to carry it
   - Improves response quality for new tasks
+  - Use `/rename` first if you may want to `/resume` later
 
 ### Code Quality
 
@@ -227,9 +232,9 @@ Track and optimize your actual usage.
   - Are model assignments optimal?
 
 - [ ] **Update configuration** based on insights
-  - [ ] Adjust agent model assignments
-  - [ ] Modify skill model overrides
-  - [ ] Refine CLAUDE.md
+  - [ ] Adjust `model:` in subagent frontmatter
+  - [ ] Adjust `model:`/`effort:` in skill frontmatter
+  - [ ] Refine CLAUDE.md, moving procedures into skills
 
 - [ ] **Set new targets**
   - Reduction goal: 5-10% monthly improvement
