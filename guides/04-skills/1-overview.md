@@ -641,9 +641,15 @@ claude "Generate documentation for api/users.ts"
 
 ### Method 3: Explicit Skill Invocation
 
+```text
+# Invoke the skill by name, then give it the target
+/code-review Review src/auth.ts
+```
+
+Skills are invoked from inside a session with `/skill-name`. There is no CLI flag for selecting a skill — to invoke one non-interactively, pass the slash command to headless mode:
+
 ```bash
-# Use Skill tool directly
-claude --skill=code-review "Review src/auth.ts"
+claude -p "/code-review Review src/auth.ts"
 ```
 
 ---

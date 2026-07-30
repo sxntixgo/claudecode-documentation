@@ -1134,112 +1134,81 @@ Generates:
 
 ---
 
-## Testing Your Skills
+## Evaluating Your Skills
 
-### Test Framework Structure
+### Write Evaluations First
 
-Create `.claude/skills/your-skill/tests/`:
+The instinct is to write the skill, then check whether it works. Reverse that. Evaluations written first tell you what the skill needs to fix; evaluations written last tend to describe whatever the skill already happens to do.
 
-```
-your-skill/
-├── SKILL.md
-├── tests/
-│   ├── test.md           # Test cases
-│   ├── fixtures/         # Test data
-│   │   ├── input1.ts
-│   │   └── expected1.ts
-│   └── run-tests.sh      # Test runner
-└── config.json
-```
+1. **Find the gap.** Run Claude on a few representative tasks with no skill loaded. Write down the specific failures — the context it lacked, the step it skipped, the convention it got wrong.
+2. **Turn each failure into a test case.** Three is enough to start.
+3. **Record the baseline.** Note how Claude performed without the skill, so you have something to compare against.
+4. **Write the minimum instructions** that close those gaps and pass the cases.
+5. **Iterate.** Re-run, compare to baseline, refine.
+
+This keeps you from documenting problems you imagined instead of the ones you have.
 
 ### Test Case Format
 
-`.claude/skills/code-review/tests/test.md`:
+Evaluations live in an `evals/` directory inside the skill:
 
-```markdown
-# Code Review Skill Tests
+```text
+code-review/
+├── SKILL.md
+├── evals/
+│   ├── evals.json          # Test cases
+│   └── fixtures/           # Input files the cases reference
+│       ├── clean-code.ts
+│       └── sql-injection.ts
+└── reference/
+```
 
-## Test 1: Quick Review - Clean Code
+`evals/evals.json` holds the prompt, the expected result described in prose, and any input files:
 
-**Input:**
-```typescript
-// fixtures/clean-code.ts
-export function add(a: number, b: number): number {
-  return a + b
+```json
+{
+  "skill_name": "code-review",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review this file for security issues",
+      "expected_output": "Flags the string-interpolated SQL query and recommends parameterized queries",
+      "files": ["fixtures/sql-injection.ts"]
+    },
+    {
+      "id": 2,
+      "prompt": "Review this file for security issues",
+      "expected_output": "Reports no security issues; does not invent problems in correct code",
+      "files": ["fixtures/clean-code.ts"]
+    }
+  ]
 }
 ```
 
-**Command:** `/code-review`
+Note what `expected_output` is: a description of what a good answer contains, not the answer itself. Model output varies between runs, so a skill that works correctly will word the same finding differently each time. Comparing against fixed text — with `diff`, exact string match, or a snapshot — fails on rewording while missing real regressions in substance.
 
-**Expected Output:**
-- ✅ No syntax errors
-- ✅ Code style good
-- ✅ No issues found
+The second case above matters as much as the first. A review skill that flags problems in clean code is worse than no skill, and you will only notice if you test for it.
 
-**Actual Output:** [Fill during test]
+### Running Evaluations
 
-**Status:** ✅ Pass / ❌ Fail
+The `skill-creator` plugin runs the comparison loop for you:
 
----
-
-## Test 2: Quick Review - Security Issue
-
-**Input:**
-```typescript
-// fixtures/sql-injection.ts
-export function getUser(id: string) {
-  const query = `SELECT * FROM users WHERE id = '${id}'`
-  return db.query(query)
-}
+```text
+/plugin install skill-creator@claude-plugins-official
+/reload-plugins
 ```
 
-**Command:** `/code-review`
+Then ask Claude to evaluate the skill by name, such as `evaluate my code-review skill with skill-creator`. For each case it runs two subagents — one with the skill, one without — grades each assertion with evidence, and aggregates pass rate, token count, and duration so you can weigh the quality gain against the token cost.
 
-**Expected Output:**
-- ❌ SQL injection vulnerability at line 2
-- 💡 Suggestion: Use parameterized queries
+Run evaluations in a fresh session. Testing in the session where you wrote the skill measures your conversation rather than your SKILL.md, and hides exactly the instructions you forgot to write down.
 
-**Actual Output:** [Fill during test]
+**Before you share a skill**, verify:
 
-**Status:** ✅ Pass / ❌ Fail
-```
+- At least three evaluations exist and pass
+- The skill has been tested with every model you plan to run it on — instructions sufficient for Opus often underspecify for Haiku
+- The skill triggers on prompts it should, and stays quiet on prompts it should not
 
-### Automated Test Runner
-
-`.claude/skills/code-review/tests/run-tests.sh`:
-
-```bash
-#!/bin/bash
-
-echo "Running Code Review Skill Tests..."
-
-SKILL_DIR=".claude/skills/code-review"
-TESTS_DIR="$SKILL_DIR/tests"
-FIXTURES_DIR="$TESTS_DIR/fixtures"
-
-# Test 1: Clean code
-echo "Test 1: Clean Code Review..."
-claude --skill=code-review "$FIXTURES_DIR/clean-code.ts" > /tmp/test1-output.txt
-if grep -q "No issues found" /tmp/test1-output.txt; then
-  echo "✅ Test 1 PASS"
-else
-  echo "❌ Test 1 FAIL"
-fi
-
-# Test 2: Security issue
-echo "Test 2: Security Issue Detection..."
-claude --skill=code-review "$FIXTURES_DIR/sql-injection.ts" > /tmp/test2-output.txt
-if grep -q "SQL injection" /tmp/test2-output.txt; then
-  echo "✅ Test 2 PASS"
-else
-  echo "❌ Test 2 FAIL"
-fi
-
-# Cleanup
-rm /tmp/test1-output.txt /tmp/test2-output.txt
-
-echo "Tests complete!"
-```
+For baseline comparison, assertion design, trigger accuracy, and benchmarking in depth, see [Advanced Patterns](5-advanced-patterns.md#advanced-evaluation-patterns).
 
 ---
 
