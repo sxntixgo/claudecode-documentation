@@ -52,7 +52,6 @@ Terms are organized alphabetically. Each entry includes:
 ```yaml
 ---
 name: database-migration-skill
-approvalRequired: true
 ---
 ```
 
@@ -256,7 +255,6 @@ Comprehensive checks...
 ```yaml
 ---
 name: code-review-skill
-version: 1.0.0
 model: sonnet
 description: Automated code reviews
 ---
@@ -717,7 +715,6 @@ const email = z.string().email().parse(input)
 **Example**:
 ```yaml
 name: my-skill
-version: 1.0.0
 model: sonnet
 ```
 

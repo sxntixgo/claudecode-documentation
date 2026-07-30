@@ -253,12 +253,6 @@ Stop if any skill reports errors.
 ```yaml
 ---
 name: deploy
-dependencies:
-  skills:
-    - test-runner     # Must pass tests
-    - security-scan   # Must pass security
-    - build          # Must build successfully
-  required: true      # Fail if dependencies fail
 ---
 
 # Deploy Skill
@@ -599,7 +593,6 @@ const result = await callWithRetry(() => fetchGitHubIssues());
 ```yaml
 ---
 name: code-review
-version: 2.0.0  # Major.Minor.Patch
 deprecated: false
 migrationGuide: MIGRATION.md
 changelog: CHANGELOG.md
