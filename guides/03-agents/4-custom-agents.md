@@ -871,7 +871,10 @@ is why a specific, action-oriented description matters more than any routing con
 
 Congratulations! You now know how to create custom agents with specialized capabilities.
 
-**Next Guide**: [What Are Skills?](../04-skills/1-overview.md) (20 min)
+**Next Guide**: [Orchestration Patterns](5-orchestration-patterns.md) (30 min)
+Coordinate several agents: fan-out/fan-in, pipelines, and nested delegation.
+
+**Then**: [What Are Skills?](../04-skills/1-overview.md) (20 min)
 Learn about skills - reusable instruction sets that leverage agents for specific workflows.
 
 **Also Explore**:
