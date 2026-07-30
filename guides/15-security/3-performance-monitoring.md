@@ -85,21 +85,36 @@ graph LR
 
 ### Automated Tracking
 
-**Hook for Token Logging** (`.claude/config.json`):
+**Built-in first**: run `/usage` for token counts and locally computed cost for the session,
+and `/context` to see what is currently filling the context window. On Pro, Max, Team, and
+Enterprise plans, `/usage` also attributes recent usage to individual skills, subagents,
+plugins, and MCP servers, and flags anything accounting for 10% or more of your usage. Press
+`d` for a 24-hour window or `w` for 7 days. Session totals reset when `/clear` starts a new
+session.
+
+**Hook for Activity Logging** (`.claude/settings.json`):
+
+`hooks` is a real settings key. Each event maps to a list of matcher groups, and every entry
+in `hooks` needs a `type`:
 
 ```json
 {
   "hooks": {
     "PostToolUse": [{
-      "matcher": ".*",
+      "matcher": "*",
       "hooks": [{
-        "command": "echo \"$(date): $TOOL - $TOKENS tokens\" >> .claude/usage.log",
-        "description": "Log token usage"
+        "type": "command",
+        "command": "jq -r '\"\\(now|todate) \\(.tool_name)\"' >> .claude/usage.log"
       }]
     }]
   }
 }
 ```
+
+⚠️ Hooks receive a JSON payload on stdin (`tool_name`, `tool_input`, and so on) — **not**
+shell variables like `$TOOL`, and **not** token counts. No hook event exposes per-call token
+usage, so a hook can tell you *how often* and *which* tools ran; use `/usage` or
+OpenTelemetry export for the token and cost numbers themselves.
 
 ---
 
@@ -621,20 +636,26 @@ export default {
 
 **Optimization 3: Context Management**
 
+There is no settings key for context budgets — no file cap, no token threshold to prune at,
+no caching toggle. Prompt caching and parallel tool calls already happen automatically. What
+`.claude/settings.json` actually offers is auto-compaction, which summarises the conversation
+before the window fills:
+
 ```json
-// .claude/config.json
+// .claude/settings.json
 {
-  "contextManagement": {
-    "maxContextFiles": 10,
-    "autoSummarize": true,
-    "pruneAfterTokens": 50000
-  },
-  "performance": {
-    "enableCaching": true,
-    "parallelReads": true
-  }
+  "autoCompactEnabled": true,
+  "fastMode": true
 }
 ```
+
+The rest of context management is operational rather than configured. The team's routine was:
+
+- Run `/context` when responses start to slow down, to see what is occupying the window.
+- `/clear` between unrelated tasks instead of letting one session sprawl.
+- Delegate wide file exploration to a subagent, so raw file contents land in *its* context and
+  only the summary returns to the main thread.
+- Keep `CLAUDE.md` short — it is re-read into every session.
 
 #### Results with Metrics
 

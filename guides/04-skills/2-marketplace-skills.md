@@ -118,9 +118,13 @@ claude skills install code-review@1.2.0
 
 **What happens:**
 1. Skill downloaded to `.claude/skills/code-review/`
-2. Skill registered in `.claude/config.json`
+2. Claude Code discovers it by reading `.claude/skills/code-review/SKILL.md` — there is no
+   registry file to update, so a skill exists the moment its directory does
 3. Dependencies installed (if any)
 4. Skill ready to use immediately
+
+That last point cuts both ways: deleting the directory uninstalls the skill, and copying one in
+by hand installs it. Nothing else has to agree.
 
 ### Custom Install: Community Skills
 
@@ -469,66 +473,73 @@ claude skills install github.com/obra/superpowers/skills/refactor
 
 ## Configuring Installed Skills
 
-### Per-Project Configuration
+### Per-Skill Configuration
 
-Edit `.claude/config.json`:
+A skill is configured in its own `SKILL.md` frontmatter. There is no central file listing your
+skills and their options.
+
+`.claude/skills/api-docs/SKILL.md`:
+```yaml
+---
+name: api-docs
+description: Generate OpenAPI documentation from route handlers
+model: haiku
+allowed-tools: Read, Glob, Grep, Write
+---
+```
+
+Useful frontmatter fields when tuning an installed skill:
+
+| Field | What it does |
+|-------|--------------|
+| `model` | Which model runs the skill (`haiku`, `sonnet`, `opus`, `fable`, or a full model ID) |
+| `effort` | Reasoning effort: `low`, `medium`, `high`, `xhigh`, `max` |
+| `allowed-tools` / `disallowed-tools` | Narrow what the skill is permitted to touch |
+| `disable-model-invocation` | Make the skill manual-only, never auto-selected |
+| `user-invocable` | Whether it appears as a slash command |
+| `paths` | File patterns the skill is relevant to |
+
+Note that `model` is scoped to the current turn — it does not rewrite your session model. The
+next prompt goes back to whatever model the session was on.
+
+### Behavior That Isn't a Frontmatter Field
+
+Things like a style guide, a coverage threshold, or which files to skip are not settings — they
+are instructions. Put them in the skill's markdown body, where the model actually reads them:
+
+`.claude/skills/code-review/SKILL.md`:
+```markdown
+## Review Rules
+
+- Enforce the Airbnb style guide; flag lines over 100 characters
+- Require tests for any new exported function
+- Treat `console.log` in committed code as a warning, not an error
+- Always run the security checks, even on small diffs
+
+Skip `**/*.test.ts`, `**/vendor/**`, and `**/.generated/**`.
+```
+
+If a skill needs machine-readable data of its own, it can ship files alongside `SKILL.md` and
+reference them from its instructions. Claude Code does not look for a config file in the skill
+directory.
+
+### Project-Wide Settings
+
+Genuinely project-wide choices go in `.claude/settings.json` — committed to git, shared by the
+team:
 
 ```json
 {
-  "skills": {
-    "code-review": {
-      "enabled": true,
-      "model": "sonnet",
-      "defaultMode": "quick",
-      "autoTrigger": true,
-      "options": {
-        "minTestCoverage": 80,
-        "securityLevel": "high",
-        "styleGuide": "airbnb"
-      }
-    },
-    "tdd-workflow": {
-      "enabled": true,
-      "model": "sonnet",
-      "options": {
-        "testFramework": "jest",
-        "coverageThreshold": 90,
-        "strictMode": true
-      }
-    },
-    "api-docs": {
-      "enabled": true,
-      "model": "haiku",  // Cheaper for docs
-      "options": {
-        "format": "openapi",
-        "includeExamples": true,
-        "interactive": false
-      }
-    }
+  "model": "sonnet",
+  "permissions": {
+    "allow": ["Bash(npm test:*)"],
+    "ask": ["Bash(git push:*)"]
   }
 }
 ```
 
-### Skill-Specific Configuration
-
-Some skills use their own config files:
-
-`.claude/skills/code-review/config.json`:
-```json
-{
-  "rules": {
-    "max-line-length": 100,
-    "require-tests": true,
-    "no-console-log": "warn",
-    "security-scan": "always"
-  },
-  "ignore": [
-    "**/*.test.ts",
-    "**/vendor/**",
-    "**/.generated/**"
-  ]
-}
-```
+Keep personal, uncommitted overrides in `.claude/settings.local.json`, which takes precedence
+and is gitignored.
 
 ---
 

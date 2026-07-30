@@ -358,20 +358,17 @@ Cost: $0.02
 
 **Principle**: You can't optimize what you don't measure
 
-Enable cost tracking:
-```json
-{
-  "costTracking": {
-    "enabled": true,
-    "logFile": ".claude/cost-log.json",
-    "dailyBudget": 100000,
-    "alerts": {
-      "threshold": 0.8,
-      "notify": "email"
-    }
-  }
-}
-```
+There is nothing to enable — measurement is built in:
+
+| Tool | What it tells you |
+|------|-------------------|
+| `/usage` | Token counts and locally computed cost for the session. On Pro, Max, Team, and Enterprise plans it also attributes recent usage to individual skills, subagents, plugins, and MCP servers as a percentage of total, and flags anything at 10% or more. Press `d` for 24 hours, `w` for 7 days. |
+| `/context` | What is occupying the context window right now — the fastest way to find the file or MCP server that is inflating every request. |
+| [Console usage page](https://platform.claude.com/usage) | Authoritative billing. `/usage` computes its dollar figure locally at list rates, so it can differ from the invoice. |
+| OpenTelemetry export | Per-user token and cost metrics streamed into your own observability stack. Works on every setup, and is how you get team-wide trends. |
+
+Session totals reset when `/clear` starts a new session, so check `/usage` before clearing if
+you want the number for a task.
 
 ---
 
@@ -396,10 +393,11 @@ Enable cost tracking:
 
 ### Monitoring
 
-- [ ] Cost tracking enabled
-- [ ] Daily budget set
-- [ ] Alerts configured
-- [ ] Weekly cost review scheduled
+- [ ] `/usage` checked after expensive sessions
+- [ ] `/context` used to find context bloat
+- [ ] Spend limits set at the org level (Team/Enterprise admin settings, or Console workspace limits)
+- [ ] OpenTelemetry export configured for team-wide metrics
+- [ ] Weekly cost review scheduled against the Console usage page
 
 ---
 
@@ -702,7 +700,7 @@ Total time: 20s, Cost: $0.30
 - **Pricing Calculator**: Use [Anthropic Pricing Page](https://www.anthropic.com/pricing) for current rates
 - **Token Estimation**: Count ~4 characters = 1 token (rough estimate)
 - **Alternative Tokenizer** (Note: Uses GPT tokenization, Claude may differ): [OpenAI Tokenizer](https://platform.openai.com/tokenizer)
-- **Cost Tracking**: Use `.claude/cost-log.json` (enable in config)
+- **Cost Tracking**: Run `/usage` in-session; use the [Console usage page](https://platform.claude.com/usage) for authoritative billing
 
 ---
 

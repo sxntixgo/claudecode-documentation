@@ -759,7 +759,7 @@ Always provide cost estimate before starting.
 
 ### 6. Hook for Auto-Testing
 
-**.claude/config.json**:
+**.claude/settings.json**:
 ```json
 {
   "hooks": {

@@ -1236,23 +1236,29 @@ claude mcp test <server-name>
 ```bash
 # Check server resource usage
 claude mcp status <server-name>
-
-# Reduce concurrent requests
-# Add to .claude/config.json:
-{
-  "mcp": {
-    "servers": {
-      "<server-name>": {
-        "maxConcurrentRequests": 5,
-        "timeout": 30000
-      }
-    }
-  }
-}
-
-# Use caching for frequently accessed data
-# (configure in server-specific settings)
 ```
+
+There is no setting for per-server concurrency or request timeouts. What you can control is
+which servers are loaded at all — and with slow servers, that is usually the bigger win,
+since every active server contributes its tool definitions to your context whether you call
+it or not.
+
+Project servers are declared in `.mcp.json`. To narrow what actually loads, use
+`.claude/settings.json`:
+
+```json
+{
+  "allowedMcpServers": ["github", "filesystem"]
+}
+```
+
+`deniedMcpServers` does the inverse if you would rather block a specific offender than
+enumerate everything you keep. Use `/context` to confirm how much room the remaining servers
+are taking.
+
+For anything server-side — caching, batching, rate-limit backoff — check that server's own
+documentation and its environment variables. Those knobs belong to the server, not to
+Claude Code.
 
 ---
 

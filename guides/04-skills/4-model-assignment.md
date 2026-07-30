@@ -89,17 +89,17 @@ graph TD
 
 ## Configuring Model Assignment
 
-### Method 1: SKILL.md Frontmatter (Recommended)
+There is exactly one place to assign a model to a skill: the `model` field in the YAML
+frontmatter of that skill's own `SKILL.md`. No settings file has a per-skill model key.
 
-Set the default model in your skill's frontmatter:
+### The `model` Field
 
 `.claude/skills/code-formatter/SKILL.md`:
 ```yaml
 ---
 name: code-formatter
-version: 1.0.0
 description: Format code with Prettier/Black
-model: haiku  # ← Default model for this skill
+model: haiku  # ← Runs this skill on Haiku
 ---
 
 # Code Formatter Skill
@@ -107,78 +107,69 @@ model: haiku  # ← Default model for this skill
 This skill runs formatters - no deep reasoning needed, so Haiku is perfect!
 ```
 
-### Method 2: Progressive Model Selection
+Accepted values are `haiku`, `sonnet`, `opus`, `fable`, or a full model ID.
 
-Use different models for different complexity levels:
+> ⚠️ **The override is scoped to the turn, not to the skill.**
+> Invoking a skill with `model: haiku` switches the model for the remainder of the current
+> turn — including work Claude does after the skill finishes. It is **not** written to your
+> settings, and your session model resumes on the next prompt. So this is not a permanent
+> per-skill assignment; it is a per-invocation one that the frontmatter requests every time.
 
-`.claude/skills/code-review/SKILL.md`:
+Two consequences worth internalizing:
+
+- A cheap skill invoked in the middle of an expensive task downgrades the rest of that task.
+  If the follow-up work needs Sonnet, invoke the Haiku skill in its own turn.
+- Nothing drifts. You never have to clean up a model setting a skill left behind.
+
+### Pairing `model` with `effort`
+
+`SKILL.md` also accepts an `effort` field — `low`, `medium`, `high`, `xhigh`, or `max` — which
+controls how much reasoning the model spends before answering. It is the finer-grained dial,
+and reaching for it first often beats jumping a model tier:
+
 ```yaml
 ---
 name: code-review
-version: 2.0.0
-description: Code review with configurable depth
-model: haiku  # Default for quick reviews
-modelOverrides:
-  quick: haiku      # Quick review: 5K tokens
-  standard: sonnet  # Standard review: 10K tokens
-  deep: opus        # Deep review: 25K tokens
+description: Review a diff for correctness, style, and obvious bugs
+model: sonnet
+effort: low     # Shallow pass; raise to high for architecture-level review
 ---
-
-# Code Review Skill
-
-## Quick Review (Default - Haiku)
-
-Fast syntax and style checking
-
-<details>
-<summary>Standard Review (Sonnet)</summary>
-
-Comprehensive code quality analysis
-
-</details>
-
-<details>
-<summary>Deep Review (Opus)</summary>
-
-Architecture and design patterns analysis
-
-</details>
 ```
 
-### Method 3: Global Configuration Override
+A Sonnet-at-`low` review and a Sonnet-at-`high` review are genuinely different tools. Try
+moving `effort` before you move `model`.
 
-Override in `.claude/config.json`:
+### Different Depths Mean Different Skills
+
+A single skill has one `model` value. There is no mechanism for a skill to select among
+several models based on how the user invoked it. When you want a quick pass and a deep pass,
+ship two skills:
+
+```
+.claude/skills/code-review/SKILL.md         # model: haiku,  effort: low
+.claude/skills/code-review-deep/SKILL.md    # model: opus,   effort: high
+```
+
+Each one gets a `description` that says plainly when it applies, which is also what lets
+Claude pick the right one on its own.
+
+### Setting the Session Default
+
+Everything a skill does not override comes from the session model, which you set in
+`.claude/settings.json`:
 
 ```json
 {
-  "skills": {
-    "code-formatter": {
-      "model": "haiku",
-      "enabled": true
-    },
-    "code-review": {
-      "model": "sonnet",
-      "enabled": true,
-      "modelOverrides": {
-        "quick": "haiku",
-        "deep": "opus"
-      }
-    },
-    "api-scaffold": {
-      "model": "sonnet",
-      "enabled": true
-    }
-  },
-  "defaultSkillModel": "sonnet"
+  "model": "sonnet",
+  "fallbackModel": "haiku"
 }
 ```
 
-**Priority Order:**
-1. Invocation-time override (highest)
-2. `.claude/config.json` skill-specific settings
-3. SKILL.md frontmatter `model` field
-4. Agent's default model
-5. Global default (Sonnet)
+**Which model actually runs:**
+1. A skill's frontmatter `model` — for the remainder of the turn that invoked it
+2. Otherwise the session model, resolved by settings precedence (highest first):
+   managed settings → command-line arguments → `.claude/settings.local.json` →
+   `.claude/settings.json` → `~/.claude/settings.json`
 
 ---
 
@@ -188,19 +179,16 @@ Override in `.claude/config.json`:
 
 **Why Haiku:** No reasoning needed, just rule application
 
-**Examples:**
+**Examples** (each in its own `SKILL.md` frontmatter):
 ```yaml
-# code-formatter
+# code-formatter/SKILL.md — typically 3-5K tokens
 model: haiku
-costEstimate: 3000-5000 tokens
 
-# spell-checker
+# spell-checker/SKILL.md — typically 2-4K tokens
 model: haiku
-costEstimate: 2000-4000 tokens
 
-# import-sorter
+# import-sorter/SKILL.md — typically 1-3K tokens
 model: haiku
-costEstimate: 1000-3000 tokens
 ```
 
 **Savings:** 66% compared to Sonnet
@@ -213,21 +201,18 @@ costEstimate: 1000-3000 tokens
 
 **Examples:**
 ```yaml
-# test-generator
+# test-generator/SKILL.md
 model: sonnet
-modelOverrides:
-  simple: haiku      # Simple unit tests
-  standard: sonnet   # Integration tests
-  complex: opus      # E2E test scenarios
+effort: medium   # Drop to low for straightforward unit tests
 
-# tdd-workflow
-model: sonnet  # Needs to understand behavior
+# tdd-workflow/SKILL.md
+model: sonnet    # Needs to understand behavior
 
-# coverage-analyzer
-model: haiku   # Just parses coverage reports
+# coverage-analyzer/SKILL.md
+model: haiku     # Just parses coverage reports
 ```
 
-**Savings:** 30-50% with smart overrides
+**Savings:** 30-50%, mostly from pulling the mechanical skills down to Haiku
 
 ---
 

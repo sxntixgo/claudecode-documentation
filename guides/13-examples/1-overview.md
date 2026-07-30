@@ -67,7 +67,7 @@ vim .claude/CLAUDE.md
 
 ```bash
 # Copy specific files
-cp guides/13-examples/projects/react-typescript/.claude/config.json .claude/
+cp guides/13-examples/projects/react-typescript/.claude/settings.json .claude/
 cp guides/13-examples/workflows/feature-development.md .claude/workflows/
 ```
 
