@@ -99,7 +99,7 @@ Press [Tab]                     # Toggle extended thinking on/off
     "general-purpose": {"model": "sonnet"},
     "Plan": {"model": "sonnet"}
   },
-  "defaultModel": "haiku"
+  "model": "haiku"
 }
 ```
 
@@ -211,10 +211,6 @@ command: review
 description: Code review
 usage: /review [options] <file>
 model: sonnet
-options:
-  - name: quick
-    type: boolean
-    default: false
 ---
 
 # Command instructions here

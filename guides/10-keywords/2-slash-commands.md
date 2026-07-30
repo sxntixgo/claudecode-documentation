@@ -128,9 +128,6 @@ command: string           # Command name (used as /command)
 description: string       # One-line description
 
 # Optional Metadata
-version: string          # Semantic version (1.0.0)
-author: string           # Author name
-category: string         # Category (code, docs, test, etc.)
 
 # Usage Information
 usage: string            # Usage syntax
@@ -143,12 +140,6 @@ agent: string            # Agent to use (optional)
 model: string            # Model override (haiku/sonnet/opus)
 
 # Options/Flags
-options:
-  - name: string         # Flag name
-    type: string         # boolean, string, number
-    default: any         # Default value
-    description: string  # Help text
-    required: boolean    # Is required?
 
 # Advanced
 confirm: boolean         # Require confirmation before execution
@@ -177,19 +168,6 @@ examples:
   - /review src/auth.ts --security
 skill: code-review
 model: sonnet
-options:
-  - name: quick
-    type: boolean
-    default: false
-    description: Quick syntax and style check only
-  - name: deep
-    type: boolean
-    default: false
-    description: Comprehensive architectural review
-  - name: security
-    type: boolean
-    default: false
-    description: Focus on security vulnerabilities
 ---
 
 # Code Review Command
@@ -237,19 +215,6 @@ examples:
   - /test --e2e
 skill: test-generator
 model: sonnet
-options:
-  - name: integration
-    type: boolean
-    default: false
-    description: Generate integration tests
-  - name: e2e
-    type: boolean
-    default: false
-    description: Generate end-to-end tests
-  - name: coverage
-    type: number
-    default: 80
-    description: Target coverage percentage
 ---
 
 # Test Generation Command
@@ -347,15 +312,6 @@ examples:
   - /deploy production
 confirm: true
 dangerous: true
-options:
-  - name: environment
-    type: string
-    required: true
-    description: Target environment (staging, production)
-  - name: skip-tests
-    type: boolean
-    default: false
-    description: Skip test suite (not recommended)
 ---
 
 # Deploy Command
@@ -800,10 +756,6 @@ command: <command-name>
 description: Description
 skill: <skill-name>
 model: sonnet
-options:
-  - name: <option-name>
-    type: boolean
-    default: false
 ---
 
 # <Command Name>

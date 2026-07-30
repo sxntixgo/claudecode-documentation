@@ -264,7 +264,7 @@ your-project/
 **File**: `.claude/settings.json`
 ```json
 {
-  "defaultModel": "claude-sonnet-4-5",
+  "model": "claude-sonnet-4-5",
   "hooks": {
     "preToolUse": [
       "npm run lint",

@@ -179,7 +179,6 @@ describe('MCP Server Performance', () => {
 ```markdown
 ---
 name: code-review-skill
-version: 1.0.0
 ---
 
 # Code Review Skill

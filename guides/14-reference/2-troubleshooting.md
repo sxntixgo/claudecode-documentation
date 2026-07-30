@@ -379,7 +379,6 @@ description: Generate comprehensive API documentation from code including REST e
 ---
 name: api-documentation
 description: Generate comprehensive API documentation from code including REST endpoints, request/response schemas, authentication methods, and example usage
-tags: ["documentation", "api", "rest", "swagger", "openapi"]
 ---
 ```
 
@@ -609,10 +608,6 @@ See @docs/database-schema.md for schema
 {
   "agents": {
     "frontend-only": {
-      "constraints": {
-        "allowedPaths": ["src/frontend/**"],
-        "deniedPaths": ["src/backend/**", "docs/**"]
-      }
     }
   }
 }
@@ -944,7 +939,7 @@ git checkout -b claude/my-feature-abc123
       "model": "haiku"  // 2x faster than Sonnet
     }
   },
-  "defaultModel": "haiku"
+  "model": "haiku"
 }
 ```
 
@@ -1010,9 +1005,6 @@ You: "Search src/**/*.ts for 'async function'"  # Specific, no extended thinking
 {
   "agents": {
     "safe-agent": {
-      "constraints": {
-        "maxFileSize": 1048576  // 1MB limit
-      }
     }
   }
 }

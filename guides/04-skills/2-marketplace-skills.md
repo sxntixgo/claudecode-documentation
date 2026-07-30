@@ -1021,13 +1021,10 @@ paths:
 - Required tools not available
 
 **Solutions**:
-```yaml
-# Check skill dependencies in frontmatter
----
-# There is no `dependencies` field, and no dependency resolution between skills.
-# A skill that needs another one's behavior should say so in its instructions,
-# and a skill that needs an MCP server should name the tool with its server prefix.
----
+
+There is no `dependencies` field and no dependency resolution between skills. A skill that
+needs another one's behavior should say so in its instructions, and a skill that needs an MCP
+server should name the tool with its server prefix.
 
 Use fully qualified MCP tool names so the tool resolves:
 

@@ -644,26 +644,29 @@ claude <your-command>
 - Execution order
 - Hook results
 
-#### 2. Test Hook Execution
-```bash
-# Simulate hook trigger
-claude hook test postToolUse --tool=Write --file=src/test.ts
+#### 2. Confirm Your Hooks Registered
 
-# Expected output:
-# ✅ Hook 'prettier-format' matched
-# ✅ Hook 'eslint-fix' matched
-# ⚠️ Multiple hooks will execute for this pattern
+```text
+/hooks
 ```
 
-#### 3. Validate Configuration
-```bash
-# Check for overlapping patterns
-claude config validate --check-conflicts
+This lists the hooks Claude Code actually loaded, grouped by event. If a hook you wrote is not
+listed here, the problem is your settings file, not your script.
 
-# Reports potential conflicts:
-# ⚠️ Hooks 'prettier-format' and 'eslint-fix' both match '*.ts'
-# ⚠️ Consider combining into single hook
+#### 3. Watch a Hook Fire
+
+There is no hook simulator. Trigger the real event and read the debug log:
+
+```bash
+claude --debug
 ```
+
+Then do the thing the hook matches — ask Claude to edit a file for a `PostToolUse` hook, for
+example. The debug log records which hooks matched, their exit codes, and their output. For a
+hook that rewrites tool input, you will see `modified tool input keys: [command]`.
+
+To check whether two hooks overlap, read the `matcher` patterns in `/hooks` output: any event
+where more than one hook matches the same tool will run both, in the order they are defined.
 
 ### Best Practices for Avoiding Conflicts
 
@@ -805,14 +808,14 @@ claude config validate --check-conflicts
 
 **Solutions**:
 ```bash
-# Test hook pattern matching
-claude hook test Stop
+# Confirm the hook loaded at all
+# (run /hooks inside the session and look for it under Stop)
 
-# Validate config.json syntax
-claude config validate
+# Validate your settings file parses
+cat .claude/settings.json | jq .
 
-# Enable hook debugging
-export CLAUDE_DEBUG_HOOKS=true
+# See what actually happened when the event fired
+claude --debug
 claude <your-command>
 ```
 
@@ -960,7 +963,7 @@ echo "OUTPUT: $OUTPUT" >> /tmp/hook-debug.log
 
 1. **Enable debug mode**: `export CLAUDE_DEBUG_HOOKS=true`
 2. **Check hook logs**: `~/.claude/logs/hooks.log`
-3. **Validate configuration**: `claude config validate`
+3. **Validate configuration**: `cat .claude/settings.json | jq .`, then check `/hooks`
 4. **Test hooks in isolation**: Run hook script manually with test inputs
 5. **Review examples**: See [Hook Examples](../13-examples/workflows/3-code-review.md)
 6. **Ask community**: [Discord #hooks channel](https://discord.gg/anthropic)

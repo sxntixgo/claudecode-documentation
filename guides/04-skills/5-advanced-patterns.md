@@ -275,7 +275,7 @@ If any fail, deployment is blocked.
 **Goal**: Combine multiple skills into a meta-skill
 
 `.claude/skills/pr-ready/SKILL.md`:
-```markdown
+````
 # PR Ready Skill
 
 This meta-skill ensures your code is ready for pull request.
@@ -309,7 +309,7 @@ This meta-skill ensures your code is ready for pull request.
 # Status: Not ready for PR
 # Please fix security issue and documentation warnings.
 ```
-```
+````
 
 ---
 
@@ -554,7 +554,7 @@ Summary: 2 passed, 1 failed, 1 skipped
 **Goal**: Retry failed operations with increasing delays
 
 `.claude/skills/api-call/SKILL.md`:
-```markdown
+````
 ## Instructions
 
 When calling external APIs, use exponential backoff:
@@ -579,7 +579,7 @@ async function callWithRetry(fn, maxRetries = 3) {
 // Usage
 const result = await callWithRetry(() => fetchGitHubIssues());
 ```
-```
+````
 
 ---
 
@@ -642,7 +642,7 @@ changelog: CHANGELOG.md
 **Goal**: Support both old and new versions during transition
 
 `.claude/skills/code-review/SKILL.md`:
-```markdown
+````
 ## Instructions
 
 Handle both v1 and v2 usage:
@@ -665,7 +665,7 @@ if (config.outputFormat === 'v1') {
 // Use new format
 return formatV2Output(results);
 ```
-```
+````
 
 ---
 
@@ -676,7 +676,7 @@ return formatV2Output(results);
 **Goal**: Avoid redundant expensive operations
 
 `.claude/skills/dependency-analyzer/SKILL.md`:
-```markdown
+````markdown
 ## Instructions
 
 Cache analysis results:
@@ -702,7 +702,7 @@ return result;
 ```
 
 Cache location: `.claude/cache/skills/dependency-analyzer/`
-```
+````
 
 ---
 
@@ -711,7 +711,7 @@ Cache location: `.claude/cache/skills/dependency-analyzer/`
 **Goal**: Process only changed files
 
 `.claude/skills/codebase-analyzer/SKILL.md`:
-```markdown
+````markdown
 ## Instructions
 
 Track processed files:
@@ -741,7 +741,7 @@ await saveAnalysis('.claude/cache/last-analysis.json', {
 
 return results;
 ```
-```
+````
 
 ---
 

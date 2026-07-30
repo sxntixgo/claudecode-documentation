@@ -87,19 +87,19 @@ graph TB
 
 ### Agent Configuration Structure
 
-Agents are defined in `.claude/agents/` directory:
+Each subagent is **one Markdown file** in `.claude/agents/` — not a directory:
 
 ```
 .claude/
 ├── agents/
-│   ├── frontend-agent/
-│   │   └── AGENT.md
-│   ├── backend-agent/
-│   │   └── AGENT.md
-│   └── security-agent/
-│       └── AGENT.md
-└── config.json
+│   ├── frontend-agent.md
+│   ├── backend-agent.md
+│   └── security-agent.md
+└── settings.json
 ```
+
+The filename does not have to match the frontmatter `name`; `name` is what Claude Code uses.
+Put the file in `~/.claude/agents/` instead to make the agent available in every project.
 
 ---
 
@@ -109,22 +109,16 @@ Agents are defined in `.claude/agents/` directory:
 
 **Goal**: Create an agent that only modifies frontend code, auto-formats with Prettier.
 
-**Step 1: Create Agent Directory**
+**Step 1: Create the agents directory** (once per project)
 
 ```bash
-mkdir -p .claude/agents/frontend-agent
+mkdir -p .claude/agents
 ```
 
-**Step 2: Create AGENT.md**
+**Step 2: Create `.claude/agents/frontend-agent.md`**
 
 ```markdown
-# Frontend Agent
-
-**Purpose**: Safe frontend development with automatic formatting
-
-## Configuration
-
-```yaml
+---
 name: frontend-agent
 description: Specialized agent for React/TypeScript frontend development
 model: sonnet
@@ -135,31 +129,11 @@ tools:
   - Glob
   - Grep
   - Bash  # For running Prettier
-constraints:
-  allowedPaths:
-    - "src/components/**"
-    - "src/pages/**"
-    - "src/hooks/**"
-    - "src/styles/**"
-    - "src/utils/**"
-  deniedPaths:
-    - "src/server/**"
-    - "src/database/**"
-    - ".env*"
-    - "config/**"
-  fileTypes:
-    - "*.tsx"
-    - "*.ts"
-    - "*.css"
-    - "*.scss"
-autoActions:
-  afterWrite:
-    - command: "npx prettier --write {file}"
-      description: "Auto-format with Prettier"
-  afterEdit:
-    - command: "npx prettier --write {file}"
-      description: "Auto-format with Prettier"
-\```
+---
+
+# Frontend Agent
+
+**Purpose**: Safe frontend development with automatic formatting
 
 ## Instructions
 
@@ -235,13 +209,7 @@ claude "Create a LoginForm component with email and password fields"
 **Use Case**: Backend API development with automatic test execution
 
 ```markdown
-# API Agent
-
-**Purpose**: Safe backend API development with automatic testing
-
-## Configuration
-
-```yaml
+---
 name: api-agent
 description: Backend API development with automatic test validation
 model: sonnet
@@ -252,28 +220,15 @@ tools:
   - Bash
   - Glob
   - Grep
-constraints:
-  allowedPaths:
-    - "server/**"
-    - "api/**"
-    - "tests/**"
-  deniedPaths:
-    - "src/components/**"  # Don't modify frontend
-    - ".env.production"     # Don't touch prod config
-    - "database/migrations/**"  # Migrations need review
   readOnlyPaths:
     - "src/components/**"  # Can read frontend for context
     - "src/pages/**"
 maxFileSize: 100000  # Don't read huge files
-autoActions:
-  afterWrite:
-    - command: "npm run test -- {file}.test.ts"
-      description: "Run tests for modified file"
-      continueOnError: true
-  beforeWrite:
-    - command: "npm run lint -- {file}"
-      description: "Lint before writing"
-\```
+---
+
+# API Agent
+
+**Purpose**: Safe backend API development with automatic testing
 
 ## Instructions
 
@@ -320,13 +275,7 @@ You are a specialized backend API development agent. Follow these rules:
 **Use Case**: Maintain documentation with spell checking and link validation
 
 ```markdown
-# Documentation Agent
-
-**Purpose**: Maintain high-quality documentation with automatic validation
-
-## Configuration
-
-```yaml
+---
 name: documentation-agent
 description: Documentation maintenance with spell check and link validation
 model: haiku  # Documentation doesn't need Sonnet
@@ -338,30 +287,11 @@ tools:
   - Grep
   - Bash
   - WebFetch  # For validating external links
-constraints:
-  allowedPaths:
-    - "**/*.md"
-    - "docs/**"
-    - "README.md"
-    - "CONTRIBUTING.md"
-  deniedPaths:
-    - "**/*.ts"
-    - "**/*.tsx"
-    - "**/*.js"
-    - "**/*.py"
-autoActions:
-  afterWrite:
-    - command: "npx cspell {file}"
-      description: "Spell check"
-      continueOnError: true
-    - command: "npx markdown-link-check {file}"
-      description: "Validate links"
-      continueOnError: true
-  afterEdit:
-    - command: "npx cspell {file}"
-      description: "Spell check"
-      continueOnError: true
-\```
+---
+
+# Documentation Agent
+
+**Purpose**: Maintain high-quality documentation with automatic validation
 
 ## Instructions
 
@@ -404,256 +334,141 @@ You are a specialized documentation agent. Follow these rules:
 
 ## Advanced Agent Features
 
+A subagent's frontmatter is deliberately small. There are no workflow stages, approval gates,
+tool rules, personas, or auto-actions as configuration — those behaviors come from three places
+instead: the agent's instruction body, hooks, and settings permissions.
+
 ### Feature 1: Multi-Stage Workflows
 
-Agents can have multi-stage workflows with approval gates:
+Stages live in the **body**, as instructions. Claude follows a checklist you write; there is no
+`workflows`/`stages` schema.
 
-```yaml
-name: database-migration-agent
-workflows:
-  createMigration:
-    stages:
-      - name: generate
-        description: "Generate migration file"
-        tools: [Write]
-        autoActions:
-          - command: "npm run migration:generate -- {file}"
+`.claude/agents/database-migration.md`:
 
-      - name: review
-        description: "Review migration"
-        requiresApproval: true
-        prompt: "Review the migration. Continue?"
+```markdown
+---
+name: database-migration
+description: Writes and applies database migrations. Use for any schema change.
+model: sonnet
+tools: Read, Write, Edit, Bash
+---
 
-      - name: test
-        description: "Test on local database"
-        tools: [Bash]
-        commands:
-          - "npm run migration:run -- --env=test"
-          - "npm run test:integration"
+Copy this checklist into your response and check items off as you go:
 
-      - name: approve
-        description: "Final approval"
-        requiresApproval: true
-        prompt: "Migration tested successfully. Apply to dev?"
+```
+- [ ] 1. Generate the migration file
+- [ ] 2. Show me the migration and WAIT for approval before continuing
+- [ ] 3. Apply to the test database
+- [ ] 4. Run the test suite
+- [ ] 5. Report the result
 ```
 
-### Feature 2: Context-Aware Tool Selection
-
-Agents can dynamically select tools based on file type:
-
-```yaml
-name: polyglot-agent
-toolRules:
-  - filePattern: "**/*.py"
-    tools: [Read, Write, Edit, Bash]
-    autoActions:
-      - command: "black {file}"  # Python formatter
-      - command: "pytest {file}"
-
-  - filePattern: "**/*.ts"
-    tools: [Read, Write, Edit, Bash]
-    autoActions:
-      - command: "npx prettier --write {file}"
-      - command: "npm run test -- {file}"
-
-  - filePattern: "**/*.rs"
-    tools: [Read, Write, Edit, Bash]
-    autoActions:
-      - command: "rustfmt {file}"
-      - command: "cargo test"
+**Step 2 is a hard stop.** Present the migration and wait. Do not apply a migration
+that has not been approved in this conversation, even if the request implied urgency.
 ```
 
-### Feature 3: Custom Prompts and Personas
+For an approval gate you want *enforced* rather than requested, use a `PreToolUse`
+[hook](../11-hooks/1-overview.md) — a hook runs regardless of what Claude decides, which
+instructions do not.
 
-Agents can have specialized prompts:
+### Feature 2: Per-File-Type Behavior
 
-```yaml
-name: test-driven-agent
-persona: |
-  You are a Test-Driven Development (TDD) specialist. You ALWAYS:
+Formatters and test runners belong in hooks, which fire on the real event for every agent:
 
-  1. **Write tests first** before implementation
-  2. **Run tests** to confirm they fail (red)
-  3. **Implement** the minimum code to pass tests (green)
-  4. **Refactor** while keeping tests green
-  5. **Document** test coverage and edge cases
-
-  Never write implementation code without tests.
-  Never commit failing tests.
-  Always explain your TDD approach.
-
-autoActions:
-  beforeWrite:
-    - prompt: "Have you written tests first?"
-      requireConfirmation: true
-  afterWrite:
-    - command: "npm run test -- {file}"
-      mustPass: true  # Fail if tests don't pass
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [{ "type": "command", "command": ".claude/hooks/format.sh" }]
+      }
+    ]
+  }
+}
 ```
+
+The script branches on extension, which is where the per-language logic goes:
+
+```bash
+#!/bin/bash
+f=$(jq -r '.tool_input.file_path')
+case "$f" in
+  *.py)        black "$f" ;;
+  *.ts|*.tsx)  npx prettier --write "$f" ;;
+  *.rs)        rustfmt "$f" ;;
+esac
+```
+
+This is strictly better than a config field would be: it runs for every agent, it is testable
+on its own, and you can see exactly what ran in `claude --debug`.
+
+### Feature 3: Persona and Standards
+
+The agent's body **is** its persona — everything after the frontmatter becomes its system
+prompt. To pull in shared standards, use `skills` to preload them rather than a `contextFiles`
+list:
+
+```markdown
+---
+name: api-builder
+description: Builds and modifies REST endpoints
+model: sonnet
+skills: api-conventions
+---
+
+Follow the preloaded API conventions. Prefer explicit errors over silent defaults.
+```
+
+`skills` injects the full skill content at startup, so shared conventions stay in one place
+instead of being duplicated across agents.
+
+### Feature 4: Restricting What an Agent Can Touch
+
+Two real mechanisms, and they compose:
+
+| Goal | Mechanism |
+|------|-----------|
+| Agent cannot use a tool at all | `tools:` in its frontmatter — omit what it should not have |
+| Nothing may touch a path, whichever agent asks | `permissions.deny` in `.claude/settings.json` |
+| Agent should not prompt for routine edits | `permissionMode: acceptEdits` |
+
+```json
+{
+  "permissions": {
+    "deny": ["Read(./.env*)", "Edit(./src/generated/**)"]
+  }
+}
+```
+
+Frontmatter `tools` is the agent's own ceiling; `permissions` is the project's floor. Use the
+floor for anything that matters, since an agent definition is just a file someone can edit.
 
 ---
 
 ## Agent Configuration Reference
 
-### Complete AGENT.md Schema
+The complete frontmatter. `name` and `description` are required; everything else is optional.
 
 ```yaml
-# Required Fields
-name: string                    # Agent identifier (e.g., "frontend-agent")
-description: string             # Human-readable description
-model: "haiku" | "sonnet" | "opus"  # Default model
-
-# Tool Access
-tools:                          # Array of allowed tools
-  - Read
-  - Write
-  - Edit
-  - Bash
-  - Glob
-  - Grep
-  - WebFetch
-  - Task
-
-# Path Constraints
-constraints:
-  allowedPaths:                 # Glob patterns for allowed paths
-    - "src/**"
-    - "tests/**"
-  deniedPaths:                  # Glob patterns for denied paths
-    - ".env*"
-    - "node_modules/**"
-  readOnlyPaths:                # Can read but not modify
-    - "config/**"
-  maxFileSize: number           # Max file size in bytes (default: 1MB)
-  maxFilesPerOperation: number  # Max files to modify at once
-
-# Automatic Actions
-autoActions:
-  beforeRead:
-    - command: string
-      description: string
-  afterRead:
-    - command: string
-  beforeWrite:
-    - command: string
-      requireConfirmation: boolean
-  afterWrite:
-    - command: string
-      continueOnError: boolean
-      mustPass: boolean
-  beforeEdit:
-    - command: string
-  afterEdit:
-    - command: string
-
-# Workflows (Advanced)
-workflows:
-  workflowName:
-    stages:
-      - name: string
-        description: string
-        tools: string[]
-        requiresApproval: boolean
-        commands: string[]
-        prompt: string
-
-# Context and Persona
-persona: string                 # Agent persona/instructions
-contextFiles:                   # Files to include in agent context
-  - "ARCHITECTURE.md"
-  - "CODING_STANDARDS.md"
-maxContextTokens: number        # Max tokens for context (default: 8000)
-
-# Behavior
-behavior:
-  confirmBeforeWrite: boolean   # Require confirmation before writing
-  confirmBeforeBash: boolean    # Require confirmation before bash
-  autoCommit: boolean           # Auto-commit changes
-  commitMessage: string         # Template for commit messages
-
-# Performance
-performance:
-  timeout: number               # Timeout in milliseconds
-  maxRetries: number            # Max retries on failure
-  cacheEnabled: boolean         # Enable response caching
-```
-
 ---
-
-## Testing Your Custom Agents
-
-### Test Plan Template
-
-Create `.claude/agents/your-agent/TESTS.md`:
-
-```markdown
-# Agent Test Plan: Frontend Agent
-
-## Test 1: Basic Component Creation
-**Request**: "Create a Button component"
-**Expected**:
-- File created at src/components/Button.tsx
-- Prettier auto-formats
-- TypeScript types included
-**Actual**: ✅ Pass
-
-## Test 2: Path Constraint Enforcement
-**Request**: "Modify server/api/users.ts"
-**Expected**: Agent refuses (outside allowed paths)
-**Actual**: ✅ Pass
-
-## Test 3: Auto-Formatting
-**Request**: "Create UserCard component"
-**Expected**:
-- Component created
-- Prettier runs automatically
-- Code is properly formatted
-**Actual**: ✅ Pass
-
-## Test 4: Read-Only Access
-**Request**: "Read server/database/schema.sql for context"
-**Expected**: Agent can read but not modify
-**Actual**: ✅ Pass
+name: string                    # lowercase + hyphens, no ":" — required
+description: string             # when Claude should delegate here — required
+tools: string[]                 # inherits all subagent tools if omitted
+model: string                   # sonnet|opus|haiku|fable|full ID|inherit (default inherit)
+permissionMode: string          # default|acceptEdits|auto|dontAsk|bypassPermissions|plan
+skills: string[]                # skills to preload into context at startup
+hooks: object                   # lifecycle hooks scoped to this subagent
+color: string                   # red|blue|green|yellow|purple|orange|pink|cyan
+---
 ```
 
-### Automated Testing Script
-
-```bash
-#!/bin/bash
-# test-agent.sh
-
-echo "Testing frontend-agent..."
-
-# Test 1: Create component (should succeed)
-claude "Create a TestButton component" --agent=frontend-agent
-if [ -f "src/components/TestButton.tsx" ]; then
-  echo "✅ Test 1: Component creation - PASS"
-else
-  echo "❌ Test 1: Component creation - FAIL"
-fi
-
-# Test 2: Modify backend (should fail)
-claude "Modify server/api/users.ts" --agent=frontend-agent 2>&1 | grep -q "denied"
-if [ $? -eq 0 ]; then
-  echo "✅ Test 2: Path constraint - PASS"
-else
-  echo "❌ Test 2: Path constraint - FAIL"
-fi
-
-# Test 3: Formatting (should auto-run)
-claude "Create a TestCard component" --agent=frontend-agent
-grep -q "prettier" .claude/logs/latest.log
-if [ $? -eq 0 ]; then
-  echo "✅ Test 3: Auto-formatting - PASS"
-else
-  echo "❌ Test 3: Auto-formatting - FAIL"
-fi
-
-# Cleanup
-rm -f src/components/TestButton.tsx src/components/TestCard.tsx
-
-echo "Tests complete!"
-```
+> ⚠️ **Fields that do not exist.** `fileTypes`, `autoActions`, `beforeRead`, `afterWrite`,
+> `workflows`, `stages`, `requiresApproval`, `toolRules`, `persona`, `contextFiles`,
+> `maxContextTokens`, `behavior`, `confirmBeforeWrite`, `autoCommit`, `performance`, `timeout`,
+> `maxRetries`, `cacheEnabled`, `constraints`, `allowedPaths`, `deniedPaths`, and
+> `contextWindow` are silently ignored. Nothing errors, which is why they are easy to keep
+> copying. Use the body for behavior, hooks for enforcement, and `permissions` for limits.
 
 ---
 
@@ -663,9 +478,6 @@ echo "Tests complete!"
 
 **The Mistake:**
 ```yaml
-constraints:
-  allowedPaths:
-    - "src/components/Button.tsx"  # Only one specific file!
 ```
 
 **Why It's Wrong:**
@@ -675,10 +487,6 @@ constraints:
 
 **The Fix:**
 ```yaml
-constraints:
-  allowedPaths:
-    - "src/components/**"  # All components
-    - "src/styles/**"      # Styles
 ```
 
 ---
@@ -719,7 +527,6 @@ tools:
 
 **The Mistake:**
 ```yaml
-# No autoActions defined
 ```
 
 **Why It's Wrong:**
@@ -729,13 +536,6 @@ tools:
 
 **The Fix:**
 ```yaml
-autoActions:
-  afterWrite:
-    - command: "npx prettier --write {file}"
-    - command: "npm run lint -- {file}"
-  afterEdit:
-    - command: "npm test -- {file}.test.ts"
-      continueOnError: true
 ```
 
 ---
@@ -829,14 +629,10 @@ Select agent based on file paths:
 my-app/
 ├── .claude/
 │   ├── agents/
-│   │   ├── frontend-agent/
-│   │   │   └── AGENT.md
-│   │   ├── backend-agent/
-│   │   │   └── AGENT.md
-│   │   ├── docs-agent/
-│   │   │   └── AGENT.md
+│   │   ├── frontend-agent.md
+│   │   ├── backend-agent.md
+│   │   ├── docs-agent.md
 │   │   └── test-agent/
-│   │       └── AGENT.md
 │   └── config.json
 ├── src/
 │   ├── components/
