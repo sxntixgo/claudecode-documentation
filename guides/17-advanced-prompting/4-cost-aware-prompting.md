@@ -250,23 +250,40 @@ Cost: $1.50
 
 ### Implementing Cascades in Skills
 
+A skill has exactly one `model`, and it cannot escalate itself mid-run. A cascade is therefore
+**separate skills**, each with its own model and a description saying when it applies:
+
 ```yaml
 # .claude/skills/code-review/SKILL.md
-name: cascading-code-review
-
-## Progressive Disclosure
-### Stage 1: Syntax Check (Haiku)
+---
+description: Quick syntax and style check of a diff. Use for routine pre-commit review.
 model: haiku
-prompt: "Quick syntax and style check"
-
-### Stage 2: Logic Review (Sonnet) - if issues found
-model: sonnet
-prompt: "Deep review: logic, security, edge cases"
-
-### Stage 3: Architecture (Opus) - if major refactor needed
-model: opus
-prompt: "Architecture and design review"
+effort: low
+---
 ```
+
+```yaml
+# .claude/skills/code-review-logic/SKILL.md
+---
+description: Deep review for logic bugs, edge cases, and security issues. Use when a quick review found problems or the change touches auth or data handling.
+model: sonnet
+effort: high
+---
+```
+
+```yaml
+# .claude/skills/code-review-architecture/SKILL.md
+---
+description: Architecture and design review covering scalability and maintainability. Use for changes spanning modules or introducing new patterns.
+model: opus
+effort: high
+---
+```
+
+You escalate by invoking the next skill, and Claude can also select the right one on its own
+because each description states its trigger. Note that a skill's `model` applies only for the
+remainder of the invoking turn, so invoke an expensive skill in its own turn rather than after
+cheap work you did not want upgraded.
 
 ---
 
