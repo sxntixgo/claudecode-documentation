@@ -876,7 +876,7 @@ You now know how to:
 - **[Skills Guide](../04-skills/1-overview.md)** - Package your optimized prompts as reusable skills
 - **[Token Optimization](../12-optimization/1-cost-optimization.md)** - Apply system-wide cost strategies
 - **[Context Management](../09-context/2-claude-md.md)** - Use CLAUDE.md files to reduce prompt length
-- **[Model Selection](../06-models/1-choosing-models.md)** - Deep dive into when to use each model
+- **[Model Selection](../06-models/1-overview.md)** - Deep dive into when to use each model
 
 **See it in action**:
 - **[Examples](../13-examples/1-overview.md)** - Real-world prompt optimization examples
