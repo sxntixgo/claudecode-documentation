@@ -56,17 +56,19 @@ approvalRequired: true
 ---
 ```
 
-### Auto-Trigger
-**Definition**: A mechanism that automatically invokes a skill when the user's natural language matches specific keywords or patterns.
+### Auto-Invocation
+**Definition**: Claude loading a skill on its own, without a `/command`. It is description-driven: Claude reads each skill's `description` (plus `when_to_use`, which is appended to it) and decides whether the request matches. There are no regex patterns and no confidence score. A `paths` glob narrows activation to matching files, `disable-model-invocation: true` turns auto-invocation off.
 
 **Example**:
 ```yaml
 ---
-autoTrigger:
-  - pattern: "review.*code"
-  - pattern: "check.*security"
+description: Reviews staged git changes for security, logic, and style issues before commit.
+when_to_use: review my changes, check this PR, look over the diff
 ---
 ```
+
+**Related Terms**: Description, Skill, Progressive Disclosure
+**See Also**: [Custom Skills](../04-skills/3-creating-skills.md)
 
 ---
 
@@ -156,7 +158,7 @@ npm test       # Run tests
 /usage                # Check token usage
 ```
 
-**See Also**: [Commands Reference](../10-keywords/commands.md)
+**See Also**: [Commands Reference](../10-keywords/2-slash-commands.md)
 
 ### Settings (Configuration)
 **Definition**: `settings.json` defines Claude Code's behavior — default model, permissions, environment variables, and hooks. It exists at four scopes, highest precedence first: managed (`managed-settings.json`, IT-deployed), `.claude/settings.local.json` (personal, gitignored), `.claude/settings.json` (project, committed), and `~/.claude/settings.json` (user, all projects).
@@ -309,7 +311,7 @@ description: Automated code reviews
 
 **Pricing** (2025): $1/M input, $5/M output
 
-**See Also**: [Model Comparison](../06-models/model-comparison.md)
+**See Also**: [Model Comparison](../06-models/1-overview.md)
 
 ### Hook
 **Definition**: Automated actions that trigger before or after specific tool usage.
@@ -332,7 +334,7 @@ description: Automated code reviews
 }
 ```
 
-**See Also**: [Hooks Reference](../10-keywords/hooks.md)
+**See Also**: [Hooks Reference](../11-hooks/1-overview.md)
 
 ### HIPAA (Health Insurance Portability)
 **Definition**: US healthcare privacy regulation requiring encryption and audit logs for health data.
@@ -431,7 +433,7 @@ Complex architecture? → Opus
 Standard coding? → Sonnet
 ```
 
-**See Also**: [Model Selection Tree](1-model-selection-tree.md)
+**See Also**: [Model Selection Tree](5-model-selection-tree.md)
 
 ---
 
@@ -448,7 +450,7 @@ Standard coding? → Sonnet
 
 **Pricing** (2025): Premium pricing
 
-**See Also**: [Model Comparison](../06-models/model-comparison.md)
+**See Also**: [Model Comparison](../06-models/1-overview.md)
 
 ### OWASP Top 10
 **Definition**: List of 10 most critical web application security risks.
@@ -485,14 +487,14 @@ Standard coding? → Sonnet
 }
 ```
 
-**See Also**: [Hooks Reference](../10-keywords/hooks.md)
+**See Also**: [Hooks Reference](../11-hooks/1-overview.md)
 
 ### PreToolUse Hook
 **Definition**: Hook that executes before a tool is run, for validation or preparation.
 
 **Common Use**: Backups, validation, logging
 
-**See Also**: [Hooks Reference](../10-keywords/hooks.md)
+**See Also**: [Hooks Reference](../11-hooks/1-overview.md)
 
 ### Progressive Disclosure
 **Definition**: Design pattern that reveals information gradually based on user needs.
@@ -511,7 +513,7 @@ Standard coding? → Sonnet
 - Include context
 - State desired output format
 
-**See Also**: [Token Optimization](../12-optimization/strategies.md)
+**See Also**: [Token Optimization](../12-optimization/1-cost-optimization.md)
 
 ### Prompt Injection
 **Definition**: Security concern where user input attempts to manipulate Claude's instructions.
@@ -605,12 +607,12 @@ Optional advanced features...
 - Best For: Feature development, code review, testing
 - Context: 200K tokens
 
-**See Also**: [Model Comparison](../06-models/model-comparison.md)
+**See Also**: [Model Comparison](../06-models/1-overview.md)
 
 ### Stop Hook
 **Definition**: Hook that executes after Claude's response is complete, for cleanup or final validation.
 
-**See Also**: [Hooks Reference](../10-keywords/hooks.md)
+**See Also**: [Hooks Reference](../11-hooks/1-overview.md)
 
 ### Subagent
 **Definition**: Agent spawned by a primary agent to handle specific subtasks.
@@ -637,7 +639,7 @@ Optional advanced features...
 - `"think hard"`: ~10,000 tokens
 - `"ultrathink"`: ~31,999 tokens
 
-**See Also**: [Extended Thinking](../08-thinking/extended-thinking.md)
+**See Also**: [Extended Thinking](../08-thinking/1-overview.md)
 
 ### Token
 **Definition**: Unit of measurement for API usage. ~4 characters = 1 token.
@@ -742,7 +744,7 @@ model: sonnet
 - Agent, Subagent, Skill
 - Explore Agent, General-Purpose Agent, Plan Agent
 - SKILL.md, AGENT.md
-- Progressive Disclosure, Auto-Trigger
+- Progressive Disclosure, Auto-Invocation
 
 ### Configuration
 - CLAUDE.md, Config, Frontmatter

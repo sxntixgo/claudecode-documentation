@@ -80,7 +80,7 @@ All reports will be handled confidentially.
 
 #### Step 1: Develop Your Skill
 
-Create a high-quality skill following [best practices](../../04-skills/4-model-assignment.md):
+Create a high-quality skill following [best practices](../04-skills/4-model-assignment.md):
 
 ```markdown
 ---
@@ -285,7 +285,7 @@ SOFTWARE.
 
 #### Step 1: Build Your Server
 
-Follow the [Creating Custom MCP Servers](../../01-mcp-servers/4-creating-custom-servers.md) guide.
+Follow the [Creating Custom MCP Servers](../01-mcp-servers/4-creating-custom-servers.md) guide.
 
 **Key Requirements**:
 - Follows MCP specification

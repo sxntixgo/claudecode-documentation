@@ -2,7 +2,7 @@
 
 **Reading Time**: 20 minutes
 **Skill Level**: Intermediate
-**Prerequisites**: [Token Optimization Guide](../12-optimization/strategies.md)
+**Prerequisites**: [Token Optimization Guide](../12-optimization/1-cost-optimization.md)
 
 ---
 
@@ -548,9 +548,9 @@ finding — clear between unrelated tasks with `/clear`.
 
 ## Next Steps
 
-- Review [Token Optimization Guide](../12-optimization/strategies.md) for strategies
-- Set up [Model Selection Tree](1-model-selection-tree.md) bookmark
-- Check [Glossary](3-glossary.md) for terms
+- Review [Token Optimization Guide](../12-optimization/1-cost-optimization.md) for strategies
+- Set up [Model Selection Tree](5-model-selection-tree.md) bookmark
+- Check [Glossary](7-glossary.md) for terms
 - Create your project's checklist version
 
 ---

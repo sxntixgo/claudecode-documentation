@@ -17,7 +17,7 @@ Keywords and triggers let you automate workflows and customize Claude Code's beh
 ## What Are Keywords and Triggers?
 
 **Keywords**: Special words or phrases that activate specific behaviors
-**Triggers**: Patterns that automatically invoke skills, agents, or commands
+**Triggers**: What a skill advertises in its `description` (and optional `paths`) so Claude invokes it on its own
 
 ---
 
@@ -44,20 +44,22 @@ Quick shortcuts for common workflows:
 
 ---
 
-### 3. Auto-Triggers
-Automatically invoke skills based on patterns:
+### 3. Auto-Invocation
+Skills can load without you typing a command. Claude reads each skill's `description` (and
+`when_to_use`, which is appended to it) and decides whether your request matches — no regex, no
+confidence score:
 
 ```yaml
 # In SKILL.md
-autoTrigger:
-  patterns:
-    - "review.*code"
-    - "check.*pr"
-  confidence: 0.85
+description: Reviews staged changes for security, logic, and style issues before commit.
+when_to_use: review my code, check this PR, look over my changes
 ```
 
 **When you say**: "Review my code for issues"
 **Claude automatically**: Uses code-review skill
+
+Add `paths` if the skill should only wake up for certain files (see
+[Custom Automation](3-automation-patterns.md)).
 
 ---
 

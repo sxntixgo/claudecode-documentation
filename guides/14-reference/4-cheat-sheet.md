@@ -459,4 +459,4 @@ Need planning? → Plan
 
 **Print This Page**: Bookmark for quick reference during development!
 
-**More Details**: See full guides at [Table of Contents](../TABLE_OF_CONTENTS.md)
+**More Details**: See full guides at [Table of Contents](../../TABLE_OF_CONTENTS.md)

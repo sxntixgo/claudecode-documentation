@@ -2,7 +2,7 @@
 
 **Reading Time**: 120 minutes
 **Skill Level**: Intermediate to Advanced
-**Prerequisites**: [Cost Optimization](../../12-optimization/1-cost-optimization.md), [Model Selection](../../06-models/5-selection-guide.md)
+**Prerequisites**: [Cost Optimization](../12-optimization/1-cost-optimization.md), [Model Selection](../06-models/5-selection-guide.md)
 
 ---
 
@@ -2594,10 +2594,10 @@ time claude "complex prompt here"
 
 ## Related Guides
 
-- [Cost Optimization](../../12-optimization/1-cost-optimization.md)
-- [Model Selection](../../06-models/5-selection-guide.md)
-- [Optimization Checklist](../../14-reference/6-optimization-checklist.md)
-- [Bug Fixing Workflow](../../13-examples/workflows/2-bug-fixing.md)
+- [Cost Optimization](../12-optimization/1-cost-optimization.md)
+- [Model Selection](../06-models/5-selection-guide.md)
+- [Optimization Checklist](../14-reference/6-optimization-checklist.md)
+- [Bug Fixing Workflow](../13-examples/workflows/2-bug-fixing.md)
 
 ---
 

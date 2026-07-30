@@ -436,8 +436,8 @@ Claude will analyze and suggest:
 **Example**:
 ```markdown
 See also:
-- [User Management API](./users.md) - Managing user accounts
-- [Security Best Practices](./security.md) - Keeping your app secure
+- User Management API (`users.md`) - Managing user accounts
+- Security Best Practices (`security.md`) - Keeping your app secure
 - [OAuth 2.0 Specification](https://oauth.net/2/) - Official OAuth docs
 ```
 
@@ -696,7 +696,7 @@ See also:
 
 3. **Mark deprecated features**:
    ```markdown
-   > ⚠️ **DEPRECATED**: This authentication method is deprecated as of v2.0. Use OAuth 2.0 instead. See [migration guide](./migration.md).
+   > ⚠️ **DEPRECATED**: This authentication method is deprecated as of v2.0. Use OAuth 2.0 instead. See the migration guide (`migration.md`).
    ```
 
 4. **Set up documentation testing**:

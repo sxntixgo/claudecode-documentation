@@ -601,7 +601,7 @@ npm test
 ## Next Steps
 
 - [Node.js API Template](2-nodejs-api.md)
-- [Full-Stack Template](4-fullstack.md)
+- [Python Project Templates](python/1-django.md)
 - [Workflow Templates](../workflows/1-feature-development.md)
 
 ---

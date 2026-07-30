@@ -2,7 +2,7 @@
 
 **Reading Time**: 15 minutes
 **Skill Level**: Intermediate
-**Prerequisites**: [Model Comparison](../06-models/model-comparison.md)
+**Prerequisites**: [Model Comparison](../06-models/1-overview.md)
 
 ---
 
