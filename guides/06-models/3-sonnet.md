@@ -97,7 +97,7 @@ claude --model=haiku "Format code with Prettier"
 **Default for Most Operations**
 ```json
 {
-  "defaultModel": "sonnet",
+  "model": "sonnet",
   "agents": {
     "Explore": { "model": "haiku" },
     "general-purpose": { "model": "sonnet" }

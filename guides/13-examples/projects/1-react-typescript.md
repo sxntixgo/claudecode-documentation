@@ -365,11 +365,6 @@ examples:
   - /component UserProfile --page
 skill: component-generator
 model: sonnet
-options:
-  - name: page
-    type: boolean
-    default: false
-    description: Generate as page component
 ---
 
 # Component Generator
@@ -486,10 +481,8 @@ describe('ComponentName', () => {
 ```markdown
 ---
 name: component-generator
-version: 1.0.0
 description: Generate React components with TypeScript
 model: sonnet
-category: code-generation
 ---
 
 # Component Generator Skill

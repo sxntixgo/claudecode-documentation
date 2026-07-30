@@ -79,7 +79,7 @@ graph TB
 | **What** | Specialized workers | Instruction manuals |
 | **Purpose** | Tool access + constraints | Workflows + best practices |
 | **Location** | `.claude/agents/` | `.claude/skills/` |
-| **Structure** | `AGENT.md` with tool configs | `SKILL.md` with instructions |
+| **Structure** | `<name>.md` with tool configs | `<dir>/SKILL.md` with instructions |
 | **Reusability** | Project-specific | Shareable across projects |
 | **Examples** | frontend-agent, api-agent | code-review, tdd-workflow |
 | **Invocation** | Auto-selected or `--agent=` | `/skill` command or auto-trigger |

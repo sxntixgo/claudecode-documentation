@@ -505,13 +505,6 @@ tools:
   - Edit
   - Grep
   - Glob
-constraints:
-  allowedPaths:
-    - "src/components/**"
-    - "src/pages/**"
-  deniedPaths:
-    - "src/server/**"
-    - ".env*"
 ---
 
 # Frontend Specialist
@@ -738,10 +731,8 @@ Create `.claude/skills/code-review/SKILL.md`:
 ```yaml
 ---
 name: code-review
-version: 1.0.0
 description: Comprehensive code review covering quality, security, and performance with configurable depth
 model: claude-sonnet-4-5
-tags: ["code-quality", "security", "review"]
 ---
 
 # Code Review Skill
@@ -814,7 +805,6 @@ You: "Review src/api/users.ts for code quality"
 ```yaml
 # Add specific keywords user might mention
 description: "API documentation generator for REST endpoints with OpenAPI/Swagger output including curl examples"
-tags: ["api", "rest", "swagger", "documentation", "curl"]
 ```
 
 **3. Wrong directory**:
@@ -856,7 +846,6 @@ You: "Generate API documentation with OpenAPI spec"
 ---
 name: tdd-workflow
 description: Test-driven development workflow
-dependencies: ["testing-utils"]
 ---
 
 # TDD Workflow
@@ -1425,9 +1414,6 @@ PostgreSQL with Prisma ORM
 {
   "agents": {
     "frontend-only": {
-      "constraints": {
-        "allowedPaths": ["src/frontend/**"]
-      }
     }
   }
 }
@@ -1587,7 +1573,7 @@ npm run build    # Production build
   "agents": {
     "Explore": {"model": "haiku"}
   },
-  "defaultModel": "haiku"
+  "model": "haiku"
 }
 ```
 
@@ -1606,9 +1592,6 @@ npm run build    # Production build
 **4. Use focused agents** with path constraints:
 ```json
 {
-  "constraints": {
-    "allowedPaths": ["src/components/**"]
-  }
 }
 ```
 
@@ -1846,9 +1829,6 @@ Savings: Eliminates repeated context
 {
   "agents": {
     "frontend-only": {
-      "constraints": {
-        "allowedPaths": ["src/frontend/**"]
-      }
     }
   }
 }
@@ -1946,13 +1926,6 @@ command: review
 description: Code review with configurable depth
 usage: /review [--quick | --standard | --deep] <file>
 model: sonnet
-options:
-  - name: quick
-    type: boolean
-    default: false
-  - name: deep
-    type: boolean
-    default: false
 ---
 
 # Code Review Command
@@ -2132,9 +2105,6 @@ Performs quick review of users.ts
   "agents": {
     "strict-tester": {
       "description": "Never allows code without tests",
-      "constraints": {
-        "requireTests": true
-      }
     }
   }
 }

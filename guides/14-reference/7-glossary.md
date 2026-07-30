@@ -28,9 +28,6 @@ Terms are organized alphabetically. Each entry includes:
     "frontend-agent": {
       "model": "haiku",
       "tools": ["Read", "Write"],
-      "constraints": {
-        "allowedPaths": ["src/components/**"]
-      }
     }
   }
 }
@@ -41,7 +38,7 @@ Terms are organized alphabetically. Each entry includes:
 **See Also**: [Agents Guide](../03-agents/1-overview.md)
 
 ### API Reference
-**Definition**: Complete technical specification of Claude Code configuration schemas (AGENT.md, SKILL.md, config.json).
+**Definition**: Complete technical specification of Claude Code configuration schemas (subagent files, SKILL.md, settings.json).
 
 **See Also**: [API Reference](../14-reference/1-api-reference.md)
 
@@ -249,7 +246,7 @@ Comprehensive checks...
 ## F
 
 ### Frontmatter
-**Definition**: YAML metadata at the beginning of SKILL.md or AGENT.md files that defines configuration.
+**Definition**: YAML metadata at the beginning of SKILL.md or subagent files that defines configuration.
 
 **Example**:
 ```yaml
@@ -357,7 +354,7 @@ description: Automated code reviews
 ### JSON Schema
 **Definition**: Format for defining the structure of JSON configuration files.
 
-**Used For**: AGENT.md schemas, SKILL.md frontmatter validation
+**Used For**: subagent and SKILL.md frontmatter
 
 ---
 
@@ -710,7 +707,7 @@ const email = z.string().email().parse(input)
 ## Y
 
 ### YAML
-**Definition**: Human-readable data format used in frontmatter for AGENT.md and SKILL.md.
+**Definition**: Human-readable data format used in frontmatter for subagent files and SKILL.md.
 
 **Example**:
 ```yaml
@@ -740,7 +737,7 @@ model: sonnet
 ### Agents & Skills
 - Agent, Subagent, Skill
 - Explore Agent, General-Purpose Agent, Plan Agent
-- SKILL.md, AGENT.md
+- SKILL.md, subagent files
 - Progressive Disclosure, Auto-Invocation
 
 ### Configuration

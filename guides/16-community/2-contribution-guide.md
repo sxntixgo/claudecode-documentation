@@ -86,9 +86,7 @@ Create a high-quality skill following [best practices](../04-skills/4-model-assi
 ---
 name: your-skill-name
 description: Clear, specific description of what the skill does. Include action verbs, file types, and use cases (100-200 chars).
-version: 1.0.0
 model: claude-haiku-4-5  # Choose appropriate model
-author: Your Name
 license: MIT
 ---
 

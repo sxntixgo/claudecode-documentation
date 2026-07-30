@@ -590,7 +590,6 @@ listing, so lead with the primary use case.
 > directory instead of `testFiles`.
 
 ---
-```
 
 ---
 

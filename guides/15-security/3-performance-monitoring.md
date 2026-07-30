@@ -419,7 +419,7 @@ print(task_analysis.sort_values('cost', ascending=False))
 // .claude/workflows/code_review.json
 {
   "name": "Code Review",
-  "defaultModel": "haiku",  // Changed from sonnet
+  "model": "haiku",  // Changed from sonnet
   "description": "Review PRs for style and basic issues",
   "prompts": {
     "review": "Review this PR for code quality, focusing on: clarity, error handling, edge cases"
@@ -595,7 +595,6 @@ for op, times in sorted(latencies.items(), key=lambda x: np.percentile(x[1], 95)
   "model": "haiku",
   "description": "Optimized for fast file operations",
   "tools": ["read", "glob", "grep"],
-  "contextWindow": "small",
   "systemPrompt": "Fast file reading specialist. Be concise."
 }
 ```
@@ -607,7 +606,6 @@ for op, times in sorted(latencies.items(), key=lambda x: np.percentile(x[1], 95)
   "model": "sonnet",
   "description": "Code generation and refactoring",
   "tools": ["read", "write", "edit"],
-  "contextWindow": "medium"
 }
 ```
 

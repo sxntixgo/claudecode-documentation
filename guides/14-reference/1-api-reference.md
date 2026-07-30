@@ -14,7 +14,7 @@ This is your complete technical reference for all Claude Code configuration sche
 
 ## Table of Contents
 
-1. [AGENT.md Schema](#agentmd-schema)
+1. [Subagent Schema](#subagent-schema)
 2. [SKILL.md Schema](#skillmd-schema)
 3. [settings.json Schema](#settingsjson-schema)
 4. [Hook Specifications](#hook-specifications)
@@ -25,207 +25,116 @@ This is your complete technical reference for all Claude Code configuration sche
 
 ---
 
-## AGENT.md Schema
+## Subagent Schema
 
 ### Overview
 
-Custom agents are defined using `AGENT.md` files with YAML frontmatter. Agents are specialized AI assistants with specific capabilities, constraints, and behaviors.
+A custom subagent is a single Markdown file with YAML frontmatter. There is no `subagent file` file
+and no registry — Claude Code discovers subagents by reading the directory, so the agent exists
+the moment the file does.
+
+| Scope | Path |
+|-------|------|
+| Project, shared via git | `.claude/agents/<name>.md` |
+| Personal, all projects | `~/.claude/agents/<name>.md` |
 
 ### Complete Schema
 
 ```yaml
 ---
 name: string (required)
-  # Unique identifier for the agent
-  # Example: "frontend-specialist", "security-auditor"
+  # Unique identifier, lowercase letters and hyphens. Cannot contain ":",
+  # which is reserved for plugin-scoped names. Hooks receive this as agent_type.
 
 description: string (required)
-  # Clear description of agent's purpose and capabilities
-  # Should be 1-2 sentences, action-oriented
-  # Example: "Specialized agent for React/TypeScript frontend development with focus on component architecture"
-
-model: "haiku" | "sonnet" | "opus" (optional)
-  # Model to use for this agent
-  # Default: inherits from parent or "sonnet"
-  # Choices:
-  #   - "haiku": Fast, cost-effective (recommended for searches, simple tasks)
-  #   - "sonnet": Balanced (recommended for standard coding)
-  #   - "opus": Maximum reasoning (recommended for complex architecture)
+  # When Claude should delegate to this subagent. This IS the routing logic —
+  # there is no rule table or pattern matcher, so be specific and action-oriented.
 
 tools: string[] (optional)
-  # Array of tool names this agent can access
-  # Available tools: "Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", etc.
-  # Default: all tools available
-  # Example: ["Read", "Grep", "Glob"] for read-only agents
+  # Tools the subagent may use. Inherits every tool available to subagents if
+  # omitted. If no entry resolves to a real tool, the subagent fails to launch.
+  # To preload skills, use the skills field rather than listing Skill here.
 
-constraints: object (optional)
-  allowedPaths: string[] (optional)
-    # Glob patterns for paths this agent can access
-    # Example: ["src/components/**", "src/pages/**"]
+model: string (optional)
+  # sonnet | opus | haiku | fable | a full model ID | inherit
+  # Defaults to inherit, meaning it runs on the main session's model.
 
-  deniedPaths: string[] (optional)
-    # Glob patterns for paths this agent cannot access
-    # Takes precedence over allowedPaths
-    # Example: ["src/server/**", ".env*", "**/*.private.*"]
+permissionMode: string (optional)
+  # default | acceptEdits | auto | dontAsk | bypassPermissions | plan
+  # Ignored for plugin subagents.
 
-  maxFileSize: number (optional)
-    # Maximum file size in bytes agent can read/write
-    # Default: unlimited
-    # Example: 1048576 (1MB)
+skills: string[] (optional)
+  # Skills to preload into the subagent's context at startup. The full skill
+  # content is injected, not just the description. The subagent can still invoke
+  # unlisted skills through the Skill tool.
 
-  readOnly: boolean (optional)
-    # If true, agent cannot modify files
-    # Default: false
-    # Use for security-sensitive agents
+hooks: object (optional)
+  # Lifecycle hooks scoped to this subagent. Ignored for plugin subagents.
 
-autoActions: object (optional)
-  beforeRead: Command[] (optional)
-    # Commands to run before reading files
-    # Example: [{"command": "git pull"}]
-
-  afterWrite: Command[] (optional)
-    # Commands to run after writing files
-    # Example: [{"command": "npx prettier --write {file}"}]
-
-  onError: Command[] (optional)
-    # Commands to run when agent encounters errors
-    # Example: [{"command": "notify-send 'Agent Error' '{error}'"}]
-
-timeout: number (optional)
-  # Maximum execution time in milliseconds
-  # Default: 120000 (2 minutes)
-  # Maximum: 600000 (10 minutes)
-
-contextWindow: number (optional)
-  # Maximum context window for this agent
-  # Default: inherits from model defaults
-  # Use to limit context for focused agents
+color: string (optional)
+  # Display color in the task list and transcript: red, blue, green, yellow,
+  # purple, orange, pink, or cyan.
 ---
 
 # Agent Instructions
 
-[Detailed instructions for how the agent should behave, written in markdown]
-
-## Capabilities
-
-- List specific capabilities
-- What this agent excels at
-- When to use this agent
-
-## Limitations
-
-- What this agent should NOT do
-- Tasks to delegate to other agents
-- Known constraints
-
-## Examples
-
-Provide concrete examples of tasks this agent handles well.
+[Instructions for how the agent should behave, in markdown]
 ```
+
+> ⚠️ **Fields that do not exist.** `constraints`, `allowedPaths`, `deniedPaths`, `maxFileSize`,
+> `readOnly`, `autoActions`, `timeout`, and `contextWindow` are not read. To restrict what an
+> agent can touch, limit `tools` in its frontmatter and set `permissions.deny` in
+> `.claude/settings.json`. To run a command after every edit, use a `PostToolUse`
+> [hook](../11-hooks/1-overview.md). There is no timeout field — narrow the task scope instead.
 
 ### Example: Frontend Specialist Agent
 
-```yaml
+`.claude/agents/frontend-specialist.md`:
+
+```markdown
 ---
 name: frontend-specialist
-description: React/TypeScript frontend development agent specializing in component architecture, hooks, and state management
+description: Builds and modifies React components, hooks, and client-side state. Use for any work under src/components/ or src/pages/.
 model: sonnet
-tools:
-  - Read
-  - Write
-  - Edit
-  - Bash
-  - Grep
-  - Glob
-constraints:
-  allowedPaths:
-    - "src/components/**"
-    - "src/pages/**"
-    - "src/hooks/**"
-    - "src/contexts/**"
-    - "src/styles/**"
-  deniedPaths:
-    - "src/server/**"
-    - "src/api/**"
-    - ".env*"
-  readOnly: false
-autoActions:
-  afterWrite:
-    - command: "npx prettier --write {file}"
-    - command: "npx eslint --fix {file}"
-timeout: 180000
+tools: Read, Write, Edit, Bash, Grep, Glob
+color: blue
 ---
 
-# Frontend Specialist Agent
+# Frontend Specialist
 
-## Capabilities
+## Scope
 
-I specialize in:
-- **React Components**: Creating functional components with TypeScript
-- **Hooks**: useState, useEffect, useContext, custom hooks
-- **State Management**: Context API, reducers, local state patterns
-- **Component Architecture**: Composition, props drilling solutions
-- **Styling**: CSS Modules, styled-components, Tailwind CSS
-- **Testing**: React Testing Library, component testing
+React components with TypeScript, hooks, Context-based state, CSS Modules and Tailwind,
+and React Testing Library tests.
 
 ## Approach
 
-1. **Type Safety First**: Always use TypeScript strict mode
-2. **Component Composition**: Prefer composition over inheritance
-3. **Performance**: Use memo, useCallback, useMemo when appropriate
-4. **Accessibility**: Follow WCAG 2.1 AA standards
-5. **Testing**: Write tests alongside components
+1. TypeScript strict mode; no `any`
+2. Composition over inheritance
+3. Reach for `memo`, `useCallback`, and `useMemo` only with a measured reason
+4. WCAG 2.1 AA for anything interactive
+5. Write the test alongside the component
 
-## Limitations
+## Out of scope
 
-I do NOT handle:
-- Backend API development (use backend-specialist agent)
-- Database queries (use data-specialist agent)
-- DevOps configuration (use devops-specialist agent)
-- Server-side rendering logic (use ssr-specialist agent)
-
-## Examples
-
-### Creating a Form Component
-
-```typescript
-interface LoginFormProps {
-  onSubmit: (credentials: {email: string; password: string}) => Promise<void>;
-  isLoading?: boolean;
-}
-
-export const LoginForm: React.FC<LoginFormProps> = ({onSubmit, isLoading}) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await onSubmit({email, password});
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-        aria-label="Email address"
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-        aria-label="Password"
-      />
-      <button type="submit" disabled={isLoading}>
-        {isLoading ? 'Logging in...' : 'Log In'}
-      </button>
-    </form>
-  );
-};
+Backend APIs, database queries, and deployment config. Say so and stop rather than
+guessing at them.
 ```
+
+To auto-format after every write, pair the agent with a hook in `.claude/settings.json`
+rather than an `autoActions` block:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [{ "type": "command", "command": "jq -r '.tool_input.file_path' | xargs npx prettier --write" }]
+      }
+    ]
+  }
+}
 ```
 
 ---
@@ -601,7 +510,7 @@ There is no `config.json` — that filename has never been part of Claude Code.
 | `enableAllProjectMcpServers` | Auto-approve MCP servers from `.mcp.json` |
 | `outputStyle` | Response output style |
 
-> ⚠️ Note the singular `agent` key. There is no `agents` object — per-subagent settings live in the subagent's own file, not here. See [AGENT.md Schema](#agentmd-schema).
+> ⚠️ Note the singular `agent` key. There is no `agents` object — per-subagent settings live in the subagent's own file, not here. See [subagent file Schema](#agentmd-schema).
 
 ### Example Configuration
 
@@ -831,7 +740,6 @@ model: "haiku" | "sonnet" | "opus" (optional)
   # Model to use for this command
   # Default: inherits from config
 
-options: array (optional)
   # Command-line style options
   - name: "option-name"
     type: "boolean" | "string" | "number"
@@ -858,30 +766,13 @@ Show example usages to guide Claude's behavior.
 
 ### Example: Code Review Command
 
-```yaml
+````
 ---
 command: review
 description: Comprehensive code review with configurable depth
 usage: /review [--quick | --standard | --deep] <file-or-directory>
 skill: code-review
 model: sonnet
-options:
-  - name: quick
-    type: boolean
-    default: false
-    description: Fast surface-level review
-  - name: standard
-    type: boolean
-    default: true
-    description: Balanced review (default)
-  - name: deep
-    type: boolean
-    default: false
-    description: Comprehensive architectural review
-  - name: security-focus
-    type: boolean
-    default: false
-    description: Focus primarily on security issues
 ---
 
 # Code Review Command
@@ -922,7 +813,7 @@ When this command is invoked:
 # Review all changed files
 /review
 ```
-```
+````
 
 ---
 
@@ -1235,7 +1126,7 @@ Settings paths are fixed per scope. There is no environment variable or flag tha
 
 ### Related Guides
 
-- [Creating Custom Agents](../03-agents/4-custom-agents.md) - Using AGENT.md schema
+- [Creating Custom Agents](../03-agents/4-custom-agents.md) - Using subagent file schema
 - [Creating Custom Skills](../04-skills/3-creating-skills.md) - Using SKILL.md schema
 - [Creating Slash Commands](../10-keywords/2-slash-commands.md) - Using command schema
 - [CLAUDE.md Files](../09-context/2-claude-md.md) - Project context structure

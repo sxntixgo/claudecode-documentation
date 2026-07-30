@@ -603,21 +603,16 @@ In `SKILL.md` frontmatter:
 
 ```yaml
 ---
-name: database-migration-skill
-description: Run database migrations
-version: 1.0.0
-requiredTools:
-  - Bash
-  - Read
-  - Write
-requiredAgent: database-agent
-constraints:
-  deniedPaths:
-    - "src/public/**"
-    - "src/components/**"
-warningMessage: "This skill modifies the database. Ensure you have backups."
-approvalRequired: true
+description: Runs database migrations. Use only when explicitly asked to migrate; never as part of a broader task.
+disable-model-invocation: true
+allowed-tools: Read Bash(npm run migrate *)
+disallowed-tools: Write Edit
 ---
+
+**This skill modifies the database. Ensure you have a backup before running.**
+
+Confirm with the user before applying any migration. Report the migration plan first and
+wait for explicit approval.
 ```
 
 ---
