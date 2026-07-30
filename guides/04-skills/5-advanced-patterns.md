@@ -29,11 +29,9 @@ By the end of this guide, you'll master:
 `.claude/skills/code-review/SKILL.md`:
 ````markdown
 ---
-name: code-review
-modelOverrides:
-  quick: haiku
-  standard: sonnet
-  expert: opus
+description: Reviews a diff for correctness, style, and obvious bugs
+model: sonnet
+effort: medium
 ---
 
 # Code Review Skill

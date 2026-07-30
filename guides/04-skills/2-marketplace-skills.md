@@ -926,10 +926,9 @@ model: sonnet  # Try upgrading to opus for better quality
 ```yaml
 # Assign cheaper model for simple tasks
 ---
-name: my-skill
-model: haiku  # Use haiku instead of sonnet
-modelOverrides:
-  deep: sonnet  # Only use sonnet for --deep flag
+description: What the skill does and when to use it
+model: haiku     # Use haiku instead of sonnet
+effort: low      # Lower the effort dial before lowering the model tier
 ---
 ```
 
