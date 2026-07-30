@@ -197,34 +197,19 @@ You are a specialized frontend development agent. Follow these rules:
 - **Bash**: Run Prettier, ESLint, type checking
 ```
 
-**Step 3: Register in `.claude/config.json`**
+**Step 3: Nothing to register**
 
-```json
-{
-  "agents": {
-    "frontend-agent": {
-      "path": ".claude/agents/frontend-agent",
-      "model": "sonnet",
-      "enabled": true
-    },
-    "Explore": {
-      "model": "haiku"
-    },
-    "general-purpose": {
-      "model": "sonnet"
-    }
-  },
-  "agentSelection": {
-    "autoSelect": true,
-    "rules": [
-      {
-        "pattern": "component|react|ui|style|css",
-        "agent": "frontend-agent",
-        "confidence": 0.8
-      }
-    ]
-  }
-}
+There is no registry. Claude Code discovers subagents by reading `.claude/agents/`, so the
+agent exists the moment the file does — and deleting the file removes it. Everything the agent
+needs, including its model, lives in its own frontmatter:
+
+```markdown
+---
+name: frontend-agent
+description: Builds and modifies React components
+model: sonnet
+tools: Read, Write, Edit, Glob, Grep, Bash
+---
 ```
 
 **Step 4: Test Your Agent**
@@ -234,9 +219,10 @@ You are a specialized frontend development agent. Follow these rules:
 claude "Create a LoginForm component with email and password fields"
 
 # Expected behavior:
-# 1. Router selects frontend-agent (matches "component" keyword)
+# 1. Claude matches the request against each agent's description and delegates
+#    to frontend-agent
 # 2. Agent creates src/components/LoginForm.tsx
-# 3. Prettier auto-formats the file
+# 3. Prettier auto-formats the file (via a PostToolUse hook)
 # 4. Agent confirms completion
 ```
 
@@ -860,92 +846,26 @@ my-app/
 └── docs/
 ```
 
-### Unified Configuration
+### How the Pieces Fit Together
 
-`.claude/config.json`:
+There is no unified configuration file. Each subagent is self-contained in
+`.claude/agents/<name>.md`, and `.claude/settings.json` holds only what is genuinely global —
+the session model, permissions, environment variables, and hooks.
 
-```json
-{
-  "agents": {
-    "frontend-agent": {
-      "path": ".claude/agents/frontend-agent",
-      "model": "sonnet",
-      "enabled": true
-    },
-    "backend-agent": {
-      "path": ".claude/agents/backend-agent",
-      "model": "sonnet",
-      "enabled": true
-    },
-    "docs-agent": {
-      "path": ".claude/agents/docs-agent",
-      "model": "haiku",
-      "enabled": true
-    },
-    "test-agent": {
-      "path": ".claude/agents/test-agent",
-      "model": "haiku",
-      "enabled": true
-    },
-    "Explore": {
-      "model": "haiku"
-    },
-    "general-purpose": {
-      "model": "sonnet"
-    }
-  },
-  "agentSelection": {
-    "autoSelect": true,
-    "rules": [
-      {
-        "keywords": ["component", "react", "ui", "page", "style"],
-        "agent": "frontend-agent",
-        "confidence": 0.85
-      },
-      {
-        "keywords": ["api", "endpoint", "route", "server", "database"],
-        "agent": "backend-agent",
-        "confidence": 0.85
-      },
-      {
-        "keywords": ["docs", "readme", "documentation", "guide"],
-        "agent": "docs-agent",
-        "confidence": 0.9
-      },
-      {
-        "keywords": ["test", "spec", "testing", "tdd"],
-        "agent": "test-agent",
-        "confidence": 0.8
-      }
-    ],
-    "filePatterns": [
-      {
-        "pattern": "src/components/**",
-        "agent": "frontend-agent"
-      },
-      {
-        "pattern": "src/server/**",
-        "agent": "backend-agent"
-      },
-      {
-        "pattern": "tests/**",
-        "agent": "test-agent"
-      },
-      {
-        "pattern": "**/*.md",
-        "agent": "docs-agent"
-      }
-    ],
-    "fallback": "general-purpose"
-  },
-  "costTracking": {
-    "enabled": true,
-    "logFile": ".claude/cost-log.json"
-  }
-}
+```text
+.claude/
+├── settings.json              # session model, permissions, hooks
+├── agents/
+│   ├── frontend-agent.md      # name, description, model, tools
+│   ├── backend-agent.md
+│   └── docs-agent.md
+└── skills/
+    └── <skill>/SKILL.md
 ```
 
----
+Delegation is driven by each agent's `description`, not by a pattern-matching rule table.
+Claude reads the descriptions and picks the agent whose stated purpose fits the request, which
+is why a specific, action-oriented description matters more than any routing config would.
 
 ## Next Steps
 

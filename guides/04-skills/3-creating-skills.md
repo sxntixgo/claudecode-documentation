@@ -166,42 +166,12 @@ claude "Format my TypeScript files using the code-formatter skill"
 
 ````markdown
 ---
-name: code-review
-version: 1.0.0
-author: Your Name <you@example.com>
-description: Automated code review with configurable depth
+description: Reviews code for correctness, style, security, and missing error handling. Use when the user asks for a code review, mentions reviewing a PR, or asks to check changes before committing.
+when_to_use: review this code, check my PR, look over these changes
 model: sonnet
-category: quality
-tags:
-  - code-review
-  - quality
-  - testing
-autoTrigger:
-  patterns:
-    - "review.*code"
-    - "check.*pr"
-    - "code.*review"
-  confidence: 0.85
-slashCommand: /code-review
-options:
-  - name: deep
-    type: boolean
-    default: false
-    description: Run comprehensive review
-  - name: security
-    type: boolean
-    default: false
-    description: Focus on security issues
-  - name: performance
-    type: boolean
-    default: false
-    description: Focus on performance
-dependencies:
-  - eslint
-  - prettier
-costEstimate:
-  quick: 5000
-  deep: 20000
+effort: medium
+argument-hint: "[file-or-directory]"
+allowed-tools: Read Grep Glob Bash(npx eslint *) Bash(npx prettier *)
 ---
 
 # Code Review Skill
@@ -603,17 +573,13 @@ options:
     required: boolean           # Is required?
 
 # Dependencies
-dependencies: string[]          # Required tools (eslint, prettier, etc.)
-requiredTools: string[]         # Required Claude tools (Read, Bash, etc.)
-mcpServers: string[]            # Required MCP servers
+allowed-tools: string | string[]  # Tools pre-approved for the invoking turn
+disallowed-tools: string | string[]  # Tools removed while this skill is active
 
-# Cost Estimation
-costEstimate:
-  [key: string]: number         # Token estimates for different modes
-
-# Agent Configuration
-agent:
-  type: string                  # Preferred agent (Explore, general-purpose)
+# Execution context
+context: string                 # "fork" runs it in an isolated subagent context
+agent: string                   # Which subagent type, when context: fork
+background: boolean             # With context: fork, false waits for the result
   tools: string[]               # Required tools for agent
   constraints:
     allowedPaths: string[]
@@ -1321,16 +1287,21 @@ name: code-review
 
 ---
 
-### 5. ✅ Document Cost
+### 5. ✅ Choose the Cheapest Model That Passes Your Evals
+
+There is no `costEstimate` field, and a number you wrote by hand would drift anyway. Declare
+the model and effort you actually want, then verify the choice against your eval set.
 
 **Good:**
 ```yaml
 ---
-costEstimate:
-  quick: 5000      # ~$0.08
-  deep: 20000      # ~$0.30
+description: Formats code with Prettier. Use when the user asks to format or clean up formatting.
+model: haiku
+effort: low
 ---
 ```
+
+Measure the result with `/usage`, which attributes recent usage to individual skills.
 
 **Bad:**
 ```yaml

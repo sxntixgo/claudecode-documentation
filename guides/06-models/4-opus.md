@@ -102,25 +102,39 @@ claude --model=opus "Add CRUD endpoints for Product"
 ## Configuration
 
 **Reserve for Critical Tasks**
-```json
-{
-  "skills": {
-    "system-design": { "model": "opus" },
-    "security-audit": {
-      "model": "sonnet",
-      "modelOverrides": {
-        "deep": "opus"  // Only deep mode uses Opus
-      }
-    },
-    "code-review": {
-      "model": "sonnet",  // Standard
-      "modelOverrides": {
-        "critical": "opus"  // Pre-production releases
-      }
-    }
-  }
-}
+
+Opus is requested per skill, in that skill's own `SKILL.md` frontmatter. There is no central
+skills block in settings:
+
+```yaml
+# .claude/skills/system-design/SKILL.md
+---
+description: Designs system architecture and evaluates trade-offs. Use before writing code for anything spanning modules.
+model: opus
+effort: high
+---
 ```
+
+```yaml
+# .claude/skills/security-audit/SKILL.md
+---
+description: Audits code for OWASP Top 10 issues. Use before release.
+model: sonnet
+effort: high
+---
+```
+
+```yaml
+# .claude/skills/security-audit-threat-model/SKILL.md
+---
+description: Builds a threat model for a system or feature. Use for pre-production review of security-critical paths.
+model: opus
+effort: high
+---
+```
+
+Note the split: one skill cannot escalate itself to Opus for a "deep" invocation, so the
+thorough version is a separate skill with its own description saying when it applies.
 
 ---
 
