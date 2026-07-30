@@ -765,7 +765,8 @@ I will guide you through the TDD cycle:
 ## Example
 
 ```bash
-/tdd "Add user authentication"
+# Command name comes from the directory: .claude/skills/tdd-workflow/
+/tdd-workflow "Add user authentication"
 ```
 
 **Step 1: 🔴 Red**
@@ -846,10 +847,10 @@ Support different test types:
 ---
 name: api-scaffold
 version: 1.0.0
-description: Generate REST API boilerplate with tests
+description: Generates REST API route, controller, model, and test boilerplate for a resource.
+when_to_use: scaffold an endpoint, generate CRUD routes, add a new API resource
 model: sonnet
 category: backend
-slashCommand: /api
 options:
   - name: type
     type: string
@@ -874,7 +875,8 @@ dependencies:
 
 ## Instructions
 
-When invoked with a resource name (e.g., `/api User`), generate:
+When invoked with a resource name (e.g., `/api-scaffold User` — the command name comes from the
+skill's directory), generate:
 
 ### 1. Route File
 
@@ -921,7 +923,7 @@ Generate OpenAPI/Swagger documentation
 ## Example
 
 ```bash
-/api User --auth=true --tests=true
+/api-scaffold User --auth=true --tests=true
 ```
 
 **Generated Files:**
@@ -1081,7 +1083,7 @@ Generate GraphQL schema, resolvers, and type definitions instead of REST routes.
 **Example:**
 
 ```bash
-/api User --type=graphql
+/api-scaffold User --type=graphql
 ```
 
 Generates:
@@ -1444,13 +1446,15 @@ options:
 
 ### Template 1: Simple Utility Skill
 
+Save as `.claude/skills/my-utility/SKILL.md` — the directory name is the command (`/my-utility`).
+
 ```markdown
 ---
 name: my-utility
 version: 1.0.0
-description: Short description of what it does
+description: Does [what], for [when]. This is what Claude reads to decide to invoke it.
+when_to_use: phrase a user would say, another phrasing
 model: haiku
-slashCommand: /utility
 ---
 
 # My Utility Skill
@@ -1473,13 +1477,15 @@ slashCommand: /utility
 
 ### Template 2: Code Generation Skill
 
+Save as `.claude/skills/generator-name/SKILL.md` — invoked as `/generator-name`.
+
 ```markdown
 ---
 name: generator-name
 version: 1.0.0
-description: Generate [what]
+description: Generates [what] with [features], including tests.
+when_to_use: scaffold [what], create a new [what], generate [what]
 model: sonnet
-slashCommand: /generate
 options:
   - name: framework
     type: string
@@ -1512,13 +1518,15 @@ When invoked, generate:
 
 ### Template 3: Review/Audit Skill
 
+Save as `.claude/skills/review-type/SKILL.md` — invoked as `/review-type`.
+
 ```markdown
 ---
 name: review-type
 version: 1.0.0
-description: Review [what] for [criteria]
+description: Reviews [what] for [criteria] and reports issues by severity.
+when_to_use: review [what], audit [what], check [what] before merging
 model: sonnet
-slashCommand: /review
 options:
   - name: deep
     type: boolean
