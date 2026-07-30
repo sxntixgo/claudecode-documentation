@@ -238,52 +238,81 @@ Skills are reusable instruction sets defined in `SKILL.md` files with YAML front
 
 ### Complete Schema
 
+All frontmatter fields are optional. Only `description` is recommended, since that is what
+Claude reads to decide whether the skill applies. A skill's command name comes from its
+**directory name**, not from `name`.
+
 ```yaml
 ---
-name: string (required)
-  # Unique identifier for the skill
-  # Use kebab-case: "api-documentation", "tdd-workflow"
+# Discovery — how Claude decides to use this skill
+description: string (recommended)
+  # What the skill does AND when to use it. Put the key use case first:
+  # description + when_to_use are truncated at 1,536 characters in the listing.
+  # Bad:  "document processing skill"
+  # Good: "Extracts tables from PDFs and converts them to CSV. Use when
+  #        working with PDF files or when the user mentions tables or extraction."
 
-version: string (optional, semver format)
-  # Semantic version number
-  # Example: "1.0.0", "2.1.3"
-  # Default: "1.0.0"
+when_to_use: string (optional)
+  # Extra trigger context — example requests or trigger phrases.
+  # Appended to description; counts toward the same 1,536-character cap.
 
-description: string (required, 100-200 characters recommended)
-  # Clear, specific description of what this skill does
-  # Include: action verbs, file types, specific use cases
-  # Bad: "document processing skill"
-  # Good: "extract tables from PDFs and convert to CSV format for data analysis workflows"
+name: string (optional)
+  # Display label in skill listings. Defaults to the directory name.
+  # For personal and project skills this does NOT change the command name.
+  # Max 64 chars, lowercase letters/numbers/hyphens, no "anthropic" or "claude".
 
+paths: string[] | string (optional)
+  # Glob patterns limiting when the skill auto-activates.
+  # Example: ["**/*.test.ts", "**/migrations/*.sql"]
+
+# Invocation control
+disable-model-invocation: boolean (optional, default false)
+  # true prevents Claude from auto-loading it; invoke manually with /name.
+
+user-invocable: boolean (optional, default true)
+  # false hides it from the / menu. For background knowledge, not commands.
+
+argument-hint: string (optional)
+  # Autocomplete hint. Example: "[issue-number]" or "[filename] [format]"
+
+arguments: string[] | string (optional)
+  # Named positional arguments for $name substitution in the body.
+
+# Model and reasoning
 model: string (optional)
-  # Default model for this skill
-  # Options: "claude-haiku-4-5", "claude-sonnet-4-5", "claude-opus-4-5"
-  # Example: "claude-haiku-4-5" for simple formatting tasks
-  #          "claude-opus-4-5" for complex architecture analysis
+  # sonnet | opus | haiku | fable | a full model ID | inherit
+  # NOTE: applies for the REMAINDER OF THE CURRENT TURN only. It is not saved
+  # to settings; the session model resumes on your next prompt.
 
-modelOverrides: object (optional)
-  # Named model configurations for different use cases
-  # Allows users to invoke skill with different models
-  # Example:
-  #   quick: "claude-haiku-4-5"
-  #   standard: "claude-sonnet-4-5"
-  #   deep: "claude-opus-4-5"
+effort: string (optional)
+  # low | medium | high | xhigh | max. Available levels depend on the model.
+  # Inherits the session effort level if omitted.
 
-dependencies: string[] (optional)
-  # List of other skills this skill depends on
-  # Example: ["tdd-workflow", "code-formatter"]
+# Tool access
+allowed-tools: string[] | string (optional)
+  # Tools usable without a permission prompt during the invoking turn.
+  # The grant clears on your next message.
 
-tags: string[] (optional)
-  # Categories/tags for skill discovery
-  # Example: ["testing", "python", "api"]
+disallowed-tools: string[] | string (optional)
+  # Tools removed from the pool while this skill is active.
 
-author: string (optional)
-  # Skill author name or organization
-  # Example: "Anthropic", "Your Name"
+# Execution context
+context: string (optional)
+  # Set to "fork" to run in a forked subagent context, keeping the skill's
+  # reads out of the main conversation's context window.
 
-license: string (optional)
-  # License for the skill
-  # Example: "MIT", "Apache-2.0"
+agent: string (optional)
+  # Which subagent type to use. Only applies with context: fork.
+
+background: boolean (optional, default true)
+  # Only applies with context: fork. false waits for the result in the
+  # invoking turn instead of running in the background.
+
+hooks: object (optional)
+  # Lifecycle hooks scoped to this skill.
+
+shell: string (optional)
+  # bash (default) or powershell, for inline shell commands in the body.
 ---
 
 # Skill Name
@@ -357,29 +386,18 @@ How to verify the skill executed correctly:
 
 ```yaml
 ---
-name: code-review
-version: 2.1.0
-description: Comprehensive code review covering quality, security, performance, and best practices with configurable depth levels
-model: claude-sonnet-4-5
-modelOverrides:
-  quick: claude-haiku-4-5
-  standard: claude-sonnet-4-5
-  deep: claude-opus-4-5
-tags: ["code-quality", "security", "best-practices", "review"]
-author: "Anthropic"
-license: "MIT"
+description: Reviews staged changes for correctness, security, and style issues. Use before committing or when the user asks for a code review.
+model: sonnet
+effort: medium
+allowed-tools: Read Grep Bash(git diff *) Bash(git status *)
 ---
 
 # Code Review Skill
 
 ## Overview
 
-This skill provides structured code review at three levels:
-- **Quick**: Fast surface-level review for syntax, obvious issues (~5 min, Haiku)
-- **Standard**: Balanced review covering quality, security, performance (~15 min, Sonnet)
-- **Deep**: Comprehensive architectural review with security audit (~45 min, Opus)
-
-Use this skill for pull request reviews, pre-merge checks, or periodic code audits.
+Reviews the staged diff for correctness, security, and style. Use for pull request reviews,
+pre-merge checks, or periodic code audits.
 
 ## Prerequisites
 

@@ -158,18 +158,22 @@ npm test       # Run tests
 
 **See Also**: [Commands Reference](../10-keywords/commands.md)
 
-### Config (Configuration)
-**Definition**: Settings file (`.claude/config.json`) that defines agents, models, hooks, and behavior of Claude Code.
+### Settings (Configuration)
+**Definition**: `settings.json` defines Claude Code's behavior — default model, permissions, environment variables, and hooks. It exists at four scopes, highest precedence first: managed (`managed-settings.json`, IT-deployed), `.claude/settings.local.json` (personal, gitignored), `.claude/settings.json` (project, committed), and `~/.claude/settings.json` (user, all projects).
 
-**Example**:
+**Example** (`.claude/settings.json`):
 ```json
 {
-  "defaultModel": "haiku",
-  "agents": {
-    "Explore": {"model": "haiku"}
+  "model": "sonnet",
+  "permissions": {
+    "deny": ["Read(./.env*)"]
   }
 }
 ```
+
+**Note**: Subagents and skills are **not** configured here. Each is a file that carries its own settings in YAML frontmatter — `.claude/agents/<name>.md` and `.claude/skills/<name>/SKILL.md` respectively. There is no `agents` or `skills` key in settings.json.
+
+**See Also**: [Model Assignment for Agents](../03-agents/3-model-assignment.md)
 
 ### Context
 **Definition**: Information provided to Claude to understand the project, including code, documentation, CLAUDE.md, and memory.
