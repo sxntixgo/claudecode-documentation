@@ -222,17 +222,14 @@ model: haiku     # Just parses coverage reports
 
 **Examples:**
 ```yaml
-# readme-generator
-model: haiku
-modelOverrides:
-  basic: haiku       # Template-based README
-  comprehensive: sonnet  # Custom content
+# readme-generator/SKILL.md
+model: haiku     # Template-driven; ship a second skill for prose-heavy READMEs
 
-# api-docs
-model: haiku  # Extracting JSDoc/TSDoc
+# api-docs/SKILL.md
+model: haiku     # Extracting JSDoc/TSDoc
 
-# changelog-generator
-model: haiku  # Git log formatting
+# changelog-generator/SKILL.md
+model: haiku     # Git log formatting
 ```
 
 **Savings:** 50-60% compared to all-Sonnet
@@ -245,17 +242,19 @@ model: haiku  # Git log formatting
 
 **Examples:**
 ```yaml
-# secrets-scanner
-model: haiku  # Pattern matching only
+# secrets-scanner/SKILL.md
+model: haiku     # Pattern matching only
 
-# security-audit
-model: sonnet
-modelOverrides:
-  quick: sonnet     # OWASP Top 10
-  deep: opus        # Threat modeling
+# security-audit/SKILL.md
+model: sonnet    # OWASP Top 10 pass
+effort: high
 
-# vulnerability-scanner
-model: sonnet  # Dependency analysis
+# security-audit-threat-model/SKILL.md
+model: opus      # Separate skill; threat modeling is a different job
+effort: high
+
+# vulnerability-scanner/SKILL.md
+model: sonnet    # Dependency analysis
 ```
 
 **Savings:** 20-40% (security is critical, use premium models)
@@ -308,40 +307,31 @@ model: opus  # Complex analysis needed
 
 **Project**: Small startup, budget-conscious
 
-`.claude/config.json`:
+Because each skill declares its own model, a "configuration" is really just the set of values
+across your skill files. There is no central list, and no `defaultSkillModel` key — the
+session model in `.claude/settings.json` is what skills fall back to.
+
+Each row below is the `model` line in that skill's own `SKILL.md`:
+
+| Skill | Model | Why |
+|-------|-------|-----|
+| `code-formatter` | `haiku` | Rule application |
+| `spell-checker` | `haiku` | No reasoning |
+| `code-review` | `haiku` + `effort: low` | Surface pass is enough day to day |
+| `code-review-deep` | `sonnet` + `effort: high` | Separate skill for the thorough pass |
+| `test-generator` | `sonnet` | Needs to understand behavior |
+| `api-scaffold` | `sonnet` | Generation with judgment |
+
+`.claude/settings.json`:
 ```json
 {
-  "skills": {
-    "code-formatter": {
-      "model": "haiku",
-      "autoRun": true
-    },
-    "spell-checker": {
-      "model": "haiku"
-    },
-    "code-review": {
-      "model": "haiku",
-      "modelOverrides": {
-        "deep": "sonnet"
-      }
-    },
-    "test-generator": {
-      "model": "sonnet"
-    },
-    "api-scaffold": {
-      "model": "sonnet"
-    }
-  },
-  "defaultSkillModel": "haiku"
+  "model": "haiku",
+  "fallbackModel": "sonnet"
 }
 ```
 
-**Daily Usage:**
-- 15 formatting operations: Haiku (15 × $0.01 = $0.15)
-- 10 code reviews: Haiku (10 × $0.04 = $0.40)
-- 2 deep reviews: Sonnet (2 × $0.20 = $0.40)
-- 5 test generations: Sonnet (5 × $0.15 = $0.75)
-- **Total: $1.70/day vs. $4.50/day all-Sonnet = 62% savings**
+A Haiku session default suits this posture: anything that genuinely needs more says so in its
+own frontmatter, and everything else stays cheap by default.
 
 ---
 
@@ -349,42 +339,24 @@ model: opus  # Complex analysis needed
 
 **Project**: Large enterprise, quality > cost
 
-`.claude/config.json`:
+| Skill | Model | Why |
+|-------|-------|-----|
+| `code-formatter` | `haiku` | Still mechanical, still cheap |
+| `code-review` | `opus` + `effort: high` | Review quality is the point |
+| `security-audit` | `opus` | No compromises |
+| `test-generator` | `sonnet` | Good balance |
+| `api-scaffold` | `opus` | Public contract; mistakes are expensive |
+| `refactor-architect` | `opus` | Design mistakes compound |
+
+`.claude/settings.json`:
 ```json
 {
-  "skills": {
-    "code-formatter": {
-      "model": "haiku"
-    },
-    "code-review": {
-      "model": "opus",
-      "modelOverrides": {
-        "quick": "sonnet"
-      }
-    },
-    "security-audit": {
-      "model": "opus"
-    },
-    "test-generator": {
-      "model": "sonnet"
-    },
-    "api-scaffold": {
-      "model": "opus"
-    },
-    "refactor-architect": {
-      "model": "opus"
-    }
-  },
-  "defaultSkillModel": "sonnet"
+  "model": "sonnet"
 }
 ```
 
-**Daily Usage:**
-- Formatting: Haiku (cheap)
-- Code review: Opus (critical quality)
-- Security: Opus (no compromises)
-- Tests: Sonnet (good balance)
-- **Total: $8.50/day (premium quality, still 35% cheaper than blind Opus-everything)**
+Note that formatting stays on Haiku even here. Quality-focused does not mean paying premium
+rates for work with no judgment in it.
 
 ---
 
@@ -392,41 +364,23 @@ model: opus  # Complex analysis needed
 
 **Project**: Mid-size team, balance cost and quality
 
-`.claude/config.json`:
+| Skill | Model | Why |
+|-------|-------|-----|
+| `code-formatter`, `spell-checker` | `haiku` | Mechanical |
+| `code-review` | `sonnet` + `effort: low` | Lower effort before lower model |
+| `test-generator`, `api-scaffold` | `sonnet` | Standard coding work |
+| `security-audit`, `refactor-architect` | `opus` | Expensive to get wrong |
+
+`.claude/settings.json`:
 ```json
 {
-  "skills": {
-    "code-formatter": {
-      "model": "haiku"
-    },
-    "spell-checker": {
-      "model": "haiku"
-    },
-    "code-review": {
-      "model": "sonnet",
-      "modelOverrides": {
-        "quick": "haiku",
-        "deep": "opus"
-      }
-    },
-    "test-generator": {
-      "model": "sonnet"
-    },
-    "api-scaffold": {
-      "model": "sonnet"
-    },
-    "security-audit": {
-      "model": "opus"
-    },
-    "refactor-architect": {
-      "model": "opus"
-    }
-  },
-  "defaultSkillModel": "sonnet"
+  "model": "sonnet"
 }
 ```
 
-**Monthly Savings:** ~$120 (50% reduction)
+**Before adopting any of these**, measure. These are postures to test with your own eval set,
+not settings to copy — see [Performance vs. Cost Trade-offs](#performance-vs-cost-trade-offs)
+below.
 
 ---
 
@@ -519,10 +473,12 @@ security-audit:
 
 **Fix:**
 ```yaml
-security-audit:
-  model: sonnet  # Minimum for security
-  modelOverrides:
-    deep: opus   # Critical security needs best model
+# security-audit/SKILL.md
+model: sonnet    # Minimum for security
+effort: high
+
+# security-audit-threat-model/SKILL.md
+model: opus      # Separate skill; threat modeling is a different job
 ```
 
 ---
@@ -565,10 +521,13 @@ code-review:
   model: sonnet  # Default safe choice
 
 # After measuring:
-code-review:
-  model: haiku   # Quick reviews work fine with Haiku!
-  modelOverrides:
-    deep: sonnet # Keep Sonnet for deep reviews
+# code-review/SKILL.md
+model: haiku     # Quick reviews work fine with Haiku
+effort: low
+
+# code-review-deep/SKILL.md
+model: sonnet    # Separate skill for the thorough pass
+effort: high
 ```
 
 ---
@@ -577,11 +536,10 @@ code-review:
 
 ```yaml
 # Match complexity to model
-skill-name:
-  model: haiku  # Default simple mode
-  modelOverrides:
-    standard: sonnet
-    deep: opus
+# One skill, one model. Progressive disclosure applies to the skill's
+# CONTENT (what files it loads), not to model selection.
+model: haiku
+effort: low
 ```
 
 ---
@@ -590,13 +548,9 @@ skill-name:
 
 ```yaml
 ---
-name: code-review
-model: haiku  # Quick reviews don't need deep reasoning
-modelOverrides:
-  deep: opus  # Architecture analysis needs best model
-costEstimate:
-  quick: 5000   # Haiku: ~$0.03
-  deep: 30000   # Opus: ~$0.90
+description: Reviews a diff for correctness, style, and obvious bugs. Use before committing.
+model: haiku     # Quick reviews don't need deep reasoning
+effort: low
 ---
 ```
 
