@@ -14,131 +14,99 @@ Monitor costs and enforce budgets to stay within limits.
 
 ## Cost Tracking Setup
 
-### Enable Tracking
+There is nothing to set up, and nothing to enable. Claude Code has no cost-tracking settings
+key, no local log file, and no local budget enforcement. Tracking is done through commands and,
+for teams, through your organization's console.
 
-`.claude/config.json`:
-```json
-{
-  "costTracking": {
-    "enabled": true,
-    "logFile": ".claude/cost-log.json",
-    "realTime": true,
-    "aggregations": ["hourly", "daily", "weekly", "monthly"]
-  }
-}
-```
+Be skeptical of any guide showing a `costTracking` block or a `.claude/cost-log.json` file —
+neither exists.
 
 ---
 
-## Reading Cost Logs
+## Reading Your Usage
 
-`.claude/cost-log.json`:
-```json
-{
-  "date": "2025-12-20",
-  "summary": {
-    "requests": 150,
-    "totalTokens": 1250000,
-    "totalCost": 18.75,
-    "byModel": {
-      "haiku": { "requests": 60, "cost": 1.80 },
-      "sonnet": { "requests": 80, "cost": 14.40 },
-      "opus": { "requests": 10, "cost": 2.55 }
-    }
-  },
-  "breakdown": {
-    "agents": {
-      "Explore": { "requests": 60, "cost": 1.80 },
-      "general-purpose": { "requests": 90, "cost": 16.95 }
-    },
-    "skills": {
-      "code-review": { "invocations": 20, "cost": 3.60 },
-      "test-generator": { "invocations": 15, "cost": 2.70 }
-    }
-  }
-}
+### `/usage` — the primary view
+
+```text
+/usage
 ```
+
+The Session block reports tokens and a locally computed cost, split by model:
+
+```text
+Total cost:            $0.55
+Total duration (API):  6m 20s
+Total code changes:    0 lines added, 0 lines removed
+Usage by model:
+   claude-sonnet-4-6:  1.2k input, 5.3k output, 940.0k cache read, 50.0k cache write ($0.55)
+```
+
+On a Pro, Max, Team, or Enterprise plan, `/usage` additionally:
+
+- Attributes recent usage to **skills, subagents, plugins, and individual MCP servers**, each
+  as a percentage of the total
+- **Flags any behavior accounting for 10% or more** of recent usage, such as long context or
+  cache misses, with a tip for reducing it
+- Switches between the last 24 hours and last 7 days with `d` and `w`
+
+That attribution is the part worth building a habit around. It answers "what is actually
+costing me money" directly, and the answer regularly contradicts intuition.
+
+Two caveats:
+
+| Caveat | Consequence |
+|--------|-------------|
+| Cost is computed locally at standard list rates | Ignores promotional and contracted pricing; may differ from your bill |
+| Built from local session history on one machine | Excludes usage from other devices and from claude.ai |
+
+For authoritative billing, use the [Console usage page](https://platform.claude.com/usage).
+
+Session totals reset when `/clear` starts a new session, which makes `/clear` a convenient
+measurement boundary when comparing two approaches.
+
+### `/context` — where the tokens went
+
+`/usage` tells you how much you spent. `/context` tells you what you spent it on, by showing
+what currently occupies the context window. When a session gets expensive, this is usually
+where the answer is. See [Context Engineering](../09-context/4-context-engineering.md).
+
+### Status line
+
+You can display context usage continuously in your status line, which turns monitoring from
+something you remember to do into something you notice.
 
 ---
 
-## Daily Budget Enforcement
+## Budget Enforcement
 
-```json
-{
-  "budgets": {
-    "daily": 100000,      // 100K tokens
-    "weekly": 600000,     // 600K tokens
-    "monthly": 2400000,   // 2.4M tokens
-    "alerts": {
-      "75%": "warning",
-      "90%": "critical",
-      "100%": "block"
-    }
-  }
-}
-```
+**Budgets are an organization-level control, not a local one.** No setting on your machine will
+stop a session from spending.
 
----
+| Your setup | Where to cap spend |
+|------------|-------------------|
+| Teams or Enterprise plan | Seat allowance is the default ceiling. With usage credits enabled, set spend limits per organization, group, or member in admin settings. |
+| Claude Console (API) | Workspace spend limits, per workspace |
+| Bedrock, Google Cloud, Microsoft Foundry | Your cloud provider's budget controls |
 
-## Cost Dashboard
-
-### Key Metrics
-
-**Dashboard View**:
-```
-Claude Code Cost Dashboard
-==========================
-
-Today (Dec 20, 2025)
---------------------
-Requests: 150
-Tokens: 1.25M
-Cost: $18.75
-Budget: $30.00 (37% remaining)
-
-This Week
----------
-Total Cost: $105.50
-Weekly Budget: $150.00 (30% remaining)
-Avg/Day: $21.10
-Trend: ↓ Down 15% vs last week
-
-Top Expenses
-------------
-1. Code Reviews: $25.20 (24%)
-2. Feature Dev: $30.50 (29%)
-3. Testing: $18.80 (18%)
-
-Optimization Opportunities
---------------------------
-⚠️  15 code reviews used Sonnet (could use Haiku)
-    Potential savings: $2.70/day
-
-✅ Good: 80% of searches use Haiku
-✅ Good: Batch operations up 40%
-```
+For planning rather than enforcement: across enterprise deployments the average is roughly
+**$13 per developer per active day**, or **$150–250 per developer per month**, with 90% of users
+staying under $30 per active day. Pilot with a small group and measure before rolling out
+widely — a coding seat costs more than a chat seat, because every turn carries file contents,
+tool calls, and multi-step reasoning.
 
 ---
 
-## Alerts and Notifications
+## Team Reporting
 
-**Slack Integration**:
-```javascript
-if (dailyCost > budget * 0.75) {
-  slack.send({
-    channel: '#dev-team',
-    message: '⚠️ Claude Code: 75% of daily budget used'
-  });
-}
+| Setup | See spend | Per-user reporting |
+|-------|-----------|--------------------|
+| Teams / Enterprise | Spend report in org analytics, CSV export, updated daily | Spend report CSV; Enterprise Analytics API on Enterprise |
+| Console (API) | [Console usage page](https://platform.claude.com/usage) | Console dashboard and Claude Code Analytics API |
+| Cloud providers | Your cloud billing console | OpenTelemetry export or an LLM gateway |
 
-if (dailyCost > budget * 0.90) {
-  slack.send({
-    channel: '#dev-team',
-    message: '🚨 Claude Code: 90% of daily budget used!',
-    priority: 'high'
-  });
-}
-```
+**OpenTelemetry export works on every setup** and is the only option that streams per-user
+token and cost metrics into your own observability stack in near real time. If you need
+per-developer attribution and you are not on Teams or Enterprise, this is the answer.
 
 ---
 
@@ -169,23 +137,20 @@ Recommendations:
 
 ---
 
-## Team Budgets
+## Team Budget Planning
 
-**Per-Developer Budgets**:
-```json
-{
-  "teamBudgets": {
-    "developer": {
-      "daily": 50000,    // 50K tokens
-      "monthly": 1200000 // 1.2M tokens
-    },
-    "lead": {
-      "daily": 100000,   // 100K tokens (more Opus usage)
-      "monthly": 2400000
-    }
-  }
-}
-```
+There is no `teamBudgets` key — see [Budget Enforcement](#budget-enforcement) above for where
+caps actually live. What you can do locally is plan, using per-role expectations as a starting
+point to validate against your own `/usage` data:
+
+| Role | Expectation | Why |
+|------|-------------|-----|
+| Individual contributor | Around the $13/active-day average | Mostly Sonnet, scoped tasks |
+| Tech lead / architect | Above average | More Opus for design work, longer sessions |
+| Occasional user | Well below average | Short, infrequent sessions |
+
+Set the actual limits where they are enforceable: seat allowances and member spend limits on
+Teams and Enterprise, or workspace spend limits in the Console.
 
 ---
 

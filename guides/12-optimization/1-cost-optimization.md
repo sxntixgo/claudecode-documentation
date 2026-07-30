@@ -484,7 +484,7 @@ you want the number for a task.
     "code-formatter": { "model": "haiku" },
     "code-review": {
       "model": "haiku",
-      "modelOverrides": { "deep": "sonnet" }
+      "effort": "low"
     }
   }
 }
