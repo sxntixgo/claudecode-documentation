@@ -64,16 +64,26 @@ Set up your `.claude/` directory correctly.
 
 ### Agent Configuration
 
-- [ ] **Create `.claude/config.json`** with optimal models
+- [ ] **Set the session default** in `.claude/settings.json`
   ```json
   {
-    "agents": {
-      "Explore": {"model": "haiku"},
-      "general-purpose": {"model": "sonnet"},
-      "Plan": {"model": "opus"}
-    }
+    "model": "sonnet",
+    "fallbackModel": "haiku"
   }
   ```
+
+- [ ] **Pin models on custom subagents** — one file each, `model` defaults to `inherit`
+  ```markdown
+  <!-- .claude/agents/code-searcher.md -->
+  ---
+  name: code-searcher
+  description: Locates files, symbols, and usage patterns
+  model: haiku
+  tools: Read, Glob, Grep
+  ---
+  ```
+  Built-in agents (Explore, Plan, general-purpose) have no file, so their models cannot be
+  reassigned. Define your own when you need a model pinned.
 
 - [ ] **Set default model** - Should be Haiku
   - [ ] `"defaultModel": "haiku"` in config
@@ -94,13 +104,12 @@ Set up your `.claude/` directory correctly.
 - [ ] **Set skill frontmatter correctly**
   ```yaml
   ---
-  name: skill-name
-  model: sonnet
-  modelOverrides:
-    quick: haiku
-    deep: opus
+  description: What it does and when to use it
+  model: sonnet     # turn-scoped; not saved to settings
+  effort: low       # try lowering effort before dropping a model tier
   ---
   ```
+  One skill, one model. For a quick pass and a deep pass, ship two skills.
 
 ### Hooks Configuration
 
@@ -116,16 +125,11 @@ Set up your `.claude/` directory correctly.
   }
   ```
 
-- [ ] **Cost tracking** - Monitor usage
-  ```json
-  {
-    "costTracking": {
-      "enabled": true,
-      "dailyBudget": 100000,
-      "alertThreshold": 0.8
-    }
-  }
-  ```
+- [ ] **Cost tracking** - Monitor usage with `/usage`
+
+  There is no cost-tracking or budget key in settings. `/usage` reports session tokens and
+  cost, and on paid plans attributes recent usage to individual skills, subagents, plugins,
+  and MCP servers. Spend caps live at the organization level, not in a local file.
 
 ---
 
@@ -197,8 +201,8 @@ Track and optimize your actual usage.
 ### Weekly Monitoring
 
 - [ ] **Review token usage**
-  ```bash
-  cat .claude/cost-log.json | jq '.weekly'
+  ```text
+  /usage      # press w for the 7-day window
   ```
 
 - [ ] **Check model distribution**
@@ -424,19 +428,30 @@ Savings: 18%
 ### Problem: Models Always Using Sonnet
 
 **Checklist:**
-- [ ] Is default model set to Haiku?
-- [ ] Are agents configured with correct models?
-- [ ] Check: `cat .claude/config.json | jq '.agents'`
+- [ ] Is the session default model what you think it is? Check with `/model`
+- [ ] Do your custom subagents set `model` in their frontmatter, or are they on `inherit`?
+- [ ] Check: `cat .claude/settings.json | jq .model` and `grep -r "^model:" .claude/agents/`
 
 **Fix:**
+
+Session default, in `.claude/settings.json`:
 ```json
 {
-  "defaultModel": "haiku",
-  "agents": {
-    "Explore": {"model": "haiku"}
-  }
+  "model": "sonnet"
 }
 ```
+
+Per-subagent, in that subagent's own file (`.claude/agents/code-searcher.md`):
+```yaml
+---
+name: code-searcher
+description: Locates files, symbols, and usage patterns
+model: haiku
+---
+```
+
+Remember `.claude/settings.local.json` and command-line arguments both outrank
+`.claude/settings.json`, so check those if the value looks ignored.
 
 ### Problem: Token Usage Not Decreasing
 
@@ -444,13 +459,16 @@ Savings: 18%
 - [ ] Are you using Explore for searches?
 - [ ] Are you batching operations?
 - [ ] Are prompts specific enough?
-- [ ] Check cost logs: `cat .claude/cost-log.json`
+- [ ] Check `/usage` for what is actually consuming tokens
 
 **Debug:**
-```bash
-# See per-task breakdown
-npm run cost-report
+```text
+/usage      # per-skill, per-subagent, per-MCP-server attribution
+/context    # what is occupying the window right now
 ```
+
+If `/usage` flags "long context" or "cache misses" at 10% or more of recent usage, that is the
+finding — clear between unrelated tasks with `/clear`.
 
 ### Problem: Haiku Producing Poor Results
 

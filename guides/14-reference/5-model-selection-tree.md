@@ -430,44 +430,51 @@ Cost: 1 session + less overhead
 - Emergency fixes: Use Sonnet (compromise speed/quality)
 ```
 
-### In .claude/config.json
+### In .claude/settings.json
+
+Settings carries the session default. It has no per-agent or per-skill keys:
 
 ```json
 {
-  "agents": {
-    "Explore": {
-      "model": "haiku",
-      "purpose": "Fast code exploration"
-    },
-    "general-purpose": {
-      "model": "sonnet",
-      "purpose": "Standard development"
-    },
-    "Plan": {
-      "model": "opus",
-      "purpose": "Architecture and planning"
-    }
-  },
-  "modelOverrides": {
-    "search": "haiku",
-    "implementation": "sonnet",
-    "architecture": "opus"
-  }
+  "model": "sonnet",
+  "fallbackModel": "haiku"
 }
 ```
 
-### In Skills
+### In a subagent
 
+Each subagent sets its own model in its own file. `model` defaults to `inherit`:
+
+`.claude/agents/code-searcher.md`:
+```markdown
+---
+name: code-searcher
+description: Locates files, symbols, and usage patterns. Use for any "where is X" question.
+model: haiku
+tools: Read, Glob, Grep
+---
+
+Report file paths with line numbers. Do not modify files.
+```
+
+Built-in agents (Explore, Plan, general-purpose) have no file to edit, so their models cannot
+be reassigned this way. Define your own subagent when you need a specific model pinned.
+
+### In a skill
+
+`.claude/skills/code-review/SKILL.md`:
 ```yaml
 ---
-name: code-review-skill
-version: 1.0.0
+description: Reviews staged changes for correctness and security. Use before committing.
 model: sonnet
-modelOverrides:
-  quick: haiku
-  deep: opus
+effort: medium
 ---
 ```
+
+A skill's `model` applies for the remainder of the invoking turn and is not saved to settings.
+There is no mechanism for one skill to offer several models — when you want a quick pass and a
+deep pass, ship two skills with different `model` and `effort` values and descriptions that
+say when each applies.
 
 ---
 
