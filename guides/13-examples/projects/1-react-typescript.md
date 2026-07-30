@@ -11,7 +11,9 @@
 ```
 .claude/
 ├── CLAUDE.md                 # Project context
-├── config.json              # Agent and skill configuration
+├── settings.json            # Project settings (committed to git)
+├── agents/                  # Custom subagents
+│   └── explore.md
 ├── commands/                # Custom slash commands
 │   ├── component.md
 │   ├── test.md
@@ -285,47 +287,66 @@ VITE_ENABLE_ANALYTICS=false
 
 ---
 
-## 2. config.json (Configuration)
+## 2. settings.json (Configuration)
 
-`.claude/config.json`:
+`.claude/settings.json`:
 ```json
 {
-  "agents": {
-    "Explore": {
-      "model": "haiku",
-      "description": "Fast file searches and navigation"
-    },
-    "general-purpose": {
-      "model": "sonnet",
-      "description": "Standard development tasks"
-    }
-  },
-  "skills": {
-    "component-generator": {
-      "path": ".claude/skills/component-generator",
-      "model": "sonnet",
-      "enabled": true
-    },
-    "code-review": {
-      "model": "haiku",
-      "modelOverrides": {
-        "deep": "sonnet"
-      },
-      "enabled": true
-    },
-    "test-generator": {
-      "model": "sonnet",
-      "enabled": true
-    }
-  },
-  "defaultModel": "sonnet",
-  "costTracking": {
-    "enabled": true,
-    "logFile": ".claude/cost-log.json",
-    "dailyBudget": 50000
-  }
+  "model": "sonnet"
 }
 ```
+
+That is all this project needs at the settings level: Sonnet is the session default for
+component work, tests, and reviews. Settings are merged by scope, with
+`.claude/settings.local.json` (personal, gitignored) overriding the committed
+`.claude/settings.json`, which overrides `~/.claude/settings.json`.
+
+### Per-Agent Models
+
+Model choices for subagents live in the frontmatter of each agent file, not in
+`settings.json`. Point searches at Haiku so navigation stays cheap:
+
+`.claude/agents/explore.md`:
+```markdown
+---
+name: explore
+description: Fast file searches and codebase navigation. Use when locating components, hooks, or tests.
+model: haiku
+---
+
+Search the codebase and report matching file paths with the relevant snippets.
+Do not edit files.
+```
+
+`model` defaults to `inherit`, so any other agent that omits the field simply runs on the
+session model (Sonnet here).
+
+### Per-Skill Models
+
+A skill sets its own model in its `SKILL.md` frontmatter — see the full
+`component-generator` skill in section 4:
+
+```markdown
+---
+name: component-generator
+description: Generate React components with TypeScript
+model: sonnet
+---
+```
+
+Drop `model: haiku` into a lightweight skill's frontmatter and `model: opus` into one doing
+deep analysis. The override lasts for the rest of the current turn only; the next prompt
+returns to the session model. Skills need no enable flag — Claude Code discovers any
+`.claude/skills/<name>/SKILL.md`.
+
+### Tracking Cost
+
+There is no cost-tracking setting and no budget key. Run `/usage` to see this session's
+token counts and locally computed cost, with `d` and `w` for 24-hour and 7-day windows; on
+Pro, Max, Team, and Enterprise plans it also breaks usage down by skill, subagent, plugin,
+and MCP server, flagging anything above 10% of the total. Use `/context` to see what is
+filling the context window, and the [Console usage page](https://platform.claude.com/usage)
+for authoritative billing.
 
 ---
 

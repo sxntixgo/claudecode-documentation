@@ -530,17 +530,9 @@ I specialize in React component development with TypeScript.
 - Write tests alongside components
 ```
 
-**2. Configure in `.claude/config.json`**:
-```json
-{
-  "agents": {
-    "frontend-specialist": {
-      "model": "sonnet",
-      "timeout": 180000
-    }
-  }
-}
-```
+**2. No settings entry needed**:
+
+Everything about a subagent — its model, tools, and permissions — lives in that file's frontmatter. `settings.json` has no `agents` key. Dropping the file into `.claude/agents/` (or `~/.claude/agents/` for all projects) is all the registration required.
 
 **3. Use the agent**:
 ```bash
@@ -628,8 +620,7 @@ You: "Use backend-specialist to create login API endpoint"
 - Clear conversation history
 
 **Solutions**:
-- Break tasks into smaller pieces
-- Increase timeout in config
+- Break tasks into smaller pieces (there is no agent timeout setting to raise)
 - Use faster model (Haiku)
 - Reduce context size
 
@@ -649,8 +640,11 @@ You: "Use Explore agent to find all API routes"
 
 **2. Check configuration**:
 ```bash
-# Verify agent config loaded
-cat .claude/config.json | jq .agents
+# Subagents are files, not settings entries — list them
+ls .claude/agents/ ~/.claude/agents/
+
+# Inspect a subagent's frontmatter
+head -10 .claude/agents/frontend.md
 ```
 
 **3. Monitor execution**:
@@ -1079,28 +1073,36 @@ You: "Use Opus model to design authentication architecture"
 
 **Yes!** This is a powerful cost-optimization strategy.
 
-**Configuration** (`.claude/config.json`):
-```json
-{
-  "agents": {
-    "Explore": {
-      "model": "haiku"  // Fast searches
-    },
-    "general-purpose": {
-      "model": "sonnet"  // Standard coding
-    },
-    "Plan": {
-      "model": "opus"  // Complex planning
-    },
-    "frontend-specialist": {
-      "model": "sonnet"
-    },
-    "quick-formatter": {
-      "model": "haiku"  // Simple formatting
-    }
-  }
-}
+**Configuration**: set `model` in each subagent's frontmatter, in its own file under `.claude/agents/`. There is no central map of agents to models.
+
+```yaml
+# .claude/agents/explore.md — fast searches
+---
+name: explore
+description: Read-only codebase exploration
+model: haiku
+---
 ```
+
+```yaml
+# .claude/agents/plan.md — complex planning
+---
+name: plan
+description: Architecture and implementation planning
+model: opus
+---
+```
+
+```yaml
+# .claude/agents/quick-formatter.md — simple formatting
+---
+name: quick-formatter
+description: Mechanical reformatting of files
+model: haiku
+---
+```
+
+Omitting `model` leaves the subagent at `inherit`, meaning it runs on whatever model the session is using. The session default comes from `"model"` in `settings.json`.
 
 **Cost savings**:
 ```

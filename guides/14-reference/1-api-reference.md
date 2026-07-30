@@ -16,7 +16,7 @@ This is your complete technical reference for all Claude Code configuration sche
 
 1. [AGENT.md Schema](#agentmd-schema)
 2. [SKILL.md Schema](#skillmd-schema)
-3. [config.json Schema](#configjson-schema)
+3. [settings.json Schema](#settingsjson-schema)
 4. [Hook Specifications](#hook-specifications)
 5. [Slash Command Schema](#slash-command-schema)
 6. [CLAUDE.md Structure](#claudemd-structure)
@@ -532,94 +532,76 @@ After code review:
 
 ---
 
-## config.json Schema
+## settings.json Schema
 
 ### Overview
 
-The `.claude/config.json` file configures Claude Code behavior at the project level, including agent settings, model defaults, hooks, and cost tracking.
+`settings.json` is Claude Code's configuration file. It holds your model selection, permission rules, environment variables, and hooks. It is plain JSON, and it exists in four scopes that layer on top of one another.
 
-### Complete Schema
+There is no `config.json` — that filename has never been part of Claude Code.
 
-```json
-{
-  "agents": {
-    "agent-name": {
-      "model": "haiku" | "sonnet" | "opus",
-      "description": "string",
-      "timeout": number,
-      "tools": string[],
-      "constraints": {
-        "allowedPaths": string[],
-        "deniedPaths": string[]
-      }
-    }
-  },
+**Scopes and precedence** (highest wins; a higher scope overrides the same key set lower down):
 
-  "defaultModel": "haiku" | "sonnet" | "opus",
+| Precedence | Location | What it is |
+|------------|----------|------------|
+| 1 (highest) | `managed-settings.json` in a system directory | Managed settings deployed by IT — cannot be overridden |
+| 2 | Command line arguments | Applies to the current invocation only |
+| 3 | `.claude/settings.local.json` | Project settings, personal to you, gitignored |
+| 4 | `.claude/settings.json` | Project settings, committed to git and shared with the team |
+| 5 (lowest) | `~/.claude/settings.json` | Your user settings, applied across all projects |
 
-  "costTracking": {
-    "enabled": boolean,
-    "dailyBudget": number,
-    "alertThreshold": number (0.0-1.0),
-    "logFile": "string (path)"
-  },
+**Related files that are *not* settings**:
 
-  "hooks": {
-    "PreToolUse": HookConfig[],
-    "PostToolUse": HookConfig[],
-    "Notification": HookConfig[],
-    "Stop": HookConfig[]
-  },
+| File | Purpose |
+|------|---------|
+| `.mcp.json` | Project MCP server definitions |
+| `~/.claude.json` | OAuth credentials and MCP state |
+| `CLAUDE.md` | Project memory and conventions — instructions, not configuration |
 
-  "projectContext": {
-    "name": "string",
-    "description": "string",
-    "techStack": string[],
-    "conventions": object
-  },
+### Available Keys
 
-  "experimentalFeatures": {
-    "featureName": boolean
-  }
-}
-```
+| Key | Purpose |
+|-----|---------|
+| `model` | Default model for the session (`haiku`, `sonnet`, `opus`, ...) |
+| `availableModels` | Models offered in the model picker |
+| `enforceAvailableModels` | Restrict selection to `availableModels` |
+| `fallbackModel` | Model used when the primary is unavailable |
+| `effortLevel` | Default reasoning effort |
+| `alwaysThinkingEnabled` | Keep extended thinking on by default |
+| `fastMode` | Optimize for speed |
+| `permissions` | `allow` / `ask` / `deny` rule arrays |
+| `env` | Environment variables exported into every session |
+| `hooks` | Lifecycle hook definitions |
+| `disableAllHooks` | Kill switch for all hooks |
+| `autoCompactEnabled` | Automatic context compaction |
+| `cleanupPeriodDays` | Retention window for local session data |
+| `agent` | Run the main thread as this named subagent (a string, not a map) |
+| `editorMode` | Editor keybinding mode |
+| `attribution` | Commit and PR attribution behavior |
+| `autoMemoryEnabled` | Automatic memory capture |
+| `allowedMcpServers` / `deniedMcpServers` | MCP server allowlist / denylist |
+| `enableAllProjectMcpServers` | Auto-approve MCP servers from `.mcp.json` |
+| `outputStyle` | Response output style |
+
+> ⚠️ Note the singular `agent` key. There is no `agents` object — per-subagent settings live in the subagent's own file, not here. See [AGENT.md Schema](#agentmd-schema).
 
 ### Example Configuration
 
+`.claude/settings.json`:
+
 ```json
 {
-  "agents": {
-    "Explore": {
-      "model": "haiku",
-      "description": "Fast codebase exploration",
-      "timeout": 120000
-    },
-    "general-purpose": {
-      "model": "sonnet",
-      "description": "Balanced coding tasks"
-    },
-    "Plan": {
-      "model": "sonnet",
-      "description": "Architecture planning"
-    },
-    "frontend-specialist": {
-      "model": "sonnet",
-      "tools": ["Read", "Write", "Edit", "Grep", "Glob"],
-      "constraints": {
-        "allowedPaths": ["src/components/**", "src/pages/**"],
-        "deniedPaths": ["src/server/**", ".env*"]
-      },
-      "timeout": 180000
-    }
+  "model": "sonnet",
+  "fallbackModel": "haiku",
+
+  "permissions": {
+    "allow": ["Bash(npm run test:*)", "Read(./src/**)"],
+    "ask": ["Bash(git push:*)"],
+    "deny": ["Read(./.env)"]
   },
 
-  "defaultModel": "sonnet",
-
-  "costTracking": {
-    "enabled": true,
-    "dailyBudget": 100000,
-    "alertThreshold": 0.8,
-    "logFile": ".claude/cost-log.json"
+  "env": {
+    "NODE_ENV": "development"
   },
 
   "hooks": {
@@ -639,22 +621,49 @@ The `.claude/config.json` file configures Claude Code behavior at the project le
     }]
   },
 
-  "projectContext": {
-    "name": "My Web App",
-    "description": "React TypeScript web application",
-    "techStack": ["React", "TypeScript", "Node.js", "PostgreSQL"],
-    "conventions": {
-      "indentation": "2 spaces",
-      "quotes": "single",
-      "semicolons": true
-    }
-  },
-
-  "experimentalFeatures": {
-    "enhancedContextManagement": true
-  }
+  "autoCompactEnabled": true,
+  "cleanupPeriodDays": 30
 }
 ```
+
+### Where Per-Agent and Per-Skill Models Live
+
+Model choice for an individual subagent or skill is *not* a settings key. It goes in the YAML frontmatter of that component's own file.
+
+```yaml
+# .claude/agents/explore.md
+---
+name: explore
+description: Fast codebase exploration
+model: haiku
+---
+```
+
+```yaml
+# .claude/skills/my-skill/SKILL.md
+---
+name: my-skill
+description: Deep architectural analysis
+model: opus
+---
+```
+
+A skill's `model` override applies for the rest of the current turn only. It is never written back to settings, and the session model resumes on your next prompt.
+
+### Cost and Usage Tracking
+
+There is no cost-tracking key and no cost log file. Usage is inspected through commands and the Console:
+
+- `/usage` — token counts and locally computed cost for the session. On Pro, Max, Team, and Enterprise plans it also attributes recent usage to skills, subagents, plugins, and individual MCP servers as a percentage of total, and flags any behavior accounting for 10% or more. Press `d` for a 24-hour window or `w` for 7 days.
+- `/context` — what is currently occupying the context window.
+- [Console usage page](https://platform.claude.com/usage) — authoritative billing. The `/usage` dollar figure is computed locally at list rates and may differ from your bill.
+- OpenTelemetry export — per-user token and cost metrics streamed into your own observability stack. Works on every setup.
+
+Session totals reset when `/clear` starts a new session.
+
+### Project Conventions Belong in CLAUDE.md
+
+Project name, description, tech stack, and coding conventions are not settings keys. Put them in `CLAUDE.md`, which Claude reads as memory at the start of every session. See [CLAUDE.md Structure](#claudemd-structure).
 
 ---
 
@@ -1125,7 +1134,6 @@ You can import additional context files:
 | Variable | Description | Example |
 |----------|-------------|---------|
 | `CLAUDE_DEFAULT_MODEL` | Default model for all operations | `sonnet`, `haiku`, `opus` |
-| `CLAUDE_CONFIG_PATH` | Custom path to config.json | `~/.config/claude/config.json` |
 | `CLAUDE_MEMORY_PATH` | Custom path to memory files | `~/.config/claude/memory/` |
 | `CLAUDE_HOOKS_TIMEOUT` | Default hook timeout (ms) | `60000` |
 
@@ -1168,23 +1176,27 @@ Required environment variables:
 
 | File/Directory | Purpose | Platform |
 |----------------|---------|----------|
-| `~/.config/claude/` | Global configuration | Linux/macOS |
-| `~/Library/Application Support/Claude/` | Global configuration | macOS |
-| `%APPDATA%\Claude\` | Global configuration | Windows |
+| `~/.claude/` | User-level configuration | All |
+| `~/.claude/settings.json` | User settings, all projects | All |
+| `~/.claude.json` | OAuth credentials and MCP state | All |
 | `.claude/` | Project-specific configuration | All |
-| `.claude/config.json` | Project configuration | All |
+| `.claude/settings.json` | Project settings, committed to git | All |
+| `.claude/settings.local.json` | Project settings, personal and gitignored | All |
 | `.claude/memory.md` | Project memory | All |
 | `.claude/skills/` | Custom skills | All |
 | `.claude/commands/` | Slash commands | All |
+| `.mcp.json` | Project MCP servers | All |
+
+Settings paths are fixed per scope. There is no environment variable or flag that redirects them elsewhere.
 
 ### Project-Level Files
 
 ```
 .claude/
-├── config.json                    # Main configuration
+├── settings.json                  # Project settings (committed)
+├── settings.local.json            # Personal overrides (gitignored)
 ├── CLAUDE.md                      # Project context
 ├── memory.md                      # Session memory
-├── cost-log.json                  # Cost tracking (if enabled)
 ├── skills/                        # Custom skills
 │   ├── my-skill/
 │   │   └── SKILL.md
