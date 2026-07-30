@@ -239,7 +239,7 @@ jobs:
         env:
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
         run: |
-          claude --skill=code-review --output=review.md
+          claude -p "/code-review Review the changes in this PR" > review.md
 
       - name: Post Review as Comment
         uses: actions/github-script@v6

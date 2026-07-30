@@ -467,95 +467,68 @@ Task({
 
 ## Performance vs. Cost Trade-offs
 
-### 📊 Benchmarks: Same Task, Different Models
+The useful pattern is not a fixed score per model — it is that **the quality gap between models widens as the task requires more judgment.** On mechanical work the models converge and the cheapest one wins. On open-ended design work they diverge sharply and paying more is rational.
 
-**Task**: "Find all React components using deprecated lifecycle methods"
+### How the gap behaves by task type
 
-| Model | Tokens Used | Cost | Time | Quality Score | Cost Efficiency |
-|-------|-------------|------|------|---------------|-----------------|
-| **Haiku 4.5** | 8,000 | $0.04 | 12s | 95% | ⭐⭐⭐⭐⭐ |
-| **Sonnet 4.5** | 8,500 | $0.13 | 18s | 95% | ⭐⭐⭐ |
-| **Opus 4.5** | 9,200 | $0.35 | 28s | 96% | ⭐ |
+**Locating things** — "find all React components using deprecated lifecycle methods"
 
-**Verdict**: Haiku wins for simple searches (same quality, 87% cheaper)
+The answer is verifiable and largely mechanical: search, filter, report. Models converge here because there is little room for judgment, so the cheapest model that can drive the search tools is usually the right call. This is why the Explore agent defaults to Haiku.
 
----
+**Applying a known transformation** — "refactor class components to functional components with hooks"
 
-**Task**: "Refactor class components to functional components with hooks"
+There is a correct general approach, but each file presents choices: what to do with lifecycle side effects, how to handle stale closures, when a `useCallback` is warranted. Weaker models tend to produce code that runs but subtly changes behavior. Sonnet is the usual starting point.
 
-| Model | Tokens Used | Cost | Time | Quality Score | Cost Efficiency |
-|-------|-------------|------|------|---------------|-----------------|
-| **Haiku 4.5** | 15,000 | $0.08 | 35s | 75% | ⭐⭐ |
-| **Sonnet 4.5** | 18,000 | $0.27 | 45s | 92% | ⭐⭐⭐⭐ |
-| **Opus 4.5** | 22,000 | $0.70 | 65s | 98% | ⭐⭐⭐⭐⭐ |
+**Open-ended design** — "design a microservices architecture for an e-commerce platform"
 
-**Verdict**: Sonnet wins for standard refactorings (best balance of quality + cost)
+No verifiable answer exists, the output is long, and early mistakes compound through everything downstream. This is where the strongest model earns its cost, because the expensive failure is not a wrong token — it is a plausible-looking design you build on for a month.
 
----
+### Measure the gap on your own work
 
-**Task**: "Design microservices architecture for e-commerce platform"
+Task-type guidance tells you where to start, not what to ship. Quality depends on your codebase, your conventions, and how specific your prompts are, so the crossover point moves.
 
-| Model | Tokens Used | Cost | Time | Quality Score | Cost Efficiency |
-|-------|-------------|------|------|---------------|-----------------|
-| **Haiku 4.5** | 25,000 | $0.13 | 60s | 65% | ⭐ |
-| **Sonnet 4.5** | 32,000 | $0.48 | 90s | 85% | ⭐⭐⭐ |
-| **Opus 4.5** | 40,000 | $1.20 | 120s | 97% | ⭐⭐⭐⭐⭐ |
+To find yours, run the same representative tasks through each candidate model and compare. What you are looking for:
 
-**Verdict**: Opus wins for architecture (quality justifies premium cost)
+| Signal | Reading |
+|--------|---------|
+| Output is equivalent on the cheaper model | Use the cheaper model |
+| Cheaper model fails only on your hardest cases | Cascade — cheap first, escalate on those |
+| Cheaper model fails broadly | The task needs the stronger model, or your prompt needs to be more specific |
+
+Use `/usage` to capture the token and cost side of the comparison. For skills specifically, the `skill-creator` plugin automates this into a pass-rate-versus-tokens benchmark; see [Evaluating Your Skills](../04-skills/3-creating-skills.md#evaluating-your-skills).
 
 ---
 
 ## Measuring Your Savings
 
-### Built-in Cost Tracking
+### Check usage with `/usage`
 
-Enable cost tracking in `.claude/config.json`:
+`/usage` is the built-in view. The Session block reports token counts and a locally computed cost for the current session, broken down by model:
 
-```json
-{
-  "costTracking": {
-    "enabled": true,
-    "dailyBudget": 100000,
-    "alertThreshold": 0.8,
-    "logFile": ".claude/cost-log.json"
-  }
-}
+```text
+Total cost:            $0.55
+Total duration (API):  6m 20s
+Usage by model:
+   claude-sonnet-4-6:  1.2k input, 5.3k output, 940.0k cache read, 50.0k cache write ($0.55)
 ```
 
-### Reading Cost Logs
+On a Pro, Max, Team, or Enterprise plan, `/usage` also attributes recent usage to subagents, skills, plugins, and individual MCP servers as a percentage of the total, and flags any behavior accounting for 10% or more — long context and cache misses being the common culprits. Press `d` or `w` to switch between 24-hour and 7-day windows.
 
-Check `.claude/cost-log.json`:
+The dollar figure is computed locally at standard list rates, so it does not account for promotional or contracted pricing and may differ from your bill. Treat it as a comparison tool rather than an invoice; for authoritative billing use the [Console usage page](https://platform.claude.com/usage).
 
-```json
-{
-  "date": "2025-12-20",
-  "operations": [
-    {
-      "timestamp": "2025-12-20T10:30:00Z",
-      "agent": "Explore",
-      "model": "haiku",
-      "inputTokens": 5000,
-      "outputTokens": 3000,
-      "cost": 0.02,
-      "task": "Find all API endpoints"
-    },
-    {
-      "timestamp": "2025-12-20T11:15:00Z",
-      "agent": "general-purpose",
-      "model": "sonnet",
-      "inputTokens": 8000,
-      "outputTokens": 6000,
-      "cost": 0.11,
-      "task": "Add user authentication"
-    }
-  ],
-  "dailyTotal": {
-    "cost": 0.13,
-    "tokensSaved": 12000,
-    "estimatedSavings": "62% vs. all-Sonnet baseline"
-  }
-}
-```
+Session totals reset when `/clear` starts a new session.
+
+### Establishing a baseline
+
+To know whether a model assignment saved anything, you need a before-and-after on comparable work:
+
+1. Run a representative day with your current assignment and record the `/usage` total.
+2. Change one assignment.
+3. Run comparable work and compare.
+
+Change one thing at a time. Switching three agents at once tells you the total moved but not which change was responsible.
+
+For per-user metrics across a team, use OpenTelemetry export, which streams token and cost data into your own observability stack and works regardless of how you authenticate.
 
 ---
 

@@ -447,91 +447,76 @@ model: opus  # Complex analysis needed
 
 ## Measuring Skill Costs
 
-### Enable Cost Tracking
+### Attribute usage per skill with `/usage`
 
-`.claude/config.json`:
-```json
-{
-  "costTracking": {
-    "enabled": true,
-    "perSkill": true,
-    "logFile": ".claude/cost-log.json"
-  }
-}
+On a Pro, Max, Team, or Enterprise plan, `/usage` breaks down what counts against your plan limits and attributes recent usage to skills, subagents, plugins, and individual MCP servers, each as a percentage of the total. Press `d` or `w` to switch between the last 24 hours and the last 7 days.
+
+This is the fastest way to find out which skill is actually costing you money, and the answer is often not the one you assumed.
+
+The Session block at the top of `/usage` shows token counts and a locally computed dollar figure for the current session:
+
+```text
+Total cost:            $0.55
+Total duration (API):  6m 20s
+Usage by model:
+   claude-sonnet-4-6:  1.2k input, 5.3k output, 940.0k cache read, 50.0k cache write ($0.55)
 ```
 
-### View Cost Report
+Two caveats worth knowing before you rely on these numbers:
 
-`.claude/cost-log.json`:
-```json
-{
-  "date": "2025-12-20",
-  "skills": {
-    "code-formatter": {
-      "invocations": 25,
-      "model": "haiku",
-      "totalTokens": 75000,
-      "cost": 0.38,
-      "avgCostPerInvocation": 0.015
-    },
-    "code-review": {
-      "invocations": 12,
-      "modelBreakdown": {
-        "haiku": { "count": 8, "cost": 0.32 },
-        "sonnet": { "count": 3, "cost": 0.60 },
-        "opus": { "count": 1, "cost": 0.85 }
-      },
-      "totalCost": 1.77,
-      "avgCostPerInvocation": 0.15
-    }
-  },
-  "totalDailyCost": 4.25,
-  "projectedMonthlyCost": 127.50,
-  "savingsVsAllSonnet": "58%"
-}
-```
+- The dollar figure is computed locally from token counts at standard list rates. It does not reflect promotional pricing or contracted discounts, so it may differ from your bill. For authoritative billing, use the [Console usage page](https://platform.claude.com/usage).
+- The breakdown is computed from local session history on one machine. Usage from other devices or from claude.ai is not included.
 
-### Generate Cost Report
+Session totals reset when `/clear` starts a new session.
 
-```bash
-# CLI command (if available)
-claude skills cost-report
+### See what is consuming context right now
 
-# Output:
-# Skill Cost Report (Last 30 Days)
-# ================================
-#
-# code-formatter (haiku):     $11.40  (750 invocations)
-# code-review (mixed):        $53.10  (360 invocations)
-# test-generator (sonnet):    $22.50  (150 invocations)
-# api-scaffold (sonnet):      $18.00  (60 invocations)
-# security-audit (opus):      $25.50  (30 invocations)
-# --------------------------------
-# Total:                      $130.50
-#
-# Estimated with all-Sonnet:  $285.00
-# Savings:                    $154.50 (54%)
-```
+`/context` shows what is currently occupying the context window. Use it when a skill feels expensive but you are not sure whether the cost is the skill itself or everything it dragged in alongside it.
+
+### Organization-wide reporting
+
+Per-skill attribution is a local view. For spend across a team, the mechanism depends on how you authenticate:
+
+| Setup | Where to look |
+|-------|---------------|
+| Teams or Enterprise plan | Spend report in org analytics, with CSV export |
+| Claude Console (API) | [Console usage page](https://platform.claude.com/usage) and the Claude Code Analytics API |
+| Bedrock, Google Cloud, or Microsoft Foundry | Your cloud billing console, or OpenTelemetry export |
+
+OpenTelemetry export works on every setup and is the only option that streams per-user token and cost metrics into your own observability stack in near real time.
 
 ---
 
 ## Performance vs. Cost Trade-offs
 
-### Benchmark: Code Review Skill
+Cost and latency scale predictably with model and mode: input and output pricing is published per model, and a deeper review reads more and writes more. Quality does not scale predictably, and it is the variable that decides whether a cheaper model is acceptable for a given skill.
 
-| Mode | Model | Tokens | Cost | Time | Quality | Cost Efficiency |
-|------|-------|--------|------|------|---------|-----------------|
-| **Quick** | Haiku | 5,000 | $0.03 | 15s | 85% | ⭐⭐⭐⭐⭐ |
-| **Quick** | Sonnet | 5,200 | $0.08 | 20s | 87% | ⭐⭐⭐ |
-| **Standard** | Haiku | 10,000 | $0.05 | 30s | 75% | ⭐⭐ |
-| **Standard** | Sonnet | 12,000 | $0.18 | 40s | 92% | ⭐⭐⭐⭐ |
-| **Deep** | Sonnet | 25,000 | $0.38 | 90s | 90% | ⭐⭐⭐ |
-| **Deep** | Opus | 30,000 | $0.90 | 120s | 97% | ⭐⭐⭐⭐⭐ |
+That means quality is the one number you have to measure on your own skill and your own codebase. A published figure would not transfer — review quality depends on your language, your conventions, and what your skill instructs Claude to look for.
 
-**Recommendations:**
-- ✅ Quick review: Haiku (same quality, 60% cheaper)
-- ✅ Standard review: Sonnet (best balance)
-- ✅ Deep review: Opus (quality worth the cost)
+### Measure it with a benchmark
+
+Run your eval set against each candidate model and compare pass rate alongside tokens and duration. The `skill-creator` plugin aggregates exactly these three into `benchmark.json`. See [Evaluating Your Skills](3-creating-skills.md#evaluating-your-skills) for the setup.
+
+What you are looking for is the point where a cheaper model stops being acceptable:
+
+| Signal | Reading |
+|--------|---------|
+| Pass rate holds within a point or two on the cheaper model | Use the cheaper model |
+| Pass rate drops but only on your hardest cases | Cascade — cheap model first, escalate on those cases |
+| Pass rate drops across the board | The skill needs more explicit instructions, or the task needs the stronger model |
+| Pass rate is identical with and without the skill | The skill is not earning its tokens |
+
+That last row is the one people skip. A skill can score well on every case and still be dead weight if Claude scored just as well without it.
+
+### Starting points
+
+Absent your own measurements, these are reasonable first guesses to test rather than conclusions to adopt:
+
+- **Mechanical, rule-checkable work** (formatting, lint-style checks, renaming) — start with Haiku
+- **Judgment over unfamiliar code** (review, refactoring proposals, test design) — start with Sonnet
+- **Multi-file reasoning with expensive mistakes** (architecture, security analysis) — start with Sonnet, escalate to Opus if your evals show a gap
+
+Test every skill against each model you intend to run it on. Instructions that are sufficient for Opus frequently underspecify for Haiku, which shows up as a pass-rate cliff rather than a gradual decline.
 
 ---
 
@@ -577,25 +562,11 @@ code-formatter:
 
 ### ❌ Pitfall 3: Not Tracking Costs
 
-```yaml
-# Bad: No cost tracking
-{
-  "skills": { ... }
-  # No costTracking config
-}
-```
+**Problem:** You assign models by intuition, never check what they actually cost, and carry a wrong guess for months. You cannot optimize what you do not measure.
 
-**Problem:** Can't optimize what you don't measure
+**Fix:** Run `/usage` after a representative working session and read the per-skill breakdown. It takes seconds and routinely contradicts expectations — the skill you invoke constantly on Haiku is often cheaper than the one you invoke twice a week on Opus.
 
-**Fix:**
-```json
-{
-  "costTracking": {
-    "enabled": true,
-    "perSkill": true
-  }
-}
-```
+Check it again after changing an assignment. A change you never verified is a guess with extra steps.
 
 ---
 

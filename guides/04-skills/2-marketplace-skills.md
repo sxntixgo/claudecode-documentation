@@ -686,7 +686,7 @@ claude skills list
 cat .claude/skills/code-review/SKILL.md | grep "autoTrigger"
 
 # Force skill invocation
-claude --skill=code-review "Review my code"
+/code-review Review my code
 ```
 
 ### Skill Errors
@@ -716,7 +716,7 @@ claude skills test "review my code"
 # Selected: code-review
 
 # Explicitly choose skill
-claude --skill=security-audit "Review my code"
+/security-audit Review my code
 ```
 
 ---
@@ -892,8 +892,9 @@ name: my-skill
 model: sonnet  # Try upgrading to opus for better quality
 ---
 
-# Use model override when invoking
-claude --skill=my-skill --model=opus "Complex task"
+# Switch the session model with /model, then invoke the skill
+/model opus
+/my-skill Complex task
 
 # Review skill instructions for clarity
 # Skills should have specific, actionable steps
@@ -958,7 +959,7 @@ autoTrigger:
 claude skill disable <other-skill-name>
 
 # Manually specify which skill to use
-claude --skill=security-review "Review my code"
+/security-review Review my code
 ```
 
 ---
