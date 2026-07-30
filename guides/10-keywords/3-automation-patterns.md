@@ -16,19 +16,16 @@ Learn advanced patterns for automating workflows with keywords, triggers, and ho
 
 ### Pattern 1: Keyword-Based Triggers
 
-Auto-invoke skills based on natural language:
+Auto-invoke skills based on natural language. The trigger is the `description` — Claude reads it
+and decides whether your request matches. `when_to_use` is appended to the description and is
+where the example phrasings go. There is no regex list and no confidence threshold:
 
 `.claude/skills/code-review/SKILL.md`:
 ```yaml
 ---
 name: code-review
-autoTrigger:
-  patterns:
-    - "review.*code"
-    - "check.*pr"
-    - "audit.*code"
-    - "look.*over.*changes"
-  confidence: 0.85
+description: Reviews code for security, logic, and style issues before it is merged.
+when_to_use: review my code, check this PR, audit this file, look over my changes
 ---
 ```
 
@@ -40,6 +37,10 @@ autoTrigger:
 "Audit the code in auth.ts"
 "Can you look over my changes?"
 ```
+
+Write the description in third person and make it slightly pushy — Claude under-invokes skills
+whose descriptions are vague ("Helps with code review"). `description` + `when_to_use` are
+truncated at 1,536 characters in the skill listing, so lead with the primary use case.
 
 ---
 

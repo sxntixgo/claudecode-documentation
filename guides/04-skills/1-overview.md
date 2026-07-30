@@ -483,13 +483,11 @@ graph LR
 **Frontmatter (YAML)**
 ```yaml
 name: code-review
-description: Automated code review with configurable depth
+description: Reviews code for security, logic, and style issues, at a configurable depth.
+when_to_use: review my code, check this PR, look over my changes
 version: 1.0.0
 author: Your Name
 model: sonnet  # Default model for this skill
-autoTrigger:
-  - pattern: "review.*code"
-  - pattern: "check.*pr"
 \```
 
 **Instructions**

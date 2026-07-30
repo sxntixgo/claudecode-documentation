@@ -124,6 +124,3 @@ claude "Review today's tasks and suggest priorities"
    - Re-use recent analyses
    - Don't re-analyze unchanged files
 
----
-
-**Next**: [Small Team (2-5)](2-small-team.md)

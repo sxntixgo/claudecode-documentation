@@ -405,19 +405,19 @@ Here are the most commonly used MCP servers:
 
 ### Official Servers
 
-**GitHub** ([Installation](installation.md#github))
+**GitHub** ([Installation](2-installation.md#github))
 - Create/manage issues and PRs
 - Review code and leave comments
 - Check CI/CD status
 - Manage repositories
 
-**Perplexity** ([Installation](installation.md#perplexity))
+**Perplexity** ([Installation](2-installation.md#perplexity))
 - Web search with citations
 - Real-time information retrieval
 - Research assistance
 - Fact-checking with sources
 
-**Context7** ([Installation](installation.md#context7))
+**Context7** ([Installation](2-installation.md#context7))
 - Up-to-date code documentation
 - Framework-specific guidance
 - API references

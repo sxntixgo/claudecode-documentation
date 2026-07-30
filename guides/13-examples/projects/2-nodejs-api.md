@@ -221,4 +221,4 @@ Generates:
 
 ---
 
-**Next**: [Python Data Science](3-python-datascience.md)
+**Next**: [Python Projects: Django](python/1-django.md)

@@ -722,4 +722,4 @@ API_KEY=[actual secure key from secret manager]
 ---
 
 **Questions or Security Concerns?**
-Found a vulnerability? Please report responsibly: [Security Policy](../../SECURITY.md)
+Found a vulnerability? Please report it responsibly through the project's issue tracker: [Open an issue](https://github.com/anthropics/claude-code/issues)
