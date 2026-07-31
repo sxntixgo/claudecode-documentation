@@ -2,137 +2,121 @@
 
 ⏱️ **Time**: 25 minutes
 📊 **Level**: Beginner to Intermediate
-🎯 **You'll Learn**: The most useful MCP servers, their capabilities, when to use each one, and how to get the most value from them
+🎯 **You'll Learn**: Which MCP servers are worth connecting, their real install commands, when to use each one, and how to find more
 
 ---
 
 ## What's in This Guide?
 
-Now that you understand [what MCP servers are](1-overview.md) and [how to install them](2-installation.md), let's explore the most popular and useful servers available. Think of this as your shopping guide—we'll show you what's available, what each server does best, and help you choose the right ones for your workflow.
+Now that you understand [what MCP servers are](1-overview.md) and [how to install them](2-installation.md), let's explore the servers worth connecting. Think of this as your shopping guide—we'll show you what's available, what each server does best, and help you choose the right ones for your workflow.
 
 **By the end of this guide**, you'll know:
-- ✅ Where to discover all available MCP servers
-- ✅ The top 5 must-have MCP servers and what they do
-- ✅ Specialized servers for databases, cloud services, and development tools
-- ✅ How to access 200+ pre-built servers via Docker
+- ✅ Where to discover MCP servers
+- ✅ Servers with verified, working install commands
+- ✅ How to evaluate a server you found somewhere else
 - ✅ Which servers to install first based on your work
+
+> 📋 **How this page was checked**: every install command below was verified against either the [Claude Code MCP documentation](https://code.claude.com/docs/en/mcp) or the package's own published metadata. Servers we could **not** verify are called out explicitly in [Servers we could not verify](#servers-we-could-not-verify) rather than given a plausible-looking command. If a command here doesn't work for you, the vendor's docs win — tell us and we'll fix the page.
 
 ---
 
 ## 🔍 Discovering MCP Servers
 
-Before exploring specific servers, know where to find the complete catalog:
+Before exploring specific servers, know where to find them.
 
-### Official Registry
+> ⚠️ **Claude Code has no built-in server registry.** There is no browse-and-install UI, and no `claude mcp search`. Discovery happens entirely through the external sources below.
 
-**[Model Context Protocol Servers](https://github.com/modelcontextprotocol/servers)**
-- 50+ official pre-built servers
-- Community-maintained and tested
-- Official Anthropic support
-- Regular updates and improvements
+### 1. The Anthropic Directory
 
-### Popular Discovery Methods
+**[claude.ai/directory](https://claude.ai/directory)** is the closest thing to an official list. Anthropic reviews connectors there against its [listing criteria](https://claude.com/docs/connectors/building/review-criteria) before adding them. Directory connectors use the same MCP infrastructure as Claude Code, so any remote server listed there can be added with `claude mcp add`.
 
-**1. Browse the Official Registry**
-- Visit [github.com/modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)
-- Explore by category (Development, Cloud, Data, etc.)
-- Read detailed READMEs for each server
+> ⚠️ Review is not a security audit. Anthropic explicitly does not security-audit or manage MCP servers. Reviewing a server before you connect it remains your job.
 
-**2. Search Package Managers**
+### 2. The Reference Implementations
+
+**[modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)** holds the protocol project's own servers, published to npm under the `@modelcontextprotocol/` scope.
+
 ```bash
-# npm (JavaScript/TypeScript servers)
+# See what's currently published under the official scope
 npm search @modelcontextprotocol
-
-# PyPI (Python servers)
-pip search mcp-server
 ```
 
-**3. Community Resources**
-- [MCP Documentation](https://modelcontextprotocol.io)
-- [GitHub Topics: mcp-server](https://github.com/topics/mcp-server)
-- [Anthropic MCP Registry](https://github.com/modelcontextprotocol)
+> 🚨 **Check for deprecation before you install from this scope.** Several early servers have been retired and now emit `Package no longer supported` on install. Verify with:
+> ```bash
+> npm view @modelcontextprotocol/server-<name> deprecated
+> ```
+> Known-deprecated at the time of writing: `@modelcontextprotocol/server-github`, `@modelcontextprotocol/server-postgres`, and `server-perplexity-ask`. Alternatives for each are given below.
 
-**4. Check Integration Marketplaces**
-- Look for "MCP-compatible" tools
-- Third-party server collections
-- Framework-specific integrations
+### 3. The Docker MCP Catalog
 
-> 💡 **Tip**: The official registry is updated weekly. Star the repo to get notifications about new servers!
+Docker publishes containerized MCP servers under the [`mcp` namespace on Docker Hub](https://hub.docker.com/u/mcp) — over 200 images. See [Docker's MCP Catalog and Toolkit docs](https://docs.docker.com/ai/mcp-catalog-and-toolkit/) for their tooling, and [Running a containerized server](2-installation.md#running-a-containerized-server) for how to wire one into `.mcp.json`.
+
+### 4. The Vendor's Own Docs
+
+For a hosted service, the vendor's documentation is the authoritative source for its MCP endpoint URL. Endpoints change; a URL copied from a blog post may be stale.
 
 ---
 
 ## The Essential Five
 
-Let's start with the five MCP servers that provide the most value for developers. If you're just getting started, install these first.
+If you're just getting started, these five give the most value for the least setup.
 
 ### Quick Comparison
 
-| Server | Best For | Setup Time | Must-Have For |
-|--------|----------|-----------|---------------|
-| **GitHub** | Code hosting, PRs, issues | 5 min | All developers |
-| **Perplexity** | Real-time web search | 3 min | Research-heavy work |
-| **Context7** | Framework documentation | 3 min | Web/mobile developers |
-| **Sequential Thinking** | Complex problem solving | 2 min | Architecture, planning |
-| **Filesystem** | Local file operations | 2 min | File management tasks |
+| Server | Type | Best For | Auth | Must-Have For |
+|--------|------|----------|------|---------------|
+| **Claude Code docs** | HTTP | Looking up Claude Code behavior | None | Everyone — the ideal first server |
+| **GitHub** | HTTP | Issues, PRs, code review | PAT header | All developers |
+| **Sentry** | HTTP | Production errors | OAuth | Anyone shipping to production |
+| **Playwright** | stdio | Browser control and testing | None | Web developers |
+| **Context7** | stdio or HTTP | Library documentation | Optional API key | Anyone using fast-moving frameworks |
 
 Now let's dive into each one!
 
 ---
 
-## 1. GitHub MCP Server
+## 1. Claude Code Docs MCP Server
 
-**The #1 most popular MCP server** for developers working with Git repositories.
+**The best first server**, because it requires no account, no token, and no configuration, and you can immediately tell whether it worked.
 
 ### What It Does
 
-Connects Claude Code directly to GitHub, enabling:
-- ✅ Create, update, and close issues
-- ✅ Create and manage pull requests
-- ✅ Review code and leave PR comments
-- ✅ Check CI/CD status
-- ✅ Search repositories
-- ✅ Manage branches and commits
-- ✅ Read repository metadata
+Full-text search over the Claude Code documentation. When Claude answers a question about Claude Code behavior, it can consult current docs rather than its training data.
 
-### Real-World Scenarios
+### Installation
 
-#### Scenario 1: End-to-End Feature Development
-
-**Without GitHub MCP:**
 ```bash
-# You: Manual workflow, 15-20 minutes
-1. Write code in Claude Code
-2. Switch to terminal: git add, git commit, git push
-3. Open browser, navigate to GitHub
-4. Click "New Pull Request"
-5. Fill out PR template
-6. Add reviewers manually
-7. Copy PR link
-8. Back to Claude Code to continue
+claude mcp add --transport http claude-code-docs https://code.claude.com/docs/mcp
 ```
 
-**With GitHub MCP:**
+**Authentication**: none.
+
+### Try It
+
 ```bash
-# In Claude Code: One natural command, 30 seconds
-> "Implement user authentication, commit it, and create a PR for review"
+claude
 
-Claude:
-✅ Implemented authentication (auth.js, routes.js, tests.js)
-✅ Created commit: "Add user authentication with JWT"
-✅ Pushed to origin/feature/user-auth
-✅ Created PR #42: "Add user authentication"
-✅ Added reviewers: @teammate1, @teammate2
-
-PR URL: https://github.com/you/repo/pull/42
+> "Use the claude-code-docs server to look up what MCP_TIMEOUT does"
 ```
 
-**Time saved**: 15 minutes per feature → 60+ minutes per day
+If the answer describes a server startup timeout in milliseconds, the server is working.
 
 ---
 
-#### Scenario 2: Code Review Workflow
+## 2. GitHub MCP Server
 
-**The task**: Review a colleague's PR and provide feedback.
+**The most useful server for most developers**, connecting Claude to issues, pull requests, and repository state.
+
+### What It Does
+
+- ✅ Create, update, and close issues
+- ✅ Read and comment on pull requests
+- ✅ Search repositories
+- ✅ Read repository metadata and CI status
+
+### Real-World Scenario: Code Review Workflow
+
+**The task**: review a colleague's PR and provide feedback.
 
 ```bash
 > "Review PR #42 and check for security issues"
@@ -143,267 +127,155 @@ Claude:
 
 Security concerns found:
 1. ❌ API key hardcoded in payment.js:45
-2. ❌ SQL injection vulnerability in database.js:112
+2. ❌ SQL injection risk in database.js:112
 3. ⚠️ Missing input validation in checkout.js:67
-
-Performance notes:
-- ✅ Good: Implemented caching
-- ⚠️ Consider: Database connection pooling
 
 ✍️ Adding review comments to PR...
 ✅ Posted 3 comments with code suggestions
 ```
 
-**Value**: Automated security scanning + direct PR feedback without leaving Claude Code.
+**Value**: review and feedback without leaving Claude Code.
+
+### Installation
+
+GitHub runs a hosted MCP server that authenticates with a personal access token passed as a header:
+
+```bash
+claude mcp add --transport http github https://api.githubcopilot.com/mcp/ \
+  --header "Authorization: Bearer YOUR_GITHUB_PAT"
+```
+
+Get the token from [GitHub token settings](https://github.com/settings/personal-access-tokens). Generate a **fine-grained** token with access only to the repositories Claude should touch.
+
+> 🚨 **`claude mcp add` does not validate the token.** A placeholder is accepted here and the server simply fails to connect later. Run `claude mcp list` and confirm `✔ Connected` before assuming it worked.
+
+> 🚨 **Don't use the old npm package.** `@modelcontextprotocol/server-github` is deprecated and no longer supported. Use the hosted server above.
+
+### Best Practices
+
+**Scope the token, not the server:**
+
+```bash
+# ✅ Good: fine-grained token, two specific repositories
+# ⚠️ OK:   fine-grained token across your personal repositories
+# ❌ Avoid: classic token with org-wide `repo` scope
+```
+
+There is no `--scope repo:owner/name`. `--scope` takes only `local`, `project`, or `user`, and controls where the *configuration* is written.
+
+**Restrict destructive tools with permission rules** in `.claude/settings.json`:
+
+```json
+{
+  "permissions": {
+    "deny": ["mcp__github__delete_repository"]
+  }
+}
+```
+
+**Use Claude for**: creating issues from error logs, batch PR review, generating PR descriptions from commit history.
+
+**Don't use Claude for**: force pushes, deleting branches in production, modifying other people's commits without permission.
 
 ---
 
-#### Scenario 3: Issue Triage
+## 3. Sentry MCP Server
 
-**The task**: Review open issues and prioritize them.
+**Production error data**, so Claude debugs against what actually happened rather than what you remember.
+
+### What It Does
+
+- ✅ Query recent issues and their frequency
+- ✅ Pull full stack traces by error ID
+- ✅ Correlate new errors with deployments
+
+### Real-World Scenario
 
 ```bash
-> "Show me open bugs, prioritize by severity, and add labels"
+> "What are the most common errors in the last 24 hours?"
+> "Show me the stack trace for error ID abc123"
+> "Which deployment introduced these new errors?"
+```
 
-Claude:
-📋 Found 12 open bugs
+The third question is the one that's hard to answer by hand and easy for Claude once it can see both your Sentry data and your git history.
 
-High Priority (Fix This Week):
-1. Issue #156: Login fails on Safari → Added label: "critical", "browser-compat"
-2. Issue #142: Data loss in checkout → Added label: "critical", "data-integrity"
+### Installation
 
-Medium Priority:
-3. Issue #134: Slow page load → Added label: "performance", "enhancement"
-4. Issue #128: UI misalignment → Added label: "ui", "minor"
+Sentry authenticates through OAuth, so you pass no credential when adding it:
 
-✅ Updated 12 issues with priority labels
-✅ Created milestone: "v2.1.0 Critical Fixes"
-✅ Assigned high-priority issues to team leads
+```bash
+claude mcp add --transport http sentry https://mcp.sentry.dev/mcp
+```
+
+Then sign in:
+
+```text
+/mcp
+```
+
+Select `sentry`, choose **Authenticate**, and complete the browser flow. Or, without opening a session:
+
+```bash
+claude mcp login sentry
 ```
 
 ---
+
+## 4. Playwright MCP Server
+
+**A real browser Claude can drive** — navigate, click, fill forms, and read what's on the page.
+
+### What It Does
+
+- ✅ Open pages and report what's rendered
+- ✅ Click, type, and navigate
+- ✅ Reproduce a bug report step by step
+- ✅ Verify a UI change against a running dev server
+
+### Real-World Scenario
+
+```bash
+> "Open http://localhost:3000/checkout, add an item to the cart,
+   and tell me what happens when I submit an empty email field"
+```
+
+Claude walks through it in a visible browser window. This turns "does my change actually work in the browser" from a manual check into something Claude can confirm.
 
 ### Installation
 
 ```bash
-# Quick install via CLI
-claude mcp add github --scope user
-
-# Or manual configuration
-# See installation guide for details
+claude mcp add playwright -- npx -y @playwright/mcp@latest
 ```
 
-**Authentication**: Requires GitHub Personal Access Token with `repo`, `workflow`, and `read:org` scopes.
+**Requires** Node.js 18 or later. **Authentication**: none.
 
-### Best Practices
+Playwright drives whichever Chrome is already installed. For a different browser, append the flag after the package:
 
-**Scope your tokens appropriately:**
 ```bash
-# ✅ Good: Limit to specific repos
-GITHUB_TOKEN with access to specific repositories
-
-# ⚠️ OK: User-level access
-GITHUB_TOKEN with user scope
-
-# ❌ Avoid: Org-wide access unless necessary
-Only use org scope when managing multiple repos
+claude mcp add playwright -- npx -y @playwright/mcp@latest --browser firefox
 ```
 
-**Use Claude for**:
-- Creating issues from error logs
-- Batch PR operations (reviewing multiple PRs)
-- Automating repetitive git workflows
-- Generating PR descriptions from commit history
-
-**Don't use Claude for**:
-- Force pushes (too dangerous)
-- Deleting branches in production
-- Modifying other people's commits without permission
+> 💡 The first `claude mcp list` may show `✘ Failed to connect` while `npx` downloads the package. Wait a moment and check again.
 
 ---
 
-## 2. Perplexity MCP Server
+## 5. Context7 MCP Server
 
-**Real-time web search with AI-powered answers** and source citations.
+**Version-aware library documentation**, pulled from the source rather than from training data.
 
 ### What It Does
 
-Gives Claude access to current web information:
-- ✅ Search the web in real-time
-- ✅ Get recent documentation updates
-- ✅ Research latest best practices
-- ✅ Fact-check with sources
-- ✅ Find current package versions
-- ✅ Access recent blog posts and articles
-
-### Real-World Scenarios
-
-#### Scenario 1: Staying Current with Framework Updates
-
-**The problem**: You need to use React Server Components but Claude's training data is from early 2024.
-
-```bash
-> "What are the latest best practices for React Server Components in 2025?"
-
-Claude (without Perplexity):
-"Based on my training data from early 2024, React Server Components are experimental..."
-# Potentially outdated information!
-
-Claude (with Perplexity):
-[Searches web via Perplexity]
-
-"According to the React documentation updated in December 2024 and recent blog posts:
-
-✅ **Current Best Practices** (as of 2025):
-1. Server Components are now stable in React 19
-2. Use async/await directly in components
-3. New streaming patterns introduced
-4. Updated bundler integration required
-
-📚 **Sources**:
-- React 19 Official Docs (react.dev)
-- Vercel Blog: "React Server Components in Production" (Dec 2024)
-- Dan Abramov: "RSC Patterns" (Nov 2024)
-
-Here's how to implement it with the latest patterns..."
-```
-
-**Value**: Always current, sourced information instead of potentially outdated training data.
-
----
-
-#### Scenario 2: Package Selection
-
-**The task**: Choose between multiple libraries for a task.
-
-```bash
-> "Should I use Prisma or Drizzle ORM for my Next.js 15 project in 2025?"
-
-Claude (with Perplexity):
-[Searches for recent comparisons and benchmarks]
-
-"Based on recent benchmarks and community feedback (December 2024):
-
-**Prisma** (More mature):
-✅ Better TypeScript support
-✅ Larger ecosystem and community
-⚠️ Slower query performance
-⚠️ Larger bundle size
-
-**Drizzle** (Rising star):
-✅ 2-3x faster queries (recent benchmarks)
-✅ Smaller bundle size
-✅ Better edge runtime support
-⚠️ Smaller community
-⚠️ Fewer integrations
-
-**Recommendation for Next.js 15**:
-Drizzle ORM - better performance for edge functions, actively developed
-
-📚 **Sources**:
-- ORM Benchmark 2024 (github.com/drizzle-team/benchmarks)
-- Next.js 15 + Drizzle Guide (vercel.com/guides)
-- Reddit r/nextjs discussion (1,200 upvotes, Nov 2024)
-```
-
-**Value**: Data-driven decisions with recent benchmarks and community consensus.
-
----
-
-#### Scenario 3: Debugging with Current Solutions
-
-**The problem**: Error message that might have recent solutions.
-
-```bash
-> "I'm getting 'Module not found: Can't resolve 'next/server'' in Next.js 15"
-
-Claude (with Perplexity):
-[Searches for this specific error in Next.js 15 context]
-
-"This is a known issue introduced in Next.js 15.0.3 (December 2024):
-
-**Quick Fix**:
-```bash
-# Update to Next.js 15.0.4 or later
-npm install next@latest
-```
-
-**Why it happened**:
-Breaking change in module resolution for edge runtime
-
-**Alternative workaround** (if can't update):
-```javascript
-// Use dynamic import instead
-const { NextResponse } = await import('next/server')
-```
-
-📚 **Sources**:
-- Next.js GitHub Issue #58234 (Closed, Fixed in 15.0.4)
-- Next.js Docs: Migration Guide 15.0.3 → 15.0.4
-```
-
-**Value**: Find solutions to recent issues that weren't in Claude's training data.
-
----
-
-### Installation
-
-```bash
-# Quick install
-claude mcp add perplexity
-
-# Requires PERPLEXITY_API_KEY environment variable
-export PERPLEXITY_API_KEY="pplx_your_key"
-```
-
-**API Access**: Sign up at [Perplexity API](https://www.perplexity.ai/api) for an API key.
-
-### Best Practices
-
-**Use Perplexity when**:
-- 🔍 You need current information (last 6-12 months)
-- 📚 Researching new frameworks, libraries, or tools
-- 🐛 Debugging recent issues or error messages
-- 📊 Comparing packages/tools with recent data
-- ✅ Fact-checking or verifying information
-
-**Don't use Perplexity for**:
-- Basic programming questions (use Claude's built-in knowledge)
-- Searching your codebase (use Explore agent)
-- Timeless concepts (algorithms, data structures)
-
-**Cost awareness**: Perplexity API calls cost money—use strategically for questions that benefit from recency.
-
----
-
-## 3. Context7 MCP Server
-
-**AI-powered documentation search** for frameworks and libraries.
-
-### What It Does
-
-Provides instant access to up-to-date documentation:
 - ✅ Framework documentation (React, Next.js, Vue, Angular)
-- ✅ Library references (TypeScript, Node.js, Python)
-- ✅ API documentation with version awareness
+- ✅ Library references with version awareness
 - ✅ Code examples from official docs
-- ✅ Migration guides and changelogs
 
-### Real-World Scenarios
-
-#### Scenario 1: Learning New Framework Patterns
-
-**The task**: Implement Next.js App Router patterns correctly.
+### Real-World Scenario
 
 ```bash
-> "How do I implement route handlers in Next.js 15 App Router?"
+> "How do I implement route handlers in the Next.js App Router? use context7"
+```
 
-Claude (with Context7):
-[Queries Context7 for Next.js 15 documentation]
-
-"According to the official Next.js 15 documentation:
-
-**Route Handlers** replace API routes in the App Router:
+Claude resolves the library ID, fetches the current docs, and answers from them:
 
 ```typescript
 // app/api/users/route.ts
@@ -413,642 +285,139 @@ export async function GET(request: NextRequest) {
   const users = await db.users.findMany()
   return NextResponse.json({ users })
 }
-
-export async function POST(request: NextRequest) {
-  const body = await request.json()
-  const user = await db.users.create({ data: body })
-  return NextResponse.json({ user }, { status: 201 })
-}
 ```
 
-**Key differences from Pages Router**:
-- ✅ Use `route.ts` instead of `/pages/api`
-- ✅ Export HTTP method functions (GET, POST, etc.)
-- ✅ Use `NextRequest`/`NextResponse` (not req/res)
-- ✅ Automatically optimized for edge runtime
+> Key differences from the Pages Router: use `route.ts` instead of `/pages/api`, export HTTP method functions, and use `NextRequest`/`NextResponse` rather than `req`/`res`.
 
-📚 **Source**: Next.js 15 Official Docs - Route Handlers"
-```
-
-**Value**: Accurate, version-specific documentation without manual searching.
-
----
-
-#### Scenario 2: API Reference Lookup
-
-**The task**: Use a specific TypeScript utility type.
-
-```bash
-> "Show me how to use TypeScript's Partial<T> and Required<T> types"
-
-Claude (with Context7):
-[Fetches TypeScript documentation]
-
-"From the TypeScript 5.3 documentation:
-
-**Partial<T>**: Makes all properties optional
-```typescript
-interface User {
-  id: string
-  name: string
-  email: string
-}
-
-// All properties optional
-type PartialUser = Partial<User>
-// Same as: { id?: string, name?: string, email?: string }
-
-// Use case: Updates where only some fields change
-function updateUser(id: string, updates: Partial<User>) {
-  return db.users.update({ where: { id }, data: updates })
-}
-
-updateUser('123', { name: 'New Name' }) // ✅ Valid
-```
-
-**Required<T>**: Makes all properties required
-```typescript
-interface Config {
-  host?: string
-  port?: number
-}
-
-// All properties required
-type RequiredConfig = Required<Config>
-// Same as: { host: string, port: number }
-
-// Use case: Ensure full configuration
-function validateConfig(config: Required<Config>) {
-  // TypeScript ensures host and port exist
-  console.log(`${config.host}:${config.port}`)
-}
-```
-
-📚 **Source**: TypeScript Handbook - Utility Types"
-```
-
----
+The value is that this reflects the version currently published, not whatever the model absorbed during training.
 
 ### Installation
 
-```bash
-# Quick install
-claude mcp add context7
+Context7 offers both a local package and a hosted endpoint. An API key is **optional** — it raises rate limits and unlocks private repositories. Get one at [context7.com/dashboard](https://context7.com/dashboard).
 
-# Requires CONTEXT7_API_KEY
-export CONTEXT7_API_KEY="your_key"
+**Local (stdio):**
+
+```bash
+claude mcp add --scope user context7 -- npx -y @upstash/context7-mcp --api-key YOUR_API_KEY
 ```
 
-**API Access**: Sign up at [Context7](https://context7.com) for documentation access.
+**Remote (HTTP):**
+
+```bash
+claude mcp add --scope user --header "CONTEXT7_API_KEY: YOUR_API_KEY" \
+  --transport http context7 https://mcp.context7.com/mcp
+```
+
+Drop `--scope user` to install for the current project only. Requires Node.js 20.18.1 or later for the local form.
+
+> 🚨 The package is **`@upstash/context7-mcp`**, published by Upstash. There is no `@context7/mcp-server` package.
 
 ### Best Practices
 
-**Use Context7 when**:
-- 📖 Learning new framework patterns
-- 🔍 Looking up API references
-- 📚 Finding official code examples
-- 🆕 Understanding version-specific changes
-- ✅ Verifying syntax and best practices
+Context7 activates most reliably when you say `use context7` in your prompt. To avoid typing it every time, add a line to your `CLAUDE.md`:
 
-**Advantages over Perplexity**:
-- More accurate for official documentation
-- Version-aware (shows docs for specific versions)
-- No random blog posts—only authoritative sources
-- Better code examples from official docs
-
----
-
-## 4. Sequential Thinking MCP Server
-
-**Advanced reasoning for complex problems** that require multi-step thinking.
-
-### What It Does
-
-Enables Claude to break down complex tasks systematically:
-- ✅ Architectural planning
-- ✅ Multi-step problem solving
-- ✅ Design decision analysis
-- ✅ Trade-off evaluation
-- ✅ Edge case identification
-
-### Real-World Scenarios
-
-#### Scenario 1: System Design
-
-**The task**: Design a caching strategy for a high-traffic API.
-
-```bash
-> "Design a caching strategy for our API that handles 10k req/s"
-
-Claude (with Sequential Thinking):
-[Activates multi-step reasoning]
-
-**Step 1: Analyze Requirements**
-- 10k requests/second = 600k req/min
-- Need sub-100ms response times
-- Mixed read/write traffic
-- Cache hit rate target: 80%+
-
-**Step 2: Identify Constraints**
-- Database can handle 2k req/s max
-- Need 5x reduction via caching
-- Cache invalidation complexity
-- Distributed cache coordination
-
-**Step 3: Evaluate Options**
-1. **In-memory (Redis)**
-   ✅ Fastest (sub-1ms)
-   ✅ Good for high read traffic
-   ❌ Eviction policy complexity
-   ❌ Memory limits
-
-2. **CDN Edge Caching**
-   ✅ Global distribution
-   ✅ Handles static content
-   ❌ Less control over invalidation
-   ❌ Not suitable for personalized data
-
-3. **Multi-tier Strategy**
-   ✅ Best of both approaches
-   ✅ L1: In-memory, L2: Redis, L3: DB
-   ⚠️ More complex to implement
-
-**Step 4: Recommendation**
-Multi-tier caching with:
-- L1 Cache: In-process LRU (10ms TTL)
-- L2 Cache: Redis (5min TTL)
-- L3 Cache: Database with query optimization
-
-**Step 5: Implementation Plan**
-[Detailed implementation steps...]
-
-**Step 6: Edge Cases to Handle**
-- Cache stampede protection
-- Stale-while-revalidate pattern
-- Graceful degradation if cache fails
-```
-
-**Value**: Systematic analysis with explicit reasoning steps visible to you.
-
----
-
-#### Scenario 2: Debugging Complex Issues
-
-**The problem**: Intermittent production bug that's hard to reproduce.
-
-```bash
-> "Our checkout fails randomly ~2% of the time. Help debug this systematically."
-
-Claude (with Sequential Thinking):
-**Step 1: Gather Information**
-What do we know?
-- Failure rate: 2% (1 in 50 transactions)
-- Symptom: Checkout doesn't complete
-- No error logs in most cases
-- Cannot reproduce locally
-
-**Step 2: Generate Hypotheses**
-Possible causes:
-1. Race condition in payment processing
-2. Network timeout to payment gateway
-3. Database connection pool exhaustion
-4. Session expiration mid-checkout
-5. Browser-specific issue
-
-**Step 3: Prioritize by Likelihood**
-High probability:
-- Network timeout (2% failure matches typical timeout rate)
-- Database connection pool exhaustion (intermittent)
-
-Low probability:
-- Session expiration (would affect more users)
-- Browser-specific (would show pattern in analytics)
-
-**Step 4: Design Diagnostic Tests**
-Test 1: Add detailed logging around payment gateway calls
-Test 2: Monitor database connection pool metrics
-Test 3: Implement retry logic with exponential backoff
-Test 4: Add distributed tracing
-
-**Step 5: Implement Incremental Fixes**
-[Step-by-step implementation plan]
+```markdown
+Always use context7 when I need code generation, setup steps, or library/API
+documentation, without me having to explicitly ask.
 ```
 
 ---
 
-### Installation
+## Databases
+
+### DBHub (Recommended)
+
+The Claude Code documentation uses [DBHub](https://github.com/bytebase/dbhub) as its worked database example. It connects to a relational database through a connection string.
 
 ```bash
-# Quick install
-claude mcp add sequential-thinking
-
-# No API key required - local processing
+claude mcp add --transport stdio db -- npx -y @bytebase/dbhub \
+  --dsn "postgresql://readonly:pass@prod.db.com:5432/analytics"
 ```
 
-### Best Practices
+Then query naturally:
 
-**Use Sequential Thinking when**:
-- 🏗️ Designing system architecture
-- 🐛 Debugging complex, intermittent issues
-- ⚖️ Evaluating multiple approaches
-- 📋 Planning multi-step implementations
-- 🔍 Analyzing edge cases
-
-**Combine with other servers**:
 ```bash
-# Example: Use with Perplexity for research + reasoning
-> "Research current microservices patterns [Perplexity], then design our service architecture [Sequential Thinking]"
+> "What's our total revenue this month?"
+> "Show me the schema for the orders table"
+> "Find customers who haven't made a purchase in 90 days"
 ```
+
+> 🚨 **Use a read-only database user in the connection string.** This is the actual security boundary. Claude will happily write a `DELETE` if the credential permits one, and no Claude Code setting restricts SQL by statement type.
+
+> 🚨 `@modelcontextprotocol/server-postgres` is **deprecated** and no longer supported. Use DBHub or a vendor-maintained server instead.
+
+### MongoDB and Others
+
+MongoDB, Redis, and most other engines have community or vendor MCP servers, but we have not verified a specific one to recommend here. See [Servers we could not verify](#servers-we-could-not-verify) for how to evaluate one you find.
 
 ---
 
-## 5. Filesystem MCP Server
+## Reference Servers
 
-**Local file operations** for advanced file management.
+These come from [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) and are actively published.
 
-### What It Does
+### Filesystem
 
-Extends file operations beyond basic read/write:
-- ✅ Recursive directory operations
-- ✅ File pattern matching (glob)
-- ✅ Bulk file operations
-- ✅ Permission management
-- ✅ File metadata queries
-- ✅ Safe file manipulation
-
-### Real-World Scenarios
-
-#### Scenario 1: Codebase Refactoring
-
-**The task**: Rename a component across the entire codebase.
+Structured filesystem access scoped to directories you name.
 
 ```bash
-> "Rename all instances of 'UserCard' to 'ProfileCard' across the codebase"
-
-Claude (with Filesystem):
-🔍 Scanning for files containing 'UserCard'...
-
-Found 47 files:
-- 23 TypeScript files (.ts, .tsx)
-- 12 test files (.test.ts)
-- 8 style files (.css)
-- 4 documentation files (.md)
-
-✏️ Renaming...
-✅ Renamed components/UserCard.tsx → ProfileCard.tsx
-✅ Updated 46 import statements
-✅ Updated 12 test files
-✅ Updated 8 style class references
-✅ Updated 4 documentation references
-
-⚠️ Manual review needed:
-- UserCard in database schema (migrations/001_users.sql:45)
-- UserCard in API response (types/api.ts:23)
-
-Would you like me to update those as well?
+claude mcp add filesystem -- npx -y @modelcontextprotocol/server-filesystem /path/to/allowed/dir
 ```
+
+> 💡 **You probably don't need this in Claude Code.** Claude Code already has native `Read`, `Write`, `Edit`, `Glob`, and `Grep` tools, plus a [working-directory permission model](https://code.claude.com/docs/en/permissions). The filesystem MCP server exists mainly for clients that lack built-in file tools. Add it only if you specifically want its directory-scoping semantics.
+
+### Sequential Thinking
+
+Structured multi-step reasoning as a tool.
+
+```bash
+claude mcp add sequential-thinking -- npx -y @modelcontextprotocol/server-sequential-thinking
+```
+
+**Authentication**: none.
+
+> 💡 **Consider whether you need it.** Claude Code has its own [extended thinking modes](../08-thinking/1-overview.md) and a planning permission mode. This server predates much of that. Try the built-in options first and add this only if you want the explicit numbered-thought output format.
 
 ---
 
-#### Scenario 2: Project Cleanup
+## Other Hosted Servers
 
-**The task**: Remove unused files and dependencies.
+These endpoints appear in the Claude Code documentation's own examples, so the URLs are verified:
 
-```bash
-> "Find and remove unused component files"
+| Service | Command |
+|---------|---------|
+| **Notion** | `claude mcp add --transport http notion https://mcp.notion.com/mcp` |
+| **Stripe** | `claude mcp add --transport http stripe https://mcp.stripe.com` |
+| **HubSpot** | `claude mcp add --scope user --transport http hubspot https://mcp.hubspot.com/anthropic` |
+| **Asana** | `claude mcp add --transport sse asana https://mcp.asana.com/sse` |
+| **Airtable** | `claude mcp add --env AIRTABLE_API_KEY=YOUR_KEY --transport stdio airtable -- npx -y airtable-mcp-server` |
 
-Claude (with Filesystem):
-🔍 Analyzing project structure...
+> ⚠️ Asana is listed with `--transport sse` because that's the endpoint it exposes. **SSE is deprecated** — prefer HTTP wherever a vendor offers it.
 
-**Unused Components** (no imports found):
-1. components/old/LegacyHeader.tsx (last modified: 6 months ago)
-2. components/deprecated/OldButton.tsx (last modified: 8 months ago)
-3. utils/unused/helper.ts (last modified: 1 year ago)
-
-**Unused Stylesheets**:
-1. styles/legacy.css (not imported anywhere)
-2. components/Modal/old-modal.css (component deleted)
-
-✅ Moved to archive/unused/:
-- 3 component files
-- 2 stylesheet files
-- Total: 2.3 KB saved
-
-**Recommendation**: Review archive/unused/ before permanent deletion
-```
+Most of these require a browser sign-in after adding. Run `/mcp` and authenticate.
 
 ---
 
-### Installation
+## Servers We Could Not Verify
 
-```bash
-# Usually pre-installed with Claude Code
-# Or install manually
-claude mcp add filesystem
-```
+This section exists on purpose. These are servers people commonly ask about where we could **not** confirm a current, working install command from a primary source. Rather than guess at one, here's what we know:
 
-### Best Practices
+| Server | Status | What to do |
+|--------|--------|------------|
+| **Perplexity** | The `server-perplexity-ask` npm package is **deprecated**. Perplexity documents a current MCP offering, but we could not reach that documentation to verify the endpoint or auth header | Check [Perplexity's own MCP documentation](https://docs.perplexity.ai) for the current endpoint before configuring anything |
+| **Jira / Atlassian** | Atlassian publishes an MCP server, but we have not verified its endpoint | Check Atlassian's docs or the [Anthropic Directory](https://claude.ai/directory) |
+| **Slack** | Multiple community servers exist; the officially-supported path is the Slack **claude.ai connector**, not a locally-added server | Add it at [claude.ai/customize/connectors](https://claude.ai/customize/connectors), where it becomes available in Claude Code automatically |
+| **AWS / GCP / Azure** | Cloud vendors publish MCP servers, but we have not verified specific install commands | Check the vendor's own documentation. **There is no `claude mcp add aws`** — that command form, with a bare service name and no URL or start command, is not valid syntax |
 
-**Use Filesystem for**:
-- 🔄 Bulk refactoring operations
-- 🧹 Project cleanup
-- 📂 Complex file organization
-- 🔍 Pattern-based file operations
+> 🚨 **`claude mcp add <name>` with nothing after it does not work.** Every add needs either a URL (with `--transport http` or `sse`) or a start command after `--`. Any snippet you see of the form `claude mcp add github` or `claude mcp add aws`, with no second argument, is wrong.
 
-**Safety features**:
-- Creates backups before destructive operations
-- Asks for confirmation on bulk deletes
-- Preserves file permissions
-- Handles symlinks correctly
+### How to Evaluate a Server You Found
 
----
-
-## Database Connectors
-
-MCP servers for direct database access.
-
-### PostgreSQL MCP Server
-
-**Query and manage PostgreSQL databases** directly from Claude.
-
-**What it does**:
-- ✅ Execute SQL queries
-- ✅ Schema inspection
-- ✅ Data migrations
-- ✅ Natural language to SQL
-- ✅ Query optimization suggestions
-
-**Example usage**:
-```bash
-> "Show me users who signed up this week"
-
-Claude:
-[Generates and executes SQL]
-
-```sql
-SELECT id, email, created_at
-FROM users
-WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'
-ORDER BY created_at DESC;
-```
-
-Found 47 users:
-- Monday: 12 signups
-- Tuesday: 8 signups
-- Wednesday: 15 signups
-...
-```
-
-**Installation**:
-```bash
-npm install -g @modelcontextprotocol/server-postgres
-# Configure with database URL
-```
-
----
-
-### MongoDB MCP Server
-
-**Work with MongoDB databases** and document collections.
-
-**What it does**:
-- ✅ Query documents with natural language
-- ✅ Aggregation pipeline generation
-- ✅ Index optimization
-- ✅ Schema validation
-
-**Example**:
-```bash
-> "Find all products with low inventory and email suppliers"
-
-Claude:
-[Queries MongoDB]
-
-Found 12 products with inventory < 10:
-- Product A (SKU: 12345): 3 units remaining
-- Product B (SKU: 67890): 7 units remaining
-...
-
-Suppliers to contact:
-- Supplier X: 5 products low
-- Supplier Y: 7 products low
-
-Draft emails prepared for review.
-```
-
----
-
-## Cloud Service Integrations
-
-### AWS MCP Server
-
-**Manage AWS resources** directly from Claude.
-
-**Capabilities**:
-- ✅ EC2 instance management
-- ✅ S3 bucket operations
-- ✅ Lambda function deployment
-- ✅ CloudWatch log analysis
-- ✅ Cost optimization recommendations
-
-**Example**:
-```bash
-> "Show me EC2 instances that have been running for >30 days unused"
-
-Claude:
-[Queries AWS API]
-
-Found 3 idle instances (< 5% CPU for 30+ days):
-
-1. i-abc123 (t3.medium)
-   - Running: 47 days
-   - Cost: $35/month
-   - Recommendation: Stop or downsize
-
-2. i-def456 (t3.large)
-   - Running: 62 days
-   - Cost: $70/month
-   - Recommendation: Terminate (no activity)
-
-Total potential savings: $105/month
-
-Would you like me to stop these instances?
-```
-
----
-
-### Google Cloud Platform MCP Server
-
-**Manage GCP resources**.
-
-**Capabilities**:
-- ✅ Compute Engine management
-- ✅ Cloud Storage operations
-- ✅ BigQuery analytics
-- ✅ Cloud Functions deployment
-
----
-
-### Azure MCP Server
-
-**Manage Microsoft Azure resources**.
-
-**Capabilities**:
-- ✅ Virtual machine management
-- ✅ Blob storage operations
-- ✅ Azure Functions deployment
-- ✅ Resource cost analysis
-
----
-
-## Development Tools
-
-### Jira MCP Server
-
-**Project management integration**.
-
-**What it does**:
-- ✅ Create and update tickets
-- ✅ Sprint planning
-- ✅ Status tracking
-- ✅ Time logging
-
-**Example**:
-```bash
-> "Create Jira tickets for all TODO comments in the codebase"
-
-Claude:
-[Scans codebase for TODO comments]
-
-Found 23 TODOs:
-
-Created tickets:
-- PROJ-401: Refactor authentication logic (src/auth.ts:45)
-- PROJ-402: Add error handling (api/users.ts:112)
-- PROJ-403: Optimize database query (db/queries.ts:89)
-...
-
-✅ Created 23 tickets in "Backlog"
-✅ Tagged with "tech-debt"
-✅ Assigned to current sprint
-```
-
----
-
-### Slack MCP Server
-
-**Team communication integration**.
-
-**What it does**:
-- ✅ Send messages to channels
-- ✅ Post code snippets
-- ✅ Share deployment status
-- ✅ Create threads for discussions
-
-**Example**:
-```bash
-> "Deploy to staging and notify the team in #deployments"
-
-Claude:
-[Deploys application]
-
-✅ Deployed to staging: v2.1.0-rc.1
-✅ All tests passed (347/347)
-✅ Posted to #deployments:
-
-"🚀 Staging Deployment: v2.1.0-rc.1
-- ✅ All tests passed
-- ✅ Performance: 15% faster load time
-- 📋 Changes: 12 features, 5 bug fixes
-- 🔗 Preview: https://staging.example.com
-- 👀 Ready for QA testing"
-```
-
----
-
-## Docker MCP Toolkit: 200+ Servers
-
-The **Docker MCP Toolkit** provides access to over 200 pre-built MCP servers in containers.
-
-### Categories Available
-
-**Development Tools** (40+ servers):
-- GitHub, GitLab, Bitbucket
-- Jira, Linear, Asana
-- Slack, Discord, Teams
-- Notion, Confluence
-
-**Search & Research** (25+ servers):
-- Perplexity, Brave Search, Google Search
-- Wikipedia, Archive.org
-- Academic databases (arXiv, PubMed)
-- News aggregators
-
-**Databases** (30+ servers):
-- PostgreSQL, MySQL, MongoDB
-- Redis, Elasticsearch
-- Neo4j, CouchDB
-- ClickHouse, TimescaleDB
-
-**Cloud Platforms** (20+ servers):
-- AWS, Google Cloud, Azure
-- DigitalOcean, Heroku
-- Cloudflare, Vercel
-
-**AI & ML** (15+ servers):
-- Hugging Face
-- OpenAI API
-- Anthropic API
-- TensorFlow Serving
-
-**Productivity** (20+ servers):
-- Google Workspace
-- Microsoft 365
-- Trello, Monday.com
-- Calendly, Zoom
-
-**And 50+ more** including:
-- Payment processors (Stripe, PayPal)
-- Analytics (Google Analytics, Mixpanel)
-- Monitoring (Datadog, New Relic)
-- Email (SendGrid, Mailgun)
-
-### Quick Start with Docker Toolkit
-
-```bash
-# Pull the toolkit
-docker pull anthropic/mcp-toolkit:latest
-
-# List all available servers
-docker run anthropic/mcp-toolkit:latest list
-
-# Run a specific server
-docker run -d \
-  --name mcp-github \
-  -e GITHUB_TOKEN="${GITHUB_TOKEN}" \
-  anthropic/mcp-toolkit:latest github
-
-# Try multiple servers
-docker run -d --name mcp-perplexity -e PERPLEXITY_API_KEY="${PERPLEXITY_API_KEY}" anthropic/mcp-toolkit:latest perplexity
-docker run -d --name mcp-slack -e SLACK_TOKEN="${SLACK_TOKEN}" anthropic/mcp-toolkit:latest slack
-```
-
-### Benefits of Docker Toolkit
-
-**Exploration**:
-- Try servers without installing dependencies
-- Quickly test 5-10 servers to find the right fit
-- No cleanup needed—just remove containers
-
-**Consistency**:
-- Same server version across team
-- Predictable behavior
-- Easy updates (`docker pull latest`)
-
-**Isolation**:
-- No dependency conflicts
-- Separate environment per server
-- Easy to debug issues
+1. **Find the publisher.** A GitHub org you recognize, a vendor's own docs, or the Anthropic Directory. An unattributed npm package that wants an API key deserves suspicion.
+2. **Check it isn't deprecated**: `npm view <package> deprecated`.
+3. **Read what it does with your credential.** A stdio server runs on your machine with your environment.
+4. **Add it at local scope first**, so a mistake doesn't propagate to your team through a committed `.mcp.json`.
+5. **Check `claude mcp list`** for `✔ Connected`, then `/mcp` for its actual tool list. A server that advertises tools but exposes none is flagged there.
 
 ---
 
@@ -1056,47 +425,87 @@ docker run -d --name mcp-slack -e SLACK_TOKEN="${SLACK_TOKEN}" anthropic/mcp-too
 
 ### Decision Matrix
 
-Use this matrix to decide which servers to install:
-
-| Your Work | Must-Have | Nice-to-Have | Optional |
-|-----------|-----------|--------------|----------|
-| **Web Development** | GitHub, Context7 | Perplexity, Filesystem | Vercel, Cloudflare |
-| **Backend/API** | GitHub, PostgreSQL | Perplexity, AWS | Redis, MongoDB |
-| **Data Science** | GitHub, Sequential Thinking | Perplexity, Python | Jupyter, TensorFlow |
-| **DevOps** | GitHub, AWS/GCP/Azure | Slack, Jira | Datadog, New Relic |
-| **Research** | Perplexity, Context7 | Sequential Thinking | arXiv, PubMed |
-| **Full-Stack** | GitHub, Perplexity, Context7 | Filesystem, Database | Slack, Jira |
+| Your Work | Start With | Add Next | Consider |
+|-----------|-----------|----------|----------|
+| **Web Development** | Claude Code docs, Playwright | GitHub, Context7 | Vendor connector for your host |
+| **Backend/API** | GitHub, DBHub | Sentry | Context7 |
+| **DevOps** | GitHub, Sentry | Cloud vendor's own server | Monitoring vendor's own server |
+| **Full-Stack** | GitHub, Playwright, Context7 | DBHub, Sentry | Project-tracking connector |
 
 ### Starter Packs
 
-**Minimal Setup** (3 servers):
-1. GitHub - Code management
-2. Perplexity - Research
-3. Filesystem - File operations
+**Minimal Setup** (2 servers):
+1. Claude Code docs — no auth, immediate payoff
+2. GitHub — code and PR management
 
-**Standard Developer** (5 servers):
-1. GitHub - Code management
-2. Perplexity - Research
-3. Context7 - Documentation
-4. PostgreSQL/MongoDB - Database
-5. Filesystem - File operations
+**Standard Developer** (4 servers):
+1. GitHub
+2. Sentry
+3. Playwright
+4. Context7
 
-**Power User** (8+ servers):
-1. GitHub - Code management
-2. Perplexity - Research
-3. Context7 - Documentation
-4. Sequential Thinking - Complex reasoning
-5. PostgreSQL/MongoDB - Database
-6. AWS/GCP/Azure - Cloud
-7. Slack - Communication
-8. Jira - Project management
+**Add a database** when you find yourself pasting query results into chat, and **add a project-tracker connector** when you find yourself pasting ticket descriptions.
 
-**Team Lead** (10+ servers):
-Add to Power User:
-9. Datadog/New Relic - Monitoring
-10. Stripe - Payments
-11. SendGrid - Email
-12. Google Analytics - Analytics
+> 💡 **Add servers one at a time and use each for a week.** The cost of a server you never call is small (see below) but not zero, and an unused server is one more thing whose credentials you have to rotate.
+
+---
+
+## Performance and Context Cost
+
+### What Adding a Server Actually Costs
+
+This is worth getting right, because the intuition most people carry is out of date.
+
+**Tool definitions are deferred by default.** With [tool search](https://code.claude.com/docs/en/mcp#scale-with-mcp-tool-search) enabled — which is the default — only tool *names* and each server's instructions load at session start. Full schemas enter context only when Claude searches for and uses a tool. Claude Code imposes no fixed per-server tool cap; your context window budget is the practical limit.
+
+```mermaid
+graph LR
+    A["10 servers connected"] --> B["Session start:<br/>names + server<br/>instructions only"]
+    B --> C["You ask for<br/>one thing"]
+    C --> D["1-2 tool definitions<br/>enter context"]
+
+    style B fill:#d4f4dd
+    style D fill:#d4f4dd
+```
+
+**When this doesn't apply.** Tool search is off, and all definitions load upfront, in these cases:
+
+- `ENABLE_TOOL_SEARCH=false` is set
+- `ANTHROPIC_BASE_URL` points at a non-first-party host (most proxies don't forward the required blocks)
+- On Google Cloud's Agent Platform and Microsoft Foundry deployments hosted on Azure
+- On models that don't support tool-reference blocks
+- For any server configured with `"alwaysLoad": true`
+
+`ENABLE_TOOL_SEARCH` accepts `true`, `false`, `auto` (load upfront if the schemas fit within 10% of the context window), and `auto:N` for a custom percentage.
+
+**The real cost drivers**, in rough order:
+
+| Driver | Why it costs | What to do |
+|--------|--------------|------------|
+| **Tool output size** | A single large result can dwarf every tool schema you have | Claude Code warns above 10,000 tokens and truncates at 25,000; raise with `MAX_MCP_OUTPUT_TOKENS` |
+| **`alwaysLoad: true` servers** | Their schemas load every session, unconditionally | Use only for tools Claude needs on every turn |
+| **Long tool descriptions** | Truncated at 2KB each, but count fully below that | Server authors: keep descriptions tight and front-load what matters |
+| **Latency of the service itself** | Network round-trips to the vendor | Not a Claude Code knob — check the server's own docs |
+
+Use `/context` to see how much of your window MCP is actually consuming, rather than guessing.
+
+### Exempting a Server From Deferral
+
+If a server's tools should always be visible without a search step:
+
+```json
+{
+  "mcpServers": {
+    "core-tools": {
+      "type": "http",
+      "url": "https://mcp.example.com/mcp",
+      "alwaysLoad": true
+    }
+  }
+}
+```
+
+> ⚠️ This also blocks startup until that server connects, capped at the 5-second connect timeout. Use it sparingly.
 
 ---
 
@@ -1104,67 +513,62 @@ Add to Power User:
 
 ### Combining Servers
 
-**Example 1: Research → Implement → Deploy**
+**Example 1: Research → Implement → Verify**
 ```bash
-# Research best practices (Perplexity)
-> "What's the best way to implement rate limiting in Express.js?"
+# Look up the current API (Context7)
+> "Show me the Express.js middleware pattern for rate limiting. use context7"
 
-# Implement with framework docs (Context7)
-> "Show me Express.js middleware pattern for rate limiting"
+# Implement, commit, open a PR (GitHub)
+> "Implement it, commit, and open a PR"
 
-# Deploy and monitor (AWS + Slack)
-> "Deploy to staging and notify team when ready"
+# Confirm it works in a browser (Playwright)
+> "Open the dev server and confirm a 429 after 11 rapid requests"
 ```
 
 **Example 2: Debug → Fix → Track**
 ```bash
-# Find issue (Filesystem + Sequential Thinking)
-> "Analyze why our checkout flow is failing"
+# Find the failure (Sentry)
+> "What's the most frequent new error since yesterday's deploy?"
 
-# Research solution (Perplexity)
-> "Latest solutions for race conditions in Node.js"
-
-# Fix and track (GitHub + Jira)
-> "Implement fix, create PR, and update Jira ticket"
+# Fix and ship (GitHub)
+> "Find the commit that introduced it, write a fix, and open a PR referencing the Sentry issue"
 ```
 
----
+### Naming a Server Explicitly
 
-### Performance Considerations
+You don't normally need to — Claude picks tools on its own. But naming one is useful when you want to guarantee which path an answer came from:
 
-**MCP server overhead**:
-- Each server adds ~100-200ms latency per request
-- Multiple servers in one query: Runs in parallel when possible
-- Docker servers: +50-100ms overhead vs. native
-
-**Optimization strategies**:
-1. **Use specific servers**: Ask Claude to use a specific server when you know which one
-2. **Batch operations**: Combine related requests
-3. **Cache results**: For frequently accessed data (docs, APIs)
+```bash
+> "Use the claude-code-docs server to check whether alwaysLoad is a real field"
+```
 
 ---
 
 ## Quick Reference
 
-### Most Popular Servers
+### Verified Install Commands
 
-| Server | Command | Key Use Case |
-|--------|---------|--------------|
-| GitHub | `claude mcp add github` | Code management, PRs |
-| Perplexity | `claude mcp add perplexity` | Real-time web search |
-| Context7 | `claude mcp add context7` | Framework documentation |
-| Sequential Thinking | `claude mcp add sequential-thinking` | Complex reasoning |
-| PostgreSQL | `npm install -g @mcp/server-postgres` | Database operations |
-| AWS | `claude mcp add aws` | Cloud management |
+| Server | Command |
+|--------|---------|
+| Claude Code docs | `claude mcp add --transport http claude-code-docs https://code.claude.com/docs/mcp` |
+| GitHub | `claude mcp add --transport http github https://api.githubcopilot.com/mcp/ --header "Authorization: Bearer PAT"` |
+| Sentry | `claude mcp add --transport http sentry https://mcp.sentry.dev/mcp` |
+| Playwright | `claude mcp add playwright -- npx -y @playwright/mcp@latest` |
+| Context7 | `claude mcp add context7 -- npx -y @upstash/context7-mcp --api-key KEY` |
+| DBHub | `claude mcp add --transport stdio db -- npx -y @bytebase/dbhub --dsn "postgresql://..."` |
+| Filesystem | `claude mcp add filesystem -- npx -y @modelcontextprotocol/server-filesystem /path` |
+| Sequential Thinking | `claude mcp add sequential-thinking -- npx -y @modelcontextprotocol/server-sequential-thinking` |
+| Notion | `claude mcp add --transport http notion https://mcp.notion.com/mcp` |
+| Stripe | `claude mcp add --transport http stripe https://mcp.stripe.com` |
 
 ### By Use Case
 
-**"I need current information"** → Perplexity
-**"I need framework docs"** → Context7
 **"I need to manage code/PRs"** → GitHub
-**"I need to solve complex problems"** → Sequential Thinking
-**"I need database access"** → PostgreSQL/MongoDB
-**"I need cloud management"** → AWS/GCP/Azure
+**"I need production error data"** → Sentry
+**"I need to check something in a browser"** → Playwright
+**"I need current library docs"** → Context7
+**"I need database access"** → DBHub
+**"I need to know how Claude Code itself behaves"** → Claude Code docs server
 
 ---
 
@@ -1172,138 +576,122 @@ Add to Power User:
 
 ### Issue 1: MCP Server Not Connecting
 
-**Symptom**: "Failed to connect to MCP server" or server appears offline
+**Symptom**: `✘ Failed to connect` in `claude mcp list`, or the server appears offline in `/mcp`
 
-**Common Causes**:
-- Server not installed correctly
-- Missing API credentials
-- Port conflicts
-- Server process crashed
+**Solutions:**
 
-**Solutions**:
 ```bash
-# Check if server is installed
-claude mcp list
+# See the underlying error for one server
+claude mcp get <server-name>
 
-# Restart the server
-claude mcp restart <server-name>
+# Reconnect a single disconnected server, from inside a session
+/mcp reconnect <server-name>
 
-# Check server logs
-claude mcp logs <server-name>
-
-# Reinstall the server
+# Reinstall
 claude mcp remove <server-name>
-claude mcp add <server-name>
+claude mcp add ...   # with the full, correct command
 ```
+
+> 🚨 There is no `claude mcp restart`, `claude mcp logs`, `claude mcp status`, or `claude mcp test`. Use `claude mcp get` from the shell, and `/mcp` from inside a session. See [the full subcommand list](2-installation.md#every-claude-mcp-subcommand).
+
+Claude Code automatically reconnects HTTP and SSE servers that drop mid-session — five attempts with exponential backoff starting at one second. Stdio servers are local processes and are **not** reconnected automatically.
 
 ---
 
 ### Issue 2: API Key Errors
 
-**Symptom**: "Invalid API key" or "Unauthorized" errors
+**Symptom**: "Invalid API key", `401`, or `403`
 
-**Common Causes**:
-- API key not set in environment variables
-- Expired or revoked API key
-- Wrong environment variable name
+**Solutions:**
 
-**Solutions**:
 ```bash
-# Check if API key is set
+# Confirm the variable is actually set in the shell that launches claude
 echo $GITHUB_TOKEN
-echo $PERPLEXITY_API_KEY
 
-# Set the API key (add to ~/.bashrc or ~/.zshrc for persistence)
-export GITHUB_TOKEN="your_token_here"
-
-# Verify the server can access the key
-claude mcp test <server-name>
+# Check what Claude Code recorded for this server
+claude mcp get github
 ```
+
+For OAuth servers, run `/mcp`, select the server, and choose **Re-authenticate**. If a stored refresh token has been rejected, Claude Code shows a notice pointing at `/mcp`.
+
+If you configured `headers.Authorization` yourself and the server rejects it, Claude Code reports the connection as **failed rather than falling back to OAuth**. Remove the header if you meant to use the browser flow.
 
 ---
 
-### Issue 3: Server Performance Issues
+### Issue 3: Slow or Timing-Out Servers
 
-**Symptom**: Slow responses or timeouts from MCP server
+**Symptom**: long waits, or tool calls that abort
 
-**Common Causes**:
-- Network latency
-- Rate limiting from external API
-- Large data payloads
-- Server resource constraints
+Claude Code gives you three timeout knobs and one structural lever:
 
-**Solutions**:
-```bash
-# Check server resource usage
-claude mcp status <server-name>
-```
-
-There is no setting for per-server concurrency or request timeouts. What you can control is
-which servers are loaded at all — and with slow servers, that is usually the bigger win,
-since every active server contributes its tool definitions to your context whether you call
-it or not.
-
-Project servers are declared in `.mcp.json`. To narrow what actually loads, use
-`.claude/settings.json`:
+| Control | Scope | Default |
+|---------|-------|---------|
+| `MCP_TIMEOUT` | Server **startup**, milliseconds | 30 seconds |
+| `MCP_TOOL_TIMEOUT` | Per tool call wall clock, milliseconds | Very long; effectively unbounded unless set |
+| `"timeout"` field in a server's JSON entry | Per tool call, that server only. Overrides `MCP_TOOL_TIMEOUT` | Unset |
+| `CLAUDE_CODE_MCP_TOOL_IDLE_TIMEOUT` | Aborts a call that sends nothing at all for this long | 5 min remote, 30 min stdio |
 
 ```json
 {
-  "allowedMcpServers": ["github", "filesystem"]
+  "mcpServers": {
+    "slow-server": {
+      "type": "http",
+      "url": "https://mcp.example.com/mcp",
+      "timeout": 600000
+    }
+  }
 }
 ```
 
-`deniedMcpServers` does the inverse if you would rather block a specific offender than
-enumerate everything you keep. Use `/context` to confirm how much room the remaining servers
-are taking.
+> 💡 A main-conversation tool call still running after two minutes moves to a background task rather than blocking your session, so a slow server no longer freezes your work. The per-call limits still apply while it runs in the background.
 
-For anything server-side — caching, batching, rate-limit backoff — check that server's own
-documentation and its environment variables. Those knobs belong to the server, not to
-Claude Code.
+**The structural lever** is which servers load at all. To narrow that:
+
+- Toggle a server off in the `/mcp` panel, or run `/mcp disable <server>`. This keeps its configuration but stops Claude Code connecting to it, recorded per project in `~/.claude.json`
+- For project `.mcp.json` servers, list the ones you want in `enabledMcpjsonServers` in `.claude/settings.json`, or reject specific ones with `disabledMcpjsonServers`
+
+```json
+{
+  "enabledMcpjsonServers": ["github", "sentry"],
+  "disabledMcpjsonServers": ["slow-server"]
+}
+```
+
+> 🚨 **`allowedMcpServers` and `deniedMcpServers` are a different mechanism** and won't work here. They are **managed settings only** — administrator policy, not a per-developer toggle — and each entry is an **object**, not a bare string: `[{ "serverName": "github" }]`, not `["github"]`. Putting them in your own project settings does not restrict anything. See [Managed MCP configuration](https://code.claude.com/docs/en/managed-mcp).
+
+Use `/context` to confirm how much room the remaining servers are taking.
+
+For anything server-side — caching, batching, rate-limit backoff — check that server's own documentation. Those knobs belong to the server, not to Claude Code.
 
 ---
 
-### Issue 4: Docker MCP Toolkit Problems
+### Issue 4: Changes to `.mcp.json` Don't Take Effect
 
-**Symptom**: Docker container won't start or can't access servers
+Claude Code reads `.mcp.json` at session start. Exit and restart.
 
-**Common Causes**:
-- Docker not running
-- Port mapping conflicts
-- Volume mount permissions
+If servers still don't appear, run `/mcp` and look for a parse warning — malformed entries are skipped with the offending field shown. If you previously rejected the server at the approval prompt:
 
-**Solutions**:
 ```bash
-# Check Docker is running
-docker ps
-
-# Pull latest MCP toolkit image
-docker pull modelcontextprotocol/mcp-toolkit:latest
-
-# Run with proper port mapping
-docker run -p 8080:8080 modelcontextprotocol/mcp-toolkit
-
-# Check container logs
-docker logs <container-id>
+claude mcp reset-project-choices
 ```
 
 ---
 
 ### Still Having Issues?
 
-1. **Check the official troubleshooting guide**: See [Troubleshooting MCP Servers](../14-reference/2-troubleshooting.md)
-2. **Search existing issues**: Check [GitHub Issues](https://github.com/modelcontextprotocol/specification/issues)
-3. **Ask the community**: Join [MCP Discord](https://discord.gg/anthropic) for help
-4. **Report bugs**: Open an issue at [MCP GitHub](https://github.com/modelcontextprotocol/specification/issues/new)
+1. **Check the official troubleshooting section**: [MCP quickstart → Troubleshooting](https://code.claude.com/docs/en/mcp-quickstart#troubleshooting)
+2. **Check this project's guide**: [Troubleshooting](../14-reference/2-troubleshooting.md)
+3. **Report a server bug** to that server's own repository — most connection problems are server-side, not Claude Code side
 
 ---
 
 ## Next Steps
 
 Excellent! You now know:
-- ✅ The top 5 essential MCP servers
-- ✅ Specialized servers for databases, cloud, and tools
-- ✅ How to access 200+ servers via Docker
-- ✅ Which servers to install based on your work
+- ✅ Servers with verified install commands, and which ones are deprecated
+- ✅ Where discovery actually happens, since there's no built-in registry
+- ✅ What connecting a server really costs in context
+- ✅ How to evaluate a server nobody has vetted for you
 
 **Ready to explore further?**
 
@@ -1317,36 +705,28 @@ Excellent! You now know:
 
 ## References & Further Reading
 
-Want to explore more? Here are excellent resources:
-
 ### 📚 Official Documentation
 
-- [MCP Server Registry](https://github.com/modelcontextprotocol/servers) - Complete list of official servers
-- [MCP Specification](https://modelcontextprotocol.io) - Protocol documentation
-- [Docker MCP Toolkit](https://hub.docker.com/r/anthropic/mcp-toolkit) - Container image and usage
-- [Building Efficient MCP Servers](https://vercel.com/blog/building-efficient-mcp-servers) - Performance and optimization guide
-- [Code Execution with MCP](https://www.anthropic.com/engineering/code-execution-with-mcp) - Efficiency and best practices
-- [Introducing Vercel MCP](https://vercel.com/blog/introducing-vercel-mcp-connect-vercel-to-your-ai-tools) - Production integration guide
-- [Building the Future of AI Coding with MCP](https://www.anthropic.com/webinars/future-of-ai-coding-mcp-vs-code) - Webinar with live demos
+- [Connect Claude Code to tools via MCP](https://code.claude.com/docs/en/mcp) - Transports, scopes, auth, tool search
+- [MCP quickstart](https://code.claude.com/docs/en/mcp-quickstart) - Step-by-step with a troubleshooting section
+- [Anthropic Directory](https://claude.ai/directory) - Reviewed connectors
+- [Managed MCP configuration](https://code.claude.com/docs/en/managed-mcp) - `allowedMcpServers`, `deniedMcpServers`, `managed-mcp.json`
+- [MCP Specification](https://modelcontextprotocol.io/introduction) - Protocol documentation
+- [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) - Reference implementations
+- [Docker MCP Catalog and Toolkit](https://docs.docker.com/ai/mcp-catalog-and-toolkit/) - Containerized servers
 
 ### 🔗 Related Topics
 
 - [MCP Overview](1-overview.md) - Conceptual foundation
-- [Installation Guide](2-installation.md) - Setup instructions
+- [Installation Guide](2-installation.md) - Setup instructions, scopes, every subcommand
 - [Agents Overview](../03-agents/1-overview.md) - How agents use MCP servers
 - [Creating Custom Servers](4-creating-custom-servers.md) - Build your own
 
-### 💬 Community & Support
-
-- [MCP Community Discord](https://discord.gg/anthropic) - Server recommendations and support
-- [GitHub MCP Discussions](https://github.com/modelcontextprotocol/specification/discussions) - Q&A
-- [Awesome MCP Servers](https://github.com/awesome-mcp/servers) - Community-curated list
-
 ### 📖 Server-Specific Documentation
 
-- [GitHub MCP Server Docs](https://github.com/modelcontextprotocol/servers/tree/main/github) - Complete API reference
-- [Perplexity API Docs](https://docs.perplexity.ai) - Search API documentation
-- [Context7 Documentation](https://docs.context7.com) - Framework documentation access
+- [Playwright MCP](https://github.com/microsoft/playwright-mcp) - Browser automation server
+- [DBHub](https://github.com/bytebase/dbhub) - Database server
+- [Context7](https://github.com/upstash/context7) - Documentation server
 
 ---
 

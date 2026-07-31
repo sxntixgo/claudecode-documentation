@@ -426,16 +426,28 @@ MCP servers expose tools and resources:
 }
 ```
 
+You reference a resource in a prompt with an `@` mention, using the form `@server:protocol://resource/path`:
+
+```text
+Can you analyze @github:issue://123 and suggest a fix?
+```
+
+Type `@` to see resources from all connected servers alongside your files. Referenced resources are fetched and attached automatically.
+
+**Prompts**: servers can also expose prompts, which show up in the `/` menu as `/mcp__servername__promptname` and accept space-separated arguments.
+
 ### Claude's Tool Selection
 
 When you make a request, Claude:
 1. **Analyzes intent**: What are you trying to do?
-2. **Evaluates available tools**: Which MCP servers can help?
-3. **Selects optimal tool**: Best match for the task
-4. **Constructs parameters**: Formats the request
-5. **Interprets results**: Presents response clearly
+2. **Searches for candidate tools**: with tool search on (the default), only tool *names* are in context, so Claude issues a search to pull in the definitions that look relevant
+3. **Selects optimal tool**: best match for the task
+4. **Constructs parameters**: formats the request against the schema it just loaded
+5. **Interprets results**: presents the response clearly
 
 This happens automatically—you just ask naturally!
+
+> 🔍 **Why the search step exists**: without it, every tool from every connected server would need its full JSON Schema in context on every single request, whether or not you use it. Deferring definitions is what makes running a dozen servers practical.
 
 ---
 

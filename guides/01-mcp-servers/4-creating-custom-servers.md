@@ -94,9 +94,10 @@ npx tsc --init
 ```json
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "lib": ["ES2020"],
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022"],
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
@@ -108,6 +109,8 @@ npx tsc --init
   "exclude": ["node_modules"]
 }
 ```
+
+> 💡 `module: "NodeNext"` pairs with `"type": "module"` in `package.json` (Step 4). It's also what makes the `.js` extensions in the SDK's import paths — `@modelcontextprotocol/sdk/server/index.js` — resolve correctly. Those extensions are not a typo; they're required in ESM.
 
 #### Step 3: Create Server Entry Point
 
@@ -254,7 +257,7 @@ main().catch((error) => {
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^0.5.0"
+    "@modelcontextprotocol/sdk": "^1.30.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -269,26 +272,34 @@ main().catch((error) => {
 # Build TypeScript
 npm run build
 
-# Test locally
-npm run dev
-
-# In another terminal, send test request
-echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | node dist/index.js
+# Smoke test: this should start and hang, waiting for a client on stdin
+node dist/index.js
 ```
+
+> 🚨 **Don't try to test with `echo '{"jsonrpc":...}' | node dist/index.js`.** MCP requires an `initialize` handshake before any other request, so a bare `tools/list` piped in gets an error rather than your tool list. Use the [MCP Inspector](#manual-testing-with-mcp-inspector) or the SDK client instead.
 
 #### Step 6: Configure in Claude Code
 
-`.claude/mcp.json`:
+Create `.mcp.json` at your project root:
 ```json
 {
   "mcpServers": {
     "calculator": {
+      "type": "stdio",
       "command": "node",
       "args": ["/absolute/path/to/mcp-calculator-server/dist/index.js"]
     }
   }
 }
 ```
+
+Or let the CLI write it for you:
+
+```bash
+claude mcp add --scope project calculator -- node /absolute/path/to/dist/index.js
+```
+
+Restart your session. Because this is a project-scoped server, Claude Code prompts you to approve it the first time — that prompt is what stops a cloned repository from launching processes on your machine unasked.
 
 #### Step 7: Use in Claude Code
 
@@ -545,20 +556,25 @@ main().catch((error) => {
 
 ### Configuration
 
-`.claude/mcp.json`:
+`.mcp.json` (at your project root):
 ```json
 {
   "mcpServers": {
     "github-issues": {
+      "type": "stdio",
       "command": "node",
-      "args": ["./dist/github-issues-server.js"],
+      "args": ["${CLAUDE_PROJECT_DIR:-.}/dist/github-issues-server.js"],
       "env": {
-        "GITHUB_TOKEN": "your-github-token-here"
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
       }
     }
   }
 }
 ```
+
+> 🚨 **Never put the literal token here.** `.mcp.json` is checked into version control. `${GITHUB_TOKEN}` expands from each developer's own environment; `${VAR:-default}` gives a fallback. Claude Code expands these in `command`, `args`, `env`, `url`, and `headers`.
+>
+> `CLAUDE_PROJECT_DIR` is set in the *spawned server's* environment, not Claude Code's, so referencing it in `args` needs the `:-.` default shown above. Inside your server code, read it directly: `process.env.CLAUDE_PROJECT_DIR`.
 
 ### Usage
 
@@ -738,34 +754,191 @@ server.setRequestHandler(GetPromptRequestSchema, async (request) => {
 
 ---
 
-### Feature 3: Streaming Responses
+### Feature 3: Progress Notifications for Long Operations
 
-For long-running operations, stream results back to Claude:
+A `tools/call` returns exactly once. There is no way to stream partial *results* back as multiple returns from a single call — a handler that tries to `return` and then keep yielding is unreachable code.
+
+What you can do for a long operation is send **progress notifications** while the call is still running. The client passes a `progressToken` in the request's `_meta`, and your handler sends notifications referencing that token until it returns its single final result:
 
 ```typescript
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const { name, arguments: args } = request.params;
+server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
+  const { name } = request.params;
 
-  if (name === 'analyze-large-codebase') {
-    // Return initial response
+  if (name === 'analyze_large_codebase') {
+    const progressToken = request.params._meta?.progressToken;
+    const files = await listFiles();
+
+    for (const [i, file] of files.entries()) {
+      await analyze(file);
+
+      if (progressToken !== undefined) {
+        await server.notification({
+          method: 'notifications/progress',
+          params: {
+            progressToken,
+            progress: i + 1,
+            total: files.length,
+          },
+        });
+      }
+    }
+
+    // One return, at the end
     return {
-      content: [
-        {
-          type: 'text',
-          text: 'Starting codebase analysis...',
-        },
-      ],
-      // Indicate more data is coming
-      _meta: {
-        progressToken: 'analysis-123',
-      },
+      content: [{ type: 'text', text: `Analyzed ${files.length} files.` }],
     };
-
-    // Continue sending progress updates
-    // (Implementation depends on MCP SDK version)
   }
+
+  throw new Error(`Unknown tool: ${name}`);
 });
 ```
+
+Two Claude Code behaviors make this worth doing:
+
+- **Progress notifications reset the idle timeout.** A call that sends nothing at all for the idle window — 5 minutes for remote servers, 30 minutes for stdio — is aborted. Notifications keep it alive.
+- **They do not extend the wall-clock limit.** The per-server `timeout` field, or `MCP_TOOL_TIMEOUT`, is a hard ceiling regardless of how much progress you report.
+
+For genuinely large results, see [Handling large outputs](#handling-large-outputs) below rather than trying to stream them.
+
+---
+
+## Building for Claude Code Specifically
+
+The MCP protocol is client-agnostic, but a few Claude Code behaviors materially change how you should design a server.
+
+### Write Server Instructions
+
+Because Claude Code defers tool definitions by default, Claude often decides whether to *look* at your server based on your server instructions alone. This makes the `instructions` field far more load-bearing than it used to be — it works much like a skill description.
+
+```typescript
+const server = new Server(
+  {
+    name: 'inventory-server',
+    version: '1.0.0',
+  },
+  {
+    capabilities: { tools: {} },
+    instructions:
+      'Tools for querying and updating the warehouse inventory database. ' +
+      'Use these when the user asks about stock levels, SKUs, suppliers, ' +
+      'or reorder thresholds. Read-only queries need no confirmation; ' +
+      'stock adjustments write to production.',
+  }
+);
+```
+
+Explain **what category of tasks** your tools handle, **when Claude should search for them**, and **what your server can do**.
+
+> ⚠️ Claude Code truncates tool descriptions and server instructions at **2KB each**. Keep them concise and put the critical details first.
+
+### Handling Large Outputs
+
+Claude Code warns when a tool's output exceeds 10,000 tokens and truncates at 25,000 by default. Results past a size threshold get persisted to disk and replaced with a file reference in the conversation.
+
+If a tool legitimately returns something large — a full database schema, a complete file tree — annotate it in your `tools/list` entry:
+
+```json
+{
+  "name": "get_schema",
+  "description": "Returns the full database schema",
+  "_meta": {
+    "anthropic/maxResultSizeChars": 200000
+  }
+}
+```
+
+Claude Code raises that tool's threshold to the annotated value, up to a hard ceiling of 500,000 characters. This applies to text content and works independently of the user's `MAX_MCP_OUTPUT_TOKENS`. Tools returning image data are still bound by the token limit.
+
+**Better still, paginate.** An annotation lets a large response through; it doesn't make it cheap.
+
+### Requiring Explicit Approval
+
+For a tool where the permission prompt *is* the point — a consent step, an access grant — mark it so it always prompts:
+
+```json
+{
+  "name": "grant_access",
+  "description": "Requests access to a protected resource",
+  "_meta": {
+    "anthropic/requiresUserInteraction": true
+  }
+}
+```
+
+Claude Code then prompts on every call, even in `acceptEdits`, `auto`, and `bypassPermissions` modes, offers no "don't ask again", and ignores matching allow rules. The value must be the JSON boolean `true`. Other tools from the same server keep normal permission behavior.
+
+### Keeping a Tool Always Loaded
+
+A tool Claude needs on essentially every turn can opt out of deferral:
+
+```json
+{
+  "name": "get_current_context",
+  "description": "Returns the active workspace and user",
+  "_meta": {
+    "anthropic/alwaysLoad": true
+  }
+}
+```
+
+Use this sparingly — every always-loaded tool spends context that would otherwise be available for the conversation.
+
+### Resolving Project-Relative Paths
+
+Claude Code sets `CLAUDE_PROJECT_DIR` in a stdio server's environment, pointing at the project root:
+
+```typescript
+const projectRoot = process.env.CLAUDE_PROJECT_DIR ?? process.cwd();
+```
+
+This is stable and doesn't change when working directories are added mid-session. If your server needs to *limit* its own filesystem access to allowed directories, implement the MCP `roots/list` request instead — Claude Code answers it with the session's launch directory plus every additional working directory the user has granted, and sends `notifications/roots/list_changed` when that set changes.
+
+### Avoid Root-Level Schema Combinators
+
+The Claude API does not accept `anyOf`, `oneOf`, or `allOf` at the **top level** of a tool's `inputSchema`. Combinators nested inside `properties` are fine and passed through unchanged.
+
+```typescript
+// ❌ Risky: union at the schema root
+inputSchema: {
+  oneOf: [
+    { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
+    { type: 'object', properties: { slug: { type: 'string' } }, required: ['slug'] },
+  ],
+}
+
+// ✅ Safe: one object, validated server-side
+inputSchema: {
+  type: 'object',
+  properties: {
+    id:   { type: 'string', description: 'Look up by ID. Provide this or slug.' },
+    slug: { type: 'string', description: 'Look up by slug. Provide this or id.' },
+  },
+}
+```
+
+Recent Claude Code versions flatten a root-level combinator automatically and describe the parameter groupings in the tool description, but older versions and some deployments skip the tool entirely. Write the flat form yourself and validate the combination in your handler.
+
+### Announcing Capability Changes
+
+If your server's tool list changes at runtime, send a `list_changed` notification. Claude Code refreshes that server's tools, prompts, and resources without a reconnect.
+
+---
+
+## Let Claude Scaffold It For You
+
+Anthropic publishes an official plugin that generates a server skeleton for you:
+
+```text
+/plugin install mcp-server-dev@claude-plugins-official
+```
+
+If Claude Code reports `Marketplace "claude-plugins-official" not found`, add it first with `/plugin marketplace add anthropics/claude-plugins-official`. Once installed, run `/reload-plugins`, then:
+
+```text
+/mcp-server-dev:build-mcp-server
+```
+
+Claude asks about your use case and scaffolds either a remote HTTP or a local stdio server. Useful as a starting point even if you rewrite most of it.
 
 ---
 
@@ -773,106 +946,116 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
 ### Unit Tests
 
-`src/__tests__/server.test.ts`:
+> 🚨 **You cannot unit-test a handler by calling `server.request(...)`.** On a `Server` instance, `request()` sends a request *out to the connected client* — it is not a way to feed a request in. There's no in-process "invoke my own handler" method.
+
+The fix is a design choice, not a testing trick: **keep your tool logic in plain functions** and let the request handler be a thin dispatcher. Then the logic is trivially testable and the handler has almost nothing left to get wrong.
+
+`src/tools.ts`:
 ```typescript
-import { describe, it, expect, beforeEach } from '@jest/globals';
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+export type ToolResult = {
+  content: Array<{ type: 'text'; text: string }>;
+  isError?: boolean;
+};
 
-describe('Calculator MCP Server', () => {
-  let server: Server;
+export function callTool(name: string, args: unknown): ToolResult {
+  switch (name) {
+    case 'add': {
+      const { a, b } = args as { a: number; b: number };
+      return { content: [{ type: 'text', text: `${a} + ${b} = ${a + b}` }] };
+    }
+    case 'multiply': {
+      const { a, b } = args as { a: number; b: number };
+      return { content: [{ type: 'text', text: `${a} × ${b} = ${a * b}` }] };
+    }
+    default:
+      throw new Error(`Unknown tool: ${name}`);
+  }
+}
+```
 
-  beforeEach(() => {
-    // Initialize server
-    server = new Server(
-      { name: 'calculator-server', version: '1.0.0' },
-      { capabilities: { tools: {} } }
-    );
+`src/index.ts` becomes a one-liner dispatcher:
+```typescript
+import { callTool } from './tools.js';
+
+server.setRequestHandler(CallToolRequestSchema, async (request) =>
+  callTool(request.params.name, request.params.arguments)
+);
+```
+
+`src/__tests__/tools.test.ts`:
+```typescript
+import { describe, it, expect } from '@jest/globals';
+import { callTool } from '../tools.js';
+
+describe('Calculator tools', () => {
+  it('adds two numbers', () => {
+    expect(callTool('add', { a: 5, b: 3 }).content[0].text).toBe('5 + 3 = 8');
   });
 
-  it('should add two numbers correctly', async () => {
-    const request = {
-      method: 'tools/call',
-      params: {
-        name: 'add',
-        arguments: { a: 5, b: 3 },
-      },
-    };
-
-    const response = await server.request(request);
-
-    expect(response.content[0].text).toBe('5 + 3 = 8');
+  it('multiplies two numbers', () => {
+    expect(callTool('multiply', { a: 4, b: 7 }).content[0].text).toBe('4 × 7 = 28');
   });
 
-  it('should multiply two numbers correctly', async () => {
-    const request = {
-      method: 'tools/call',
-      params: {
-        name: 'multiply',
-        arguments: { a: 4, b: 7 },
-      },
-    };
-
-    const response = await server.request(request);
-
-    expect(response.content[0].text).toBe('4 × 7 = 28');
-  });
-
-  it('should handle unknown tools', async () => {
-    const request = {
-      method: 'tools/call',
-      params: {
-        name: 'unknown-tool',
-        arguments: {},
-      },
-    };
-
-    await expect(server.request(request)).rejects.toThrow('Unknown tool');
+  it('rejects unknown tools', () => {
+    expect(() => callTool('unknown-tool', {})).toThrow('Unknown tool');
   });
 });
 ```
 
 ### Integration Tests
 
+To exercise the real protocol, drive your server with the SDK's own client over an in-memory or stdio transport. Doing this by hand-writing JSON-RPC to a spawned process is a trap: **MCP requires an `initialize` handshake before any other request**, so a bare `tools/list` written straight to stdin gets an error, not a tool list. The client handles that for you.
+
 `tests/integration.test.ts`:
 ```typescript
-import { spawn } from 'child_process';
 import { describe, it, expect } from '@jest/globals';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 
-describe('MCP Server Integration', () => {
-  it('should respond to tools/list request', (done) => {
-    const server = spawn('node', ['dist/index.js']);
-
-    const request = JSON.stringify({
-      jsonrpc: '2.0',
-      id: 1,
-      method: 'tools/list',
+describe('MCP Protocol Integration', () => {
+  it('lists and calls tools over stdio', async () => {
+    const transport = new StdioClientTransport({
+      command: 'node',
+      args: ['dist/index.js'],
     });
 
-    server.stdin.write(request + '\n');
+    const client = new Client({ name: 'test-client', version: '1.0.0' });
+    await client.connect(transport);   // performs the initialize handshake
 
-    server.stdout.on('data', (data) => {
-      const response = JSON.parse(data.toString());
-      expect(response.result.tools).toHaveLength(2);
-      expect(response.result.tools[0].name).toBe('add');
-      server.kill();
-      done();
+    const { tools } = await client.listTools();
+    expect(tools.map((t) => t.name)).toContain('add');
+
+    const result = await client.callTool({
+      name: 'add',
+      arguments: { a: 5, b: 3 },
     });
+    expect(result.content[0].text).toBe('5 + 3 = 8');
+
+    await client.close();
   });
 });
 ```
 
+This is also the closest thing to a real Claude Code session you can get in CI: same handshake, same transport, same result shape.
+
 ### Manual Testing with MCP Inspector
 
 ```bash
-# Install MCP Inspector
-npm install -g @modelcontextprotocol/inspector
-
-# Run your server with inspector
+# Run your server under the inspector (no global install needed)
 npx @modelcontextprotocol/inspector node dist/index.js
-
-# Open browser to http://localhost:5173
-# Test tools interactively
 ```
+
+The inspector prints the local URL to open in your browser. From there you can list tools, call them with arbitrary arguments, and inspect raw request/response JSON — which is the fastest way to find a schema mismatch.
+
+### A Quick Smoke Test
+
+To confirm the process starts at all, without the protocol:
+
+```bash
+node dist/index.js
+```
+
+A stdio MCP server communicates over stdin and stdout, so **a silent, blocked terminal means it's working** — it's waiting for a client. Anything printed to stdout that isn't JSON-RPC will corrupt the stream; use `console.error` for logging, never `console.log`.
 
 ---
 
@@ -880,27 +1063,33 @@ npx @modelcontextprotocol/inspector node dist/index.js
 
 ### 1. ✅ Authentication
 
+> 🚨 **Claude Code does not pass an API key in `request.params._meta`.** A handler that reads `_meta.apiKey` and rejects the call when it's missing will reject *every* call. There is no client-supplied per-request credential in the MCP request shape.
+
+Where authentication actually lives depends on your transport:
+
+| Transport | Who authenticates | How your server gets the credential |
+|-----------|-------------------|-------------------------------------|
+| **stdio** | The user, at config time | Your process environment — the `env` field of the server entry, or `--env` on `claude mcp add`. The trust boundary is the machine: your server already runs as the user |
+| **HTTP / SSE** | The user, per connection | The `Authorization` header, either from OAuth (Claude Code manages the token) or a static `--header`. Read it off the incoming HTTP request |
+
+For a **stdio** server, authenticate to the *upstream service* and validate configuration at startup — not per request:
+
 ```typescript
-// Require API key
-function validateApiKey(key: string): boolean {
-  const validKey = process.env.API_KEY;
-  if (!validKey) {
-    throw new Error('API_KEY not configured');
+function getUpstreamToken(): string {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) {
+    // Fail loudly at startup, so the user sees it in `claude mcp get`
+    throw new Error('GITHUB_TOKEN environment variable is required');
   }
-  return key === validKey;
+  return token;
 }
 
-// In tool handler
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  // Check for API key in metadata
-  const apiKey = request.params._meta?.apiKey;
-  if (!validateApiKey(apiKey)) {
-    throw new Error('Invalid API key');
-  }
-
-  // Process request...
-});
+const octokit = new Octokit({ auth: getUpstreamToken() });
 ```
+
+For an **HTTP** server, validate the bearer token in your HTTP layer, before the request ever reaches an MCP handler. Claude Code supports OAuth 2.0 with automatic discovery, so implementing the standard flow means users get browser sign-in and automatic token refresh for free.
+
+If you need per-call human approval rather than per-call credentials — a consent step, an access grant — that's [`anthropic/requiresUserInteraction`](#requiring-explicit-approval), not an auth check.
 
 ### 2. ✅ Input Validation
 
@@ -928,26 +1117,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
 ### 3. ✅ Rate Limiting
 
+A stdio server has exactly one client — the Claude Code session that spawned it. So there's no `clientId` to key on, and no client-supplied identifier in the request. What you're really protecting is the **upstream API's** quota, so limit per process:
+
 ```typescript
-import rateLimit from 'express-rate-limit';
-
-// Simple in-memory rate limiter
+// Simple in-memory rate limiter for this server process
 class RateLimiter {
-  private requests = new Map<string, number[]>();
+  private timestamps: number[] = [];
 
-  check(clientId: string, maxRequests: number, windowMs: number): boolean {
+  check(maxRequests: number, windowMs: number): boolean {
     const now = Date.now();
-    const requests = this.requests.get(clientId) || [];
+    this.timestamps = this.timestamps.filter((t) => now - t < windowMs);
 
-    // Remove old requests
-    const recentRequests = requests.filter((time) => now - time < windowMs);
-
-    if (recentRequests.length >= maxRequests) {
+    if (this.timestamps.length >= maxRequests) {
       return false; // Rate limit exceeded
     }
 
-    recentRequests.push(now);
-    this.requests.set(clientId, recentRequests);
+    this.timestamps.push(now);
     return true;
   }
 }
@@ -956,15 +1141,20 @@ const limiter = new RateLimiter();
 
 // In handler
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const clientId = request.params._meta?.clientId || 'default';
-
-  if (!limiter.check(clientId, 100, 60000)) {
-    throw new Error('Rate limit exceeded (100 requests per minute)');
+  if (!limiter.check(100, 60_000)) {
+    return {
+      content: [{ type: 'text', text: 'Rate limit reached: 100 calls/minute. Try again shortly.' }],
+      isError: true,
+    };
   }
 
   // Process request...
 });
 ```
+
+> 💡 Return `isError: true` rather than throwing. Claude sees the message and can back off or explain the wait; an uncaught throw is far less legible.
+
+For a **remote HTTP** server serving many users, key the limiter on the authenticated identity from the `Authorization` header — the thing you actually authenticated — not on anything in the MCP payload.
 
 ### 4. ✅ Error Handling
 
@@ -1109,7 +1299,7 @@ npm install
 npm run build
 ```
 
-Then reference in `.claude/mcp.json`:
+Then reference in `.mcp.json` at your project root:
 ```json
 {
   "mcpServers": {
@@ -1344,16 +1534,30 @@ console.error('Server starting...');
 
 ### Problem: Tools not appearing in Claude Code
 
+Work through these in order — each rules out a different layer:
+
 ```bash
-# Verify tools/list response
-echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | node dist/index.js
+# 1. Does the server report its tools at all?
+npx @modelcontextprotocol/inspector node dist/index.js
+#    An empty tool list here means the bug is in your server, not the config.
 
-# Check .claude/mcp.json configuration
-cat .claude/mcp.json
+# 2. Is Claude Code even reading your config?
+cat .mcp.json          # must be at the PROJECT ROOT, not .claude/mcp.json
+claude mcp list        # does the server appear, and with what status?
+claude mcp get <name>  # what command/scope did Claude Code actually record?
 
-# Restart Claude Code
-# (Configuration changes require restart)
+# 3. Did you restart? .mcp.json is read at session start.
 ```
+
+Then, inside a session:
+
+```text
+/mcp
+```
+
+Select the server to see its tool list. Claude Code flags a server that advertises the tools capability but exposes none. An empty list with a healthy connection almost always means a missing required environment variable.
+
+> 💡 **"No tools in context" is not the same as "no tools available."** With tool search on by default, MCP tool *definitions* are deferred — Claude loads them on demand. If `/mcp` shows a non-zero tool count, the server is fine even though the schemas aren't sitting in your context window.
 
 ---
 
@@ -1381,7 +1585,7 @@ Learn security, performance, and error handling best practices.
 
 **Also Explore**:
 - [Model Context Protocol Specification](https://modelcontextprotocol.io)
-- [MCP SDK Documentation](https://github.com/modelcontextprotocol/sdk)
+- [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)
 - [Official MCP Servers Examples](https://github.com/modelcontextprotocol/servers)
 
 ---
@@ -1450,7 +1654,7 @@ main().catch(console.error);
 
 ### Official Resources
 - [Model Context Protocol Specification](https://modelcontextprotocol.io)
-- [MCP SDK Repository](https://github.com/modelcontextprotocol/sdk)
+- [MCP TypeScript SDK Repository](https://github.com/modelcontextprotocol/typescript-sdk)
 - [Official MCP Servers](https://github.com/modelcontextprotocol/servers)
 
 ### TypeScript Resources
@@ -1461,8 +1665,8 @@ main().catch(console.error);
 - [JSON-RPC 2.0 Specification](https://www.jsonrpc.org/specification)
 
 ### Community
-- [MCP Community Forum](https://community.anthropic.com/mcp)
-- [GitHub Discussions](https://github.com/modelcontextprotocol/sdk/discussions)
+- [MCP TypeScript SDK issues and discussions](https://github.com/modelcontextprotocol/typescript-sdk)
+- [Reference server implementations](https://github.com/modelcontextprotocol/servers)
 
 ---
 
