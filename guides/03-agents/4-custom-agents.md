@@ -670,6 +670,9 @@ Congratulations! You now know how to create custom agents with specialized capab
 **Next Guide**: [Orchestration Patterns](5-orchestration-patterns.md) (30 min)
 Coordinate several agents: fan-out/fan-in, pipelines, and nested delegation.
 
+**Then**: [Loops and Scheduling](6-loops-and-scheduling.md) (30 min)
+Keep a single agent going without prompting each step: `/goal`, `/loop`, and scheduled tasks.
+
 **Then**: [What Are Skills?](../04-skills/1-overview.md) (20 min)
 Learn about skills - reusable instruction sets that leverage agents for specific workflows.
 

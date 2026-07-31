@@ -136,8 +136,9 @@ graph TD
 | [Model Assignment](guides/03-agents/3-model-assignment.md) | 25 min | Per-agent model selection for cost optimization |
 | **[Creating Custom Agents](guides/03-agents/4-custom-agents.md)** | **50 min** | **Build specialized agents for your workflows** |
 | **[Orchestration Patterns](guides/03-agents/5-orchestration-patterns.md)** | **30 min** | **Fan-out/fan-in, pipelines, nested delegation, graph engineering vocabulary** |
+| **[Loops and Scheduling](guides/03-agents/6-loops-and-scheduling.md)** | **30 min** | **`/goal`, `/loop`, cron tasks, polling vs events, unattended runs** |
 
-**Total Time**: ~2.5 hours
+**Total Time**: ~3 hours
 **Dependencies**: MCP Servers (Agents use MCP tools)
 **Next**: Skills (leverage agents with reusable instructions)
 
