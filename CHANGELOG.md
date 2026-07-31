@@ -18,6 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   CLAUDE.md authoring guides. Attention budget and context rot, subagent context isolation,
   just-in-time retrieval, compaction versus clearing, and diagnosis with `/context` and `/usage`.
 
+**Loops and Scheduling**
+- `guides/03-agents/6-loops-and-scheduling.md` — the counterpart to orchestration: how a single
+  agent keeps going without a prompt each step. `/goal` (condition-driven, including the
+  evaluator's blind spot — it only sees the conversation), `/loop` (interval-driven, three
+  modes, `loop.md`), cron scheduling with its jitter and seven-day expiry, polling versus
+  Monitor and Channels, and the routines/desktop/`/loop` comparison for unattended work.
+
 **Orchestration**
 - `guides/03-agents/5-orchestration-patterns.md` — multi-agent topology using the
   graph-engineering vocabulary, scoped to what Claude Code actually provides. Fan-out/fan-in,

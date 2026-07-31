@@ -330,6 +330,7 @@ will rate them generously.
 
 ## Next Steps
 
+- [Loops and Scheduling](6-loops-and-scheduling.md) — the other half of this framing: how a single node keeps going
 - [Context Engineering](../09-context/4-context-engineering.md) — the context economics that make delegation worth it
 - [Custom Agents](4-custom-agents.md) — defining the nodes
 - [Skills Overview](../04-skills/1-overview.md) — packaging a topology as a reusable workflow
