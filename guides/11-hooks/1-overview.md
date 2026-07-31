@@ -43,58 +43,167 @@ graph LR
     style F fill:#FF6347
 ```
 
-### Available Hook Types
+### Available Hook Events
 
-| Hook Type | When It Runs | Common Uses |
-|-----------|--------------|-------------|
-| **PreToolUse** | Before Claude uses a tool (Write, Bash, etc.) | Run tests, lint code, validate inputs |
-| **PostToolUse** | After Claude uses a tool | Auto-format, run tests, notify team |
-| **UserPromptSubmit** | When user submits a message | Inject context, modify prompts |
-| **Stop** | Blocks specific actions | Prevent force push, block dangerous commands |
+Thirty events exist. These are the ones you will reach for first:
+
+| Event | When It Runs | Common Uses |
+|-------|--------------|-------------|
+| **PreToolUse** | Before a tool call executes — **can block it** | Validate inputs, deny dangerous commands, rewrite arguments |
+| **PostToolUse** | After a tool call succeeds | Auto-format, run tests, notify |
+| **PostToolUseFailure** | After a tool call fails | Log, retry guidance |
+| **UserPromptSubmit** | Before Claude processes your prompt | Inject context |
+| **Stop** | When Claude finishes responding | Verify work, decide whether to continue |
+| **SubagentStart` / `SubagentStop** | A subagent spawns or finishes | Per-agent setup and teardown |
+| **SessionStart` / `SessionEnd** | Session begins, resumes, or terminates | Environment setup, cleanup |
+| **PreCompact` / `PostCompact** | Around context compaction | Preserve state across a compact |
+| **InstructionsLoaded** | A CLAUDE.md or rules file loads | Debug which instruction files actually loaded |
+| **FileChanged** | A watched file changes on disk | React to external edits |
+
+Others include `Setup`, `UserPromptExpansion`, `PermissionRequest`, `PermissionDenied`,
+`PostToolBatch`, `Notification`, `MessageDisplay`, `TaskCreated`, `TaskCompleted`,
+`StopFailure`, `TeammateIdle`, `ConfigChange`, `CwdChanged`, `WorktreeCreate`,
+`WorktreeRemove`, `Elicitation`, and `ElicitationResult`.
+
+> ⚠️ **Event names are case-sensitive and PascalCase.** `postToolUse` is not `PostToolUse`,
+> and a hook under a misspelled event **silently never fires** — no error, no warning. If a
+> hook you wrote seems to do nothing, check the casing first, then run `/hooks` to confirm
+> Claude Code actually loaded it.
 
 ---
 
 ## Hook Configuration
 
-Hooks are configured in `.claude/settings.json`. Here's the basic structure:
+Hooks live in `.claude/settings.json` under the `hooks` key.
 
 ### Basic Hook Configuration
+
+The structure is **two levels deep**: each event holds a list of *matchers*, and each matcher
+holds a list of *handlers*.
 
 ```json
 {
   "hooks": {
-    "preToolUse": [
+    "PostToolUse": [
       {
-        "name": "hook-name",
-        "description": "What this hook does",
-        "tool": "Write",
-        "command": "npm test"
-      }
-    ],
-    "postToolUse": [
-      {
-        "name": "auto-format",
-        "description": "Format code after writing",
-        "tool": "Write",
-        "command": "prettier --write ."
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx prettier --write ."
+          }
+        ]
       }
     ]
   }
 }
 ```
 
-### Hook Configuration Options
+Read it as: *on `PostToolUse`, for tool calls matching `Write|Edit`, run this command.*
 
-| Option | Type | Description | Example |
-|--------|------|-------------|---------|
-| `name` | string | Unique hook identifier | `"pre-commit-lint"` |
-| `description` | string | What the hook does | `"Run linting before commits"` |
-| `tool` | string | Which tool triggers this | `"Write"`, `"Bash"`, `"Edit"` |
-| `filter` | string | Pattern to match | `"*.ts"`, `"git commit"` |
-| `command` | string | Command to execute | `"npm test"` |
-| `blocking` | boolean | Wait for completion? | `true` or `false` |
-| `timeout` | number | Max execution time (ms) | `5000` |
-| `onError` | string | What to do on error | `"stop"`, `"warn"`, `"continue"` |
+The nesting exists so several handlers can share one matcher, and several matchers can share
+one event.
+
+### Matcher Patterns
+
+| Pattern | Example | Behavior |
+|---------|---------|----------|
+| Exact | `Bash` | That tool only |
+| Pipe list | `Edit\|Write` | Any in the list |
+| Comma list | `Edit, Write` | Any in the list |
+| Regex | `^Notebook` | Unanchored regex |
+| Everything | `*`, `""`, or omitted | Fires every time |
+
+For MCP tools, match `mcp__<server>__<tool>`, or `mcp__memory__.*` for every tool from one
+server.
+
+### Handler Types
+
+| `type` | What it does |
+|--------|-------------|
+| `command` | Runs a shell command. The most common. |
+| `http` | POSTs to a URL |
+| `mcp_tool` | Calls an MCP tool |
+| `prompt` | Sends a single-turn prompt to a model for a yes/no decision |
+| `agent` | Spawns a subagent that can use Read, Grep, and Glob to verify before deciding (experimental) |
+
+A **prompt-based hook** is how `/goal` is implemented — a `Stop` hook whose prompt asks a small
+fast model whether a condition holds. See [Loops and Scheduling](../03-agents/6-loops-and-scheduling.md).
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Is this command destructive? $ARGUMENTS"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Handler Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `type` | string | `command`, `http`, `mcp_tool`, `prompt`, or `agent` |
+| `command` | string | The command to run, for `type: command` |
+| `timeout` | number | Timeout in **seconds** |
+| `if` | string | Extra condition, such as `Bash(git *)` |
+| `once` | boolean | Run only the first time it matches |
+| `statusMessage` | string | Custom message shown while it runs |
+| `async` | boolean | Do not block on completion |
+| `shell` | string | Shell to use |
+
+> ⚠️ **Fields that do not exist.** `name`, `description`, `tool`, `filter`, `blocking`, and
+> `onError` are not read. Use `matcher` rather than `tool`, exit codes rather than `onError`,
+> and `async` rather than `blocking`. A hook that appears configured but never runs is usually
+> using the flat shape rather than the matcher/hooks nesting.
+
+### Input and Exit Codes
+
+Command hooks receive a JSON object on **stdin** and signal intent through the **exit code**:
+
+| Exit code | Meaning |
+|-----------|---------|
+| `0` | Success. stdout is parsed for JSON output. |
+| `2` | Blocking error. stdout ignored; **stderr becomes the reason.** |
+| anything else | Non-blocking error. First line of stderr shows in the transcript. |
+
+Every event supplies `session_id`, `transcript_path`, `cwd`, `permission_mode`, and
+`hook_event_name`; tool events add `tool_name`, `tool_input`, and `tool_use_id`. Parse with
+`jq`:
+
+```bash
+#!/bin/bash
+input=$(cat)
+file=$(echo "$input" | jq -r '.tool_input.file_path')
+[[ "$file" == *.ts ]] && npx prettier --write "$file"
+```
+
+To return structured decisions, print JSON on exit 0:
+
+```json
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "deny",
+    "permissionDecisionReason": "Refusing to force-push to main"
+  }
+}
+```
+
+`permissionDecision` accepts `allow`, `deny`, `ask`, or `defer`. `updatedInput` rewrites the
+tool's arguments before it runs — this is how a hook turns a full test run into a filtered one.
+
+Useful variables inside hook commands: `$CLAUDE_PROJECT_DIR`, `$CLAUDE_PLUGIN_ROOT`, and
+`$CLAUDE_EFFORT`.
 
 ---
 
@@ -107,16 +216,16 @@ Automatically lint code before any git commit:
 ```json
 {
   "hooks": {
-    "preToolUse": [
+    "PreToolUse": [
       {
-        "name": "pre-commit-lint",
-        "description": "Lint code before git commits",
-        "tool": "Bash",
-        "filter": "git commit",
-        "command": "npm run lint",
-        "blocking": true,
-        "onError": "stop",
-        "timeout": 10000
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm run lint",
+            "timeout": 10
+          }
+        ]
       }
     ]
   }
@@ -137,15 +246,17 @@ Automatically format code after writing any TypeScript file:
 ```json
 {
   "hooks": {
-    "postToolUse": [
+    "PostToolUse": [
       {
-        "name": "auto-format-ts",
-        "description": "Format TypeScript files after writing",
-        "tool": "Write",
-        "filter": "*.ts",
-        "command": "prettier --write {{file}}",
-        "blocking": false,
-        "timeout": 5000
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "prettier --write {{file}}",
+            "timeout": 5,
+            "async": true
+          }
+        ]
       }
     ]
   }
@@ -167,14 +278,16 @@ Run relevant tests after modifying code files:
 ```json
 {
   "hooks": {
-    "postToolUse": [
+    "PostToolUse": [
       {
-        "name": "post-write-test",
-        "description": "Run tests after modifying files",
-        "tool": "Write",
-        "filter": "src/**/*.ts",
-        "command": "npm test -- {{file}}",
-        "blocking": false
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm test -- {{file}}",
+            "async": true
+          }
+        ]
       }
     ]
   }
@@ -190,15 +303,15 @@ Block force pushes to main branch:
 ```json
 {
   "hooks": {
-    "preToolUse": [
+    "PreToolUse": [
       {
-        "name": "prevent-force-push-main",
-        "description": "Block force push to main/master",
-        "tool": "Bash",
-        "filter": "git push.*--force.*main|git push.*--force.*master",
-        "command": "echo 'Force push to main/master is blocked' && exit 1",
-        "blocking": true,
-        "onError": "stop"
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Force push to main/master is blocked' && exit 1"
+          }
+        ]
       }
     ]
   }
@@ -218,15 +331,15 @@ Enforce tests before any code changes:
 ```json
 {
   "hooks": {
-    "preToolUse": [
+    "PreToolUse": [
       {
-        "name": "tdd-test-first",
-        "description": "Run tests before writing code",
-        "tool": "Write",
-        "filter": "src/**/*.ts",
-        "command": "npm test",
-        "blocking": true,
-        "onError": "warn"
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm test"
+          }
+        ]
       }
     ]
   }
@@ -240,15 +353,16 @@ Simulate CI pipeline locally:
 ```json
 {
   "hooks": {
-    "preToolUse": [
+    "PreToolUse": [
       {
-        "name": "local-ci",
-        "description": "Run CI checks before commits",
-        "tool": "Bash",
-        "filter": "git commit",
-        "command": "npm run lint && npm test && npm run build",
-        "blocking": true,
-        "timeout": 60000
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm run lint && npm test && npm run build",
+            "timeout": 60
+          }
+        ]
       }
     ]
   }
@@ -262,11 +376,15 @@ Automatically add project context to conversations:
 ```json
 {
   "hooks": {
-    "userPromptSubmit": [
+    "UserPromptSubmit": [
       {
-        "name": "inject-context",
-        "description": "Add project context to prompts",
-        "command": "cat .claude/CONTEXT.md"
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat .claude/CONTEXT.md"
+          }
+        ]
       }
     ]
   }
@@ -281,62 +399,34 @@ It's important to test hooks before relying on them. Here's how:
 
 ### Testing Hook Configuration
 
-```python
-import pytest
-import json
-from pathlib import Path
+There is no hook simulator, and a schema-validation test would only confirm your JSON parses —
+not that Claude Code accepted it. Two checks are worth more:
 
-def test_hook_configuration_valid():
-    """Test that hooks configuration is valid JSON."""
-    config_path = Path(".claude/settings.json")
+**1. Confirm Claude Code loaded the hook.** Run `/hooks` inside a session. It lists every event
+with the hooks registered under it and the settings file each came from. A hook missing here was
+never loaded, which is almost always a misspelled event name or the flat shape instead of the
+matcher/hooks nesting.
 
-    with open(config_path) as f:
-        config = json.load(f)
+**2. Watch it fire.**
 
-    assert "hooks" in config
-    assert "preToolUse" in config["hooks"]
-    assert "postToolUse" in config["hooks"]
-
-def test_hook_has_required_fields():
-    """Test that each hook has required fields."""
-    config_path = Path(".claude/settings.json")
-
-    with open(config_path) as f:
-        config = json.load(f)
-
-    for hook_type in ["preToolUse", "postToolUse"]:
-        for hook in config["hooks"].get(hook_type, []):
-            assert "name" in hook, f"Hook missing name: {hook}"
-            assert "command" in hook, f"Hook missing command: {hook}"
-            assert "tool" in hook, f"Hook missing tool: {hook}"
-
-def test_hook_commands_exist():
-    """Test that hook commands are executable."""
-    import subprocess
-
-    config_path = Path(".claude/settings.json")
-
-    with open(config_path) as f:
-        config = json.load(f)
-
-    for hook_type in ["preToolUse", "postToolUse"]:
-        for hook in config["hooks"].get(hook_type, []):
-            command = hook["command"].split()[0]
-
-            # Check if command exists
-            try:
-                result = subprocess.run(
-                    ["which", command],
-                    capture_output=True,
-                    text=True
-                )
-                assert result.returncode == 0, f"Command '{command}' not found"
-            except Exception as e:
-                pytest.fail(f"Failed to verify command '{command}': {e}")
-
-if __name__ == '__main__':
-    pytest.main([__file__])
+```bash
+claude --debug
 ```
+
+Trigger the real event — ask Claude to edit a file for a `PostToolUse` hook — and the debug log
+records which hooks matched, their exit codes, and their output. A hook that rewrites tool input
+shows `modified tool input keys: [command]`.
+
+**Test the script separately**, since it is just a program reading JSON on stdin:
+
+```bash
+echo '{"tool_input":{"file_path":"src/app.ts"},"hook_event_name":"PostToolUse"}' \
+  | .claude/hooks/format.sh
+echo "exit: $?"
+```
+
+This is the fastest loop by far: no session, no waiting for an event, and you can assert on the
+exit code and stdout directly.
 
 ### Manual Testing
 
@@ -344,11 +434,15 @@ if __name__ == '__main__':
 ```json
 {
   "hooks": {
-    "postToolUse": [
+    "PostToolUse": [
       {
-        "name": "test-hook",
-        "tool": "Write",
-        "command": "echo 'Hook triggered!'"
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Hook triggered!'"
+          }
+        ]
       }
     ]
   }
@@ -370,12 +464,15 @@ if __name__ == '__main__':
 ```json
 {
   "hooks": {
-    "preToolUse": [
+    "PreToolUse": [
       {
-        "name": "slow-test",
-        "tool": "Write",
-        "command": "npm test",
-        "blocking": true  // ❌ Blocks every file write!
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm test"
+          }
+        ]
       }
     ]
   }
@@ -389,23 +486,28 @@ if __name__ == '__main__':
 ```json
 {
   "hooks": {
-    "preToolUse": [
+    "PreToolUse": [
       {
-        "name": "fast-lint",
-        "tool": "Write",
-        "filter": "*.ts",
-        "command": "eslint {{file}}",
-        "blocking": true,
-        "timeout": 5000  // ✅ Fast lint only
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "eslint {{file}}",
+            "timeout": 5
+          }
+        ]
       }
     ],
-    "postToolUse": [
+    "PostToolUse": [
       {
-        "name": "unit-tests",
-        "tool": "Write",
-        "filter": "*.ts",
-        "command": "npm test -- {{file}}",
-        "blocking": false  // ✅ Non-blocking tests
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm test -- {{file}}",
+            "async": true
+          }
+        ]
       }
     ]
   }
@@ -422,12 +524,15 @@ if __name__ == '__main__':
 ```json
 {
   "hooks": {
-    "preToolUse": [
+    "PreToolUse": [
       {
-        "name": "test",
-        "tool": "Write",
-        "command": "npm test"
-        // ❌ No onError, no timeout
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm test"
+          }
+        ]
       }
     ]
   }
@@ -441,14 +546,16 @@ if __name__ == '__main__':
 ```json
 {
   "hooks": {
-    "preToolUse": [
+    "PreToolUse": [
       {
-        "name": "test",
-        "tool": "Write",
-        "command": "npm test",
-        "blocking": true,
-        "timeout": 30000,
-        "onError": "stop"  // ✅ Clear behavior
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm test",
+            "timeout": 30
+          }
+        ]
       }
     ]
   }
@@ -466,9 +573,20 @@ When multiple hooks match, they execute in order:
 ```json
 {
   "hooks": {
-    "preToolUse": [
-      {"name": "lint", "tool": "Write", "command": "eslint {{file}}"},
-      {"name": "test", "tool": "Write", "command": "npm test"}
+    "PreToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "eslint {{file}}"
+          },
+          {
+            "type": "command",
+            "command": "npm test"
+          }
+        ]
+      }
     ]
   }
 }
@@ -496,18 +614,19 @@ When multiple hooks have the same trigger and match the same tool or file patter
 ```json
 {
   "hooks": {
-    "postToolUse": [
+    "PostToolUse": [
       {
-        "name": "prettier-format",
-        "tool": "Write",
-        "filter": "*.ts",
-        "command": "prettier --write {{file}}"
-      },
-      {
-        "name": "eslint-fix",
-        "tool": "Write",
-        "filter": "*.ts",
-        "command": "eslint --fix {{file}}"
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "prettier --write {{file}}"
+          },
+          {
+            "type": "command",
+            "command": "eslint --fix {{file}}"
+          }
+        ]
       }
     ]
   }
@@ -520,6 +639,21 @@ When multiple hooks have the same trigger and match the same tool or file patter
 3. `eslint-fix` runs second
 4. Both modify the same file → **Potential conflict!**
 
+### A note on the examples below
+
+There is no `filter` field. File-type conditions live in the command itself, and since a hook
+receives its input as JSON on stdin, the path has to be extracted first. The examples below
+write `"$f"` for brevity; in a real hook that is:
+
+```bash
+#!/bin/bash
+f=$(jq -r '.tool_input.file_path')
+[[ "$f" == *.ts ]] && npx prettier --write "$f"
+```
+
+Point the `command` at that script rather than inlining shell in settings.json — it is easier to
+test, and you can run it standalone by piping JSON to it.
+
 ### Types of Hook Conflicts
 
 #### 1. Formatting Conflicts
@@ -530,9 +664,20 @@ When multiple hooks have the same trigger and match the same tool or file patter
 // ❌ CONFLICT: Prettier and ESLint both modify formatting
 {
   "hooks": {
-    "postToolUse": [
-      {"name": "prettier", "tool": "Write", "filter": "*.ts", "command": "prettier --write {{file}}"},
-      {"name": "eslint", "tool": "Write", "filter": "*.ts", "command": "eslint --fix {{file}}"}
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[[ \"$f\" == *.ts ]] && prettier --write \"$f\""
+          },
+          {
+            "type": "command",
+            "command": "[[ \"$f\" == *.ts ]] && eslint --fix \"$f\""
+          }
+        ]
+      }
     ]
   }
 }
@@ -543,12 +688,15 @@ When multiple hooks have the same trigger and match the same tool or file patter
 // ✅ BETTER: Single formatting pipeline
 {
   "hooks": {
-    "postToolUse": [
+    "PostToolUse": [
       {
-        "name": "format-and-lint",
-        "tool": "Write",
-        "filter": "*.ts",
-        "command": "prettier --write {{file}} && eslint --fix {{file}}"
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[[ \"$f\" == *.ts ]] && prettier --write \"$f\" && eslint --fix \"$f\""
+          }
+        ]
       }
     ]
   }
@@ -563,9 +711,20 @@ When multiple hooks have the same trigger and match the same tool or file patter
 // ❌ CONFLICT: First hook stops, second never runs
 {
   "hooks": {
-    "preToolUse": [
-      {"name": "lint", "tool": "Bash", "filter": "git commit", "command": "npm run lint", "onError": "stop"},
-      {"name": "test", "tool": "Bash", "filter": "git commit", "command": "npm test", "onError": "stop"}
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "# only for git commit\nnpm run lint"
+          },
+          {
+            "type": "command",
+            "command": "# only for git commit\nnpm test"
+          }
+        ]
+      }
     ]
   }
 }
@@ -576,13 +735,15 @@ When multiple hooks have the same trigger and match the same tool or file patter
 // ✅ BETTER: Combined validation
 {
   "hooks": {
-    "preToolUse": [
+    "PreToolUse": [
       {
-        "name": "pre-commit-checks",
-        "tool": "Bash",
-        "filter": "git commit",
-        "command": "npm run lint && npm test",
-        "onError": "stop"
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "# only for git commit\nnpm run lint && npm test"
+          }
+        ]
       }
     ]
   }
@@ -597,9 +758,20 @@ When multiple hooks have the same trigger and match the same tool or file patter
 // ❌ CONFLICT: Both hooks match components/Button.tsx
 {
   "hooks": {
-    "postToolUse": [
-      {"name": "component-test", "tool": "Write", "filter": "src/components/*.tsx", "command": "npm test"},
-      {"name": "button-test", "tool": "Write", "filter": "*/Button.tsx", "command": "npm test -- Button"}
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "# only for src/components/*.tsx\nnpm test"
+          },
+          {
+            "type": "command",
+            "command": "# only for */Button.tsx\nnpm test -- Button"
+          }
+        ]
+      }
     ]
   }
 }
@@ -610,19 +782,19 @@ When multiple hooks have the same trigger and match the same tool or file patter
 // ✅ BETTER: Non-overlapping filters
 {
   "hooks": {
-    "postToolUse": [
+    "PostToolUse": [
       {
-        "name": "button-test",
-        "tool": "Write",
-        "filter": "*/Button.tsx",
-        "command": "npm test -- Button"
-      },
-      {
-        "name": "other-components-test",
-        "tool": "Write",
-        "filter": "src/components/*.tsx",
-        "exclude": "*/Button.tsx",  // Exclude Button.tsx
-        "command": "npm test"
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "# only for */Button.tsx\nnpm test -- Button"
+          },
+          {
+            "type": "command",
+            "command": "# only for src/components/*.tsx\nnpm test"
+          }
+        ]
       }
     ]
   }
@@ -676,10 +848,24 @@ where more than one hook matches the same tool will run both, in the order they 
 // Good: Specific filters minimize conflicts
 {
   "hooks": {
-    "postToolUse": [
-      {"name": "ts-format", "tool": "Write", "filter": "*.ts", "command": "..."},
-      {"name": "css-format", "tool": "Write", "filter": "*.css", "command": "..."},
-      {"name": "json-format", "tool": "Write", "filter": "*.json", "command": "..."}
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[[ \"$f\" == *.ts ]] && ..."
+          },
+          {
+            "type": "command",
+            "command": "[[ \"$f\" == *.css ]] && ..."
+          },
+          {
+            "type": "command",
+            "command": "[[ \"$f\" == *.json ]] && ..."
+          }
+        ]
+      }
     ]
   }
 }
@@ -691,12 +877,15 @@ where more than one hook matches the same tool will run both, in the order they 
 // Better: Combine related operations
 {
   "hooks": {
-    "postToolUse": [
+    "PostToolUse": [
       {
-        "name": "format-code",
-        "tool": "Write",
-        "filter": "*.{ts,tsx,js,jsx}",
-        "command": "prettier --write {{file}} && eslint --fix {{file}}"
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[[ \"$f\" == *.{ts,tsx,js,jsx} ]] && prettier --write \"$f\" && eslint --fix \"$f\""
+          }
+        ]
       }
     ]
   }
@@ -708,13 +897,15 @@ where more than one hook matches the same tool will run both, in the order they 
 ```json
 {
   "hooks": {
-    "preToolUse": [
+    "PreToolUse": [
       {
-        "name": "pre-commit-pipeline",
-        "description": "Runs lint, then test, then build (must execute in order)",
-        "tool": "Bash",
-        "filter": "git commit",
-        "command": "npm run lint && npm test && npm run build"
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm run lint && npm test && npm run build"
+          }
+        ]
       }
     ]
   }
@@ -726,18 +917,19 @@ where more than one hook matches the same tool will run both, in the order they 
 ```json
 {
   "hooks": {
-    "postToolUse": [
+    "PostToolUse": [
       {
-        "name": "format-first",
-        "priority": 1,  // Runs first
-        "tool": "Write",
-        "command": "prettier --write {{file}}"
-      },
-      {
-        "name": "lint-second",
-        "priority": 2,  // Runs after formatting
-        "tool": "Write",
-        "command": "eslint --fix {{file}}"
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "prettier --write {{file}}"
+          },
+          {
+            "type": "command",
+            "command": "eslint --fix {{file}}"
+          }
+        ]
       }
     ]
   }
@@ -752,9 +944,20 @@ where more than one hook matches the same tool will run both, in the order they 
 ```json
 {
   "hooks": {
-    "postToolUse": [
-      {"name": "add-license", "tool": "Write", "filter": "*.ts", "command": "prepend-license {{file}}"},
-      {"name": "format", "tool": "Write", "filter": "*.ts", "command": "prettier --write {{file}}"}
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "prepend-license {{file}}"
+          },
+          {
+            "type": "command",
+            "command": "prettier --write {{file}}"
+          }
+        ]
+      }
     ]
   }
 }
@@ -766,12 +969,15 @@ where more than one hook matches the same tool will run both, in the order they 
 ```json
 {
   "hooks": {
-    "postToolUse": [
+    "PostToolUse": [
       {
-        "name": "format-then-license",
-        "tool": "Write",
-        "filter": "*.ts",
-        "command": "prettier --write {{file}} && prepend-license {{file}}"
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "prettier --write {{file}} && prepend-license {{file}}"
+          }
+        ]
       }
     ]
   }
@@ -876,14 +1082,18 @@ prettier --write "$FILE" || {
 ```json
 {
   "hooks": {
-    "PostToolUse": [{
-      "matcher": "Write",
-      "hooks": [{
-        "type": "command",
-        "command": "prettier --write $FILE",
-        "timeout": 5000  // Add 5-second timeout
-      }]
-    }]
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "prettier --write $FILE",
+            "timeout": 5000
+          }
+        ]
+      }
+    ]
   }
 }
 ```
@@ -935,14 +1145,17 @@ exit 0  # Always succeed
 ```json
 {
   "hooks": {
-    "PostToolUse": [{
-      "matcher": "Write",
-      "hooks": [{
-        "type": "command",
-        // Use exact variable names: $FILE, $TOOL, $OUTPUT
-        "command": "echo 'Modified: $FILE with $TOOL' >> /tmp/hooks.log"
-      }]
-    }]
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Modified: $FILE with $TOOL' >> /tmp/hooks.log"
+          }
+        ]
+      }
+    ]
   }
 }
 ```

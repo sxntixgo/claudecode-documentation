@@ -159,9 +159,10 @@ MCP (Model Context Protocol) is a standardized way for AI assistants to communic
 3. **Server**: External tool (GitHub, Perplexity, etc.)
 4. **Data**: Structured information exchange
 
-```
-Claude Code  →  MCP Request   →  GitHub Server
-             ←  MCP Response  ←
+```mermaid
+graph LR
+    CC["Claude Code<br/>(MCP client)"] -->|"MCP request"| GH["GitHub<br/>MCP server"]
+    GH -->|"MCP response"| CC
 ```
 
 ### Step 2: Server Types
@@ -206,26 +207,58 @@ sequenceDiagram
 
 ### Step 4: Authentication & Security
 
-MCP servers handle sensitive operations, so security matters:
+MCP servers handle sensitive operations, so security matters. Claude Code supports four authentication styles:
 
-**Authentication Methods**:
-- **API Tokens**: Personal access tokens (GitHub, GitLab)
-- **OAuth**: User authorization flows (Google, Microsoft)
-- **Environment Variables**: Secure credential storage
-- **Config Files**: Encrypted local configuration
+| Style | How it works | Typical servers |
+|-------|--------------|-----------------|
+| **OAuth 2.0** | Add the server, then run `/mcp` inside a session and sign in through your browser. Tokens are stored securely and refreshed automatically | Sentry, Linear, Notion |
+| **Static token header** | Pass the token when you add the server: `--header "Authorization: Bearer <token>"` | GitHub |
+| **Environment variables** | Pass secrets to a local stdio server with `--env KEY=value`, or the `env` field of its config entry | Database and CLI-backed servers |
+| **Dynamic headers** | A `headersHelper` command generates headers at connection time, for Kerberos, short-lived tokens, or internal SSO | Internal/enterprise servers |
 
 **Security Best Practices**:
 ```bash
-# ✅ Good: Store tokens in environment variables
-export GITHUB_TOKEN="ghp_..."
+# ✅ Good: reference an environment variable, so the secret never
+#          lands in a file you might commit
+claude mcp add my-server -e API_KEY=${MY_API_KEY} -- npx -y my-mcp-server
 
-# ❌ Bad: Hardcode tokens in config files
+# ❌ Bad: a literal secret pasted into a checked-in .mcp.json
 {
-  "github_token": "ghp_..."  # Don't do this!
+  "mcpServers": {
+    "my-server": { "env": { "API_KEY": "sk-actual-key" } }
+  }
 }
 ```
 
+`.mcp.json` supports `${VAR}` and `${VAR:-default}` expansion, so a team can share one config file while each developer supplies their own credentials.
+
+> ⚠️ **Trust matters.** Anthropic reviews connectors listed in the [Anthropic Directory](https://claude.ai/directory), but does not security-audit arbitrary MCP servers. A server that fetches external content can expose you to [prompt injection](https://code.claude.com/docs/en/security#protect-against-prompt-injection). Review a server before connecting it.
+
 We'll cover secure configuration in the [Installation Guide](2-installation.md).
+
+---
+
+### Step 5: How MCP Tools Reach Claude
+
+Two details are worth knowing up front, because they shape everything else in this section.
+
+**Tools are namespaced.** Every MCP tool is exposed to Claude under a fully qualified name of the form `mcp__<server>__<tool>`. A `create_issue` tool on a server you named `github` is `mcp__github__create_issue`. You use that same fully qualified name anywhere a tool is referenced — permission rules, a subagent's `tools` list, or a hook matcher.
+
+**Tool definitions are deferred by default.** Claude Code does *not* load every MCP tool's full schema into your context at session start. Only tool names and each server's instructions load; Claude searches for and pulls in a tool's definition when a task actually needs it. This is called **tool search**, and it's on by default.
+
+```mermaid
+graph LR
+    Start["Session start"] --> Names["Tool names +<br/>server instructions<br/>load into context"]
+    Names --> Task["You ask for<br/>something"]
+    Task --> Search["Claude searches<br/>for a matching tool"]
+    Search --> Load["Only that tool's<br/>definition enters context"]
+    Load --> Call["Tool is called"]
+
+    style Names fill:#fff9e6
+    style Load fill:#d4f4dd
+```
+
+The practical consequence: **adding another MCP server costs far less context than you might expect.** The old advice of "keep your server count low or you'll burn your whole context window on tool schemas" no longer describes the default behavior. See [MCP Best Practices](5-best-practices.md) for the cases where this doesn't apply and what the real cost drivers are.
 
 ---
 
