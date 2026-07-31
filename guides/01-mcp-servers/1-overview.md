@@ -31,13 +31,13 @@ graph TB
         Built["Built-in Capabilities<br/>• Read/Write Files<br/>• Execute Commands<br/>• Code Generation"]
         Built --> MCP["MCP Protocol Layer"]
         MCP --> Server1["GitHub<br/>MCP Server"]
-        MCP --> Server2["Perplexity<br/>MCP Server"]
+        MCP --> Server2["Sentry<br/>MCP Server"]
         MCP --> Server3["Context7<br/>MCP Server"]
         MCP --> More["..."]
     end
 
     Server1 --> API1["GitHub<br/>API"]
-    Server2 --> API2["Web<br/>Search"]
+    Server2 --> API2["Error<br/>Monitoring"]
     Server3 --> API3["Docs<br/>Database"]
 
     style Claude fill:#e1f5ff
@@ -82,30 +82,32 @@ Claude:
 **Time saved**: 5-10 minutes per PR creation
 **Context switches**: Eliminated
 
-### Scenario 2: Real-Time Research (Always Current Information)
+### Scenario 2: Live System State (Not Training Data)
 
 **Without MCP**:
 ```bash
-> "What's the latest best practice for React Server Components?"
-Claude: "Based on my training data from early 2024..."
-# Information might be outdated!
+> "Why is checkout failing in production?"
+Claude: "I can't see your production errors. Paste a stack trace and I'll take a look."
+
+# You switch to Sentry, filter, copy a trace, paste it back...
 ```
 
-**With Perplexity MCP Server**:
+**With Sentry MCP Server**:
 ```bash
-> "What's the latest best practice for React Server Components?"
+> "What are the most common errors in the last 24 hours?"
 Claude:
-  [Searches web via Perplexity]
+  [Queries Sentry]
 
-  "According to the React docs updated last week and recent blog posts:
-   1. Always use 'use server' directive...
-   2. New async/await patterns introduced in React 19..."
+  "Three issues account for 84% of events since yesterday:
+   1. TypeError in checkout.js — 1,203 events, first seen after deploy a1b2c3d
+   2. Timeout calling payments-api — 340 events
+   3. Null session in /account — 118 events
 
-  Sources: [Links to latest articles]
+   The first one is new as of this morning's deploy. Want me to look at that diff?"
 ```
 
-**Benefit**: Always current, sourced information
-**Confidence**: Know your answers are up-to-date
+**Benefit**: Claude reasons over your actual system state, not a description of it
+**Confidence**: No transcription errors from copy-pasting between tools
 
 ### Scenario 3: Code Documentation (Instant Context)
 
@@ -156,7 +158,7 @@ MCP (Model Context Protocol) is a standardized way for AI assistants to communic
 **Key Components**:
 1. **Client**: Claude Code (initiates requests)
 2. **Protocol**: MCP (standardized communication)
-3. **Server**: External tool (GitHub, Perplexity, etc.)
+3. **Server**: External tool (GitHub, Sentry, a database, etc.)
 4. **Data**: Structured information exchange
 
 ```mermaid
@@ -172,7 +174,7 @@ MCP servers come in different flavors:
 | Server Type | Purpose | Examples |
 |-------------|---------|----------|
 | **API Integrations** | Connect to web services | GitHub, GitLab, Jira |
-| **Search Tools** | Query knowledge bases | Perplexity, Context7 |
+| **Search Tools** | Query knowledge bases | Context7, Claude Code docs server |
 | **Database Access** | Query/modify data | PostgreSQL, MongoDB connectors |
 | **File Systems** | Access external files | Cloud storage (S3, Dropbox) |
 | **Custom Tools** | Your specific needs | Internal APIs, proprietary systems |
@@ -274,9 +276,7 @@ Let's see the difference MCP servers make:
 | Query database | Write SQL, run query, parse | `Ask in natural language` | ~5-10 min |
 | Check CI/CD status | Open browser, navigate, check | `Ask Claude for status` | ~2-3 min |
 
-**Daily Impact**: 30-60 minutes saved per developer
-**Yearly Impact**: 125-250 hours saved per developer
-**Context Switches**: Reduced by 70-80%
+> 📏 **About these numbers**: the times above are illustrative estimates for the manual workflows they replace, not measured benchmarks. Your own savings depend on how often you do each task and how fast the underlying service responds. Treat them as a way to reason about *which* servers are worth adding, not as a figure to quote.
 
 ---
 
@@ -371,17 +371,24 @@ MCP uses JSON-RPC 2.0 for communication:
 }
 ```
 
-**Response**:
+**Response**: a `tools/call` result is always a `content` array of typed blocks, not a bare object. That's what lets any client render any server's output:
+
 ```json
 {
   "jsonrpc": "2.0",
   "result": {
-    "issue_number": 123,
-    "url": "https://github.com/owner/repo/issues/123"
+    "content": [
+      {
+        "type": "text",
+        "text": "Created issue #123: https://github.com/owner/repo/issues/123"
+      }
+    ]
   },
   "id": 1
 }
 ```
+
+A tool that failed sets `"isError": true` alongside `content`, so Claude sees the failure message and can react to it rather than the call disappearing.
 
 ### Server Implementation
 
@@ -580,25 +587,22 @@ MCP provides a standardized protocol that Claude Code understands natively. Inst
 Want to dive deeper? Here are some excellent resources:
 
 ### 📚 Official Documentation
-- [Model Context Protocol Specification](https://modelcontextprotocol.io) - Complete protocol reference
-- [Claude Code MCP Guide](https://code.claude.com/docs/en/mcp) - Official Claude Code integration docs
-- [Introducing MCP](https://anthropic.com/news/model-context-protocol) - Anthropic's announcement
-- [Code Execution with MCP](https://www.anthropic.com/engineering/code-execution-with-mcp) - Architecture and optimization patterns
-- [Introduction to MCP Course](https://anthropic.skilljar.com/introduction-to-model-context-protocol) - Official Anthropic course
+- [Connect Claude Code to tools via MCP](https://code.claude.com/docs/en/mcp) - The full Claude Code MCP reference
+- [MCP quickstart](https://code.claude.com/docs/en/mcp-quickstart) - Connect one server end to end
+- [Model Context Protocol](https://modelcontextprotocol.io/introduction) - Protocol introduction
 - [Build an MCP Server Tutorial](https://modelcontextprotocol.io/docs/develop/build-server) - Step-by-step guide
+- [Anthropic Directory](https://claude.ai/directory) - Reviewed connectors you can add with `claude mcp add`
+- [Introducing MCP](https://www.anthropic.com/news/model-context-protocol) - Anthropic's announcement
 
 ### 🔗 Related Topics
 - [Installing MCP Servers](2-installation.md) - Hands-on setup next
 - [Agents Overview](../03-agents/1-overview.md) - How agents use MCP tools
 - [Skills Overview](../04-skills/1-overview.md) - Skills that leverage MCP capabilities
+- [Permissions reference](https://code.claude.com/docs/en/permissions) - How `mcp__server__tool` rules work
 
 ### 💬 Community & Support
-- [MCP GitHub Discussions](https://github.com/modelcontextprotocol/specification/discussions) - Ask questions
-- [Claude Code Discord](https://discord.gg/anthropic) - Community help
+- [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) - Reference server implementations and their issue trackers
 - [Stack Overflow Tag: mcp](https://stackoverflow.com/questions/tagged/mcp) - Q&A
-
-### 📖 Academic/Technical Papers (Advanced)
-- [Model Context Protocol: Specification v1.0](https://modelcontextprotocol.io/spec) - Technical specification
 
 ---
 
