@@ -24,34 +24,31 @@ By the end of this guide, you'll know:
 
 ### 1. ✅ Authentication and Authorization
 
-**Always validate credentials:**
+**Authenticate at the transport boundary, not per request.**
+
+> 🚨 There is no client-supplied credential inside an MCP request. `request.params._meta` does **not** carry an `apiKey`, and a handler that requires one will reject every call. Where authentication lives depends on how your server is reached:
+
+| Transport | Trust boundary | Where the credential comes from |
+|-----------|----------------|--------------------------------|
+| **stdio** | The machine. Your process already runs as the user who configured it | Your process environment: the `env` field of the server entry, or `--env` on `claude mcp add` |
+| **HTTP / SSE** | The network. Anyone who can reach the URL can try | The `Authorization` header — OAuth 2.0 (Claude Code manages and refreshes the token) or a static bearer token |
+
+**For a stdio server**, validate configuration once, at startup, so a misconfiguration surfaces immediately in `claude mcp list` rather than as a confusing failure on the first tool call:
 
 ```typescript
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-
-class SecureMCPServer {
-  private validateApiKey(key: string | undefined): boolean {
-    if (!key) {
-      throw new Error('API key required');
-    }
-
-    const validKeys = process.env.VALID_API_KEYS?.split(',') || [];
-    return validKeys.includes(key);
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    // Fail loudly at startup, not per call
+    throw new Error(`${name} environment variable is required`);
   }
-
-  async handleRequest(request: any) {
-    // Extract API key from request metadata
-    const apiKey = request.params._meta?.apiKey;
-
-    if (!this.validateApiKey(apiKey)) {
-      throw new Error('Unauthorized: Invalid API key');
-    }
-
-    // Process authenticated request
-    return await this.processRequest(request);
-  }
+  return value;
 }
+
+const octokit = new Octokit({ auth: requireEnv('GITHUB_TOKEN') });
 ```
+
+**For an HTTP server**, validate the bearer token in your HTTP layer before the request reaches any MCP handler. Implementing standard OAuth 2.0 discovery is worth the effort: Claude Code discovers the authorization server automatically, runs the browser flow from `/mcp`, stores the token securely, and refreshes it — including a transparent retry of the failed call — without your server doing anything special.
 
 **Use environment variables for secrets:**
 ```typescript
@@ -61,6 +58,17 @@ const apiKey = process.env.GITHUB_TOKEN;
 // ❌ Bad
 const apiKey = 'ghp_hardcoded_token_12345';
 ```
+
+**Need a human in the loop on a specific tool?** That's a separate mechanism from authentication. Mark the tool in its `tools/list` entry:
+
+```json
+{
+  "name": "grant_access",
+  "_meta": { "anthropic/requiresUserInteraction": true }
+}
+```
+
+Claude Code then prompts on every call to that tool, even in `acceptEdits`, `auto`, and `bypassPermissions` modes, and ignores matching allow rules.
 
 ---
 
@@ -115,43 +123,22 @@ await pool.query(`SELECT * FROM users WHERE id = '${userId}'`);
 
 ### 3. ✅ Rate Limiting
 
-**Protect against abuse:**
+**What you're actually protecting** is the upstream API's quota. A stdio server has exactly one client — the session that spawned it — and MCP requests carry no client identifier, so per-process limiting is the right shape:
 
 ```typescript
 class RateLimiter {
-  private requests = new Map<string, number[]>();
+  private timestamps: number[] = [];
 
-  isAllowed(clientId: string, maxRequests: number, windowMs: number): boolean {
+  isAllowed(maxRequests: number, windowMs: number): boolean {
     const now = Date.now();
-    const clientRequests = this.requests.get(clientId) || [];
+    this.timestamps = this.timestamps.filter((t) => now - t < windowMs);
 
-    // Remove old requests outside window
-    const recentRequests = clientRequests.filter(
-      (timestamp) => now - timestamp < windowMs
-    );
-
-    if (recentRequests.length >= maxRequests) {
+    if (this.timestamps.length >= maxRequests) {
       return false; // Rate limit exceeded
     }
 
-    // Add current request
-    recentRequests.push(now);
-    this.requests.set(clientId, recentRequests);
-
+    this.timestamps.push(now);
     return true;
-  }
-
-  // Cleanup old entries periodically
-  cleanup() {
-    const now = Date.now();
-    for (const [clientId, requests] of this.requests.entries()) {
-      const recent = requests.filter((t) => now - t < 60000);
-      if (recent.length === 0) {
-        this.requests.delete(clientId);
-      } else {
-        this.requests.set(clientId, recent);
-      }
-    }
   }
 }
 
@@ -159,18 +146,23 @@ const limiter = new RateLimiter();
 
 // Use in handler
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const clientId = request.params._meta?.clientId || 'default';
-
-  if (!limiter.isAllowed(clientId, 100, 60000)) {
-    throw new Error('Rate limit exceeded: 100 requests per minute');
+  if (!limiter.isAllowed(100, 60_000)) {
+    return {
+      content: [{
+        type: 'text',
+        text: 'Rate limit reached: 100 calls per minute. Try again in a moment.',
+      }],
+      isError: true,
+    };
   }
 
   return await processRequest(request);
 });
-
-// Cleanup every minute
-setInterval(() => limiter.cleanup(), 60000);
 ```
+
+> 💡 Return `isError: true` rather than throwing. Claude reads the message, can wait or explain the limit to the user, and doesn't treat the tool as broken.
+
+> 🚨 Don't key a limiter on `request.params._meta?.clientId`. That field isn't populated — every call would collapse into a single `"default"` bucket, which is at best an accident and at worst a limiter you think is per-user but isn't. For a **remote** server serving many users, key on the authenticated identity from the `Authorization` header.
 
 ---
 
@@ -364,40 +356,44 @@ function processFiles(files: string[]) {
 
 ---
 
-### 9. ✅ Streaming for Large Data
+### 9. ✅ Handling Large Data
 
-**Stream large responses:**
+> 🚨 **You cannot stream a tool result.** A `tools/call` returns exactly once. There is no `stream: true` flag on a content block, and a handler that returns and then tries to `yield` more is unreachable code. Design around the single return.
+
+**Three real options, in order of preference:**
+
+**Paginate.** Take a cursor or offset, return one page plus a token for the next. Claude will ask for more if it needs more, and usually it doesn't:
 
 ```typescript
-import { Readable } from 'stream';
-
-async function streamLargeFile(filePath: string) {
-  const stream = fs.createReadStream(filePath);
-
-  return {
-    content: [
-      {
-        type: 'text',
-        text: '', // Start with empty
-        stream: true,
-      },
-    ],
-    _meta: {
-      stream: true,
+{
+  name: 'list_records',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      limit:  { type: 'number', description: 'Max records to return (default 50)' },
+      cursor: { type: 'string', description: 'Opaque cursor from a previous call' },
     },
-  };
+  },
+}
+```
 
-  // Send data in chunks
-  for await (const chunk of stream) {
-    yield {
-      content: [{
-        type: 'text',
-        text: chunk.toString(),
-      }],
-    };
+**Summarize server-side.** A tool that returns 40,000 rows so Claude can count them is doing the wrong work in the wrong place. Return the count.
+
+**Annotate, if the output genuinely must be large.** Claude Code warns above 10,000 tokens and truncates at 25,000 by default; results past a size threshold are persisted to disk and replaced with a file reference. For a tool whose whole purpose is a large payload — a full schema, a complete file tree — raise its own ceiling:
+
+```json
+{
+  "name": "get_schema",
+  "description": "Returns the full database schema",
+  "_meta": {
+    "anthropic/maxResultSizeChars": 200000
   }
 }
 ```
+
+This applies per tool, up to a hard ceiling of 500,000 characters, and works independently of the user's `MAX_MCP_OUTPUT_TOKENS`. Tools returning image data are still bound by the token limit.
+
+**For long-running operations**, send progress notifications rather than trying to stream results. They keep the call alive against the idle timeout — 5 minutes for remote servers, 30 minutes for stdio — though they do **not** extend the wall-clock limit set by the per-server `timeout` or `MCP_TOOL_TIMEOUT`. See [Progress notifications](4-creating-custom-servers.md#feature-3-progress-notifications-for-long-operations) for the code.
 
 ---
 
@@ -544,6 +540,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   }
 });
 ```
+
+**How this interacts with Claude Code's own timeouts.** Claude Code enforces its own limits regardless of what you do in-server, so your timeout should be *tighter* than theirs — you want your legible error message, not a generic abort:
+
+| Limit | What it bounds | Default | Who sets it |
+|-------|----------------|---------|-------------|
+| `MCP_TIMEOUT` | Server **startup** | 30 seconds | The user, env var |
+| `MCP_TOOL_TIMEOUT` | Per tool call, wall clock | Effectively unbounded unless set | The user, env var |
+| `"timeout"` field in the server's config entry | Per tool call, this server only. Overrides `MCP_TOOL_TIMEOUT` | Unset | The user, in `.mcp.json` |
+| `CLAUDE_CODE_MCP_TOOL_IDLE_TIMEOUT` | Silence — no response *and* no progress notification | 5 min remote, 30 min stdio | The user, env var |
+
+Two consequences worth designing for:
+
+- **Send progress notifications on anything slow.** They reset the idle timeout. They do not extend the wall-clock limit.
+- **A call still running after two minutes moves to a background task** rather than blocking the session. Claude keeps working and picks up the result when it lands. This means a genuinely slow tool is tolerable — but only if it eventually returns.
+
+If your server needs more time than the defaults allow, document the `"timeout"` value users should set in their config entry. You can't raise it from inside the server.
 
 ---
 
@@ -704,12 +716,16 @@ class HealthCheck {
   }
 }
 
-// Expose health check (if using HTTP transport)
+// Expose health check — HTTP transport only, on your own Express/Fastify app
 app.get('/health', async (req, res) => {
   const health = await healthCheck.check();
   res.status(health.healthy ? 200 : 503).json(health);
 });
 ```
+
+> ⚠️ **A stdio server has no HTTP surface to hang this on.** For stdio, health is expressed through the protocol instead: fail fast at startup so the process exits with a legible error (which the user sees via `claude mcp get`), and return `isError: true` with a specific message when a dependency is down mid-session. A `check_health` *tool* is also a reasonable pattern, since Claude can call it when something looks wrong.
+
+> 💡 Claude Code reconnects HTTP and SSE servers automatically when they drop mid-session — five attempts, exponential backoff from one second. **Stdio servers are not reconnected automatically**, so for a local server, crashing is a much more expensive failure mode than degrading. Prefer returning an error result over letting the process die.
 
 ---
 
@@ -963,14 +979,80 @@ volumes:
 
 ---
 
+## Designing for Claude Code's Context Model
+
+### 21. ✅ Write Server Instructions Like a Skill Description
+
+This is the highest-leverage thing you can do, and it's easy to miss.
+
+Claude Code **defers MCP tool definitions by default**. At session start, only tool names and your server's `instructions` field load into context; Claude searches for and pulls in a definition when a task needs it. That means your server instructions are frequently the *only* thing Claude sees about your server when deciding whether to look at it at all.
+
+```typescript
+const server = new Server(
+  { name: 'inventory-server', version: '1.0.0' },
+  {
+    capabilities: { tools: {} },
+    instructions:
+      'Tools for querying and updating warehouse inventory. Use these when the ' +
+      'user asks about stock levels, SKUs, suppliers, or reorder thresholds. ' +
+      'Queries are read-only; stock adjustments write to production.',
+  }
+);
+```
+
+Cover three things: **what category of tasks** your tools handle, **when Claude should search for them**, and **what your server can do**.
+
+> ⚠️ Claude Code truncates tool descriptions and server instructions at **2KB each**. Put the critical details first.
+
+### 22. ✅ Don't Optimize for a Context Cost That No Longer Applies
+
+Advice written before tool search told server authors to minimize tool *count*, because every schema was loaded upfront on every request. With deferral on by default, that pressure is mostly gone: Claude Code imposes no per-server tool cap, and the practical limit is the user's context budget.
+
+What actually costs context now, in order:
+
+| Cost | Mitigation |
+|------|------------|
+| **Tool output size** | Paginate. This dominates everything else |
+| **Tools marked `alwaysLoad`** | Reserve for tools needed on essentially every turn |
+| **Overlong descriptions** | Concise, front-loaded, under 2KB |
+| **Tool count** | Barely matters when deferred. Design for clarity instead |
+
+**When deferral does not apply** — and your upfront cost is back — is worth knowing so you don't assume it away: `ENABLE_TOOL_SEARCH=false`, a non-first-party `ANTHROPIC_BASE_URL`, Google Cloud's Agent Platform, Microsoft Foundry on Azure, models without tool-reference support, and any server configured `"alwaysLoad": true`.
+
+So: design tools for a **searchable, self-describing** catalog, not a minimal one. A tool whose name and description clearly state what it does gets found; a clever abstraction that packs six operations behind a `mode` parameter does not.
+
+### 23. ✅ Keep Tool Schemas API-Compatible
+
+The Claude API does not accept `anyOf`, `oneOf`, or `allOf` at the **top level** of a tool's `inputSchema`. Combinators nested inside `properties` are fine.
+
+Recent Claude Code versions flatten a root-level combinator and describe the groupings in the tool description, but older versions and some deployments skip the tool entirely — silently, from the user's perspective. Write the flat form and validate the combination server-side.
+
+### 24. ✅ Never Write to stdout on a stdio Server
+
+stdout **is** the transport. A stray `console.log`, a dependency's banner, or a progress bar corrupts the JSON-RPC stream and the connection dies in a way that's genuinely hard to diagnose.
+
+```typescript
+// ✅ Good
+console.error('Server starting...');
+
+// ❌ Fatal
+console.log('Server starting...');
+```
+
+Audit your dependencies for this too — it's a common source of "works standalone, fails under Claude Code".
+
+---
+
 ## Quick Reference Checklists
 
 ### Security Checklist
-- [ ] Authentication implemented
+- [ ] Authentication at the transport boundary — env for stdio, `Authorization` header for HTTP
+- [ ] No handler reads a credential from `request.params._meta`
+- [ ] Required configuration validated at startup, so failures show in `claude mcp get`
 - [ ] Input validation with schemas
-- [ ] Rate limiting enabled
-- [ ] Secrets in environment variables
-- [ ] Least privilege principle followed
+- [ ] Rate limiting enabled (per process for stdio, per identity for HTTP)
+- [ ] Secrets in environment variables, never in a committed `.mcp.json`
+- [ ] Least privilege principle followed (read-only DB user, fine-grained token)
 - [ ] Safe error messages (no leaks)
 - [ ] Dependencies audited (npm audit)
 
@@ -978,9 +1060,21 @@ volumes:
 - [ ] Connection pooling for databases
 - [ ] Caching for expensive operations
 - [ ] Async operations (no blocking)
-- [ ] Streaming for large data
-- [ ] Timeout protection
+- [ ] Large results paginated, not streamed — `tools/call` returns once
+- [ ] Progress notifications on anything slow, to hold off the idle timeout
+- [ ] In-server timeout tighter than Claude Code's, so your error message wins
 - [ ] Resource cleanup
+
+### Claude Code Integration Checklist
+- [ ] Server `instructions` written — this is what Claude sees before it searches for your tools
+- [ ] Descriptions and instructions under 2KB, critical details first
+- [ ] No root-level `anyOf` / `oneOf` / `allOf` in any tool's `inputSchema`
+- [ ] Nothing but JSON-RPC on stdout (`console.error` for all logging)
+- [ ] `anthropic/maxResultSizeChars` set on any tool that must return a large payload
+- [ ] `anthropic/requiresUserInteraction` set on any consent or access-grant tool
+- [ ] `alwaysLoad` used only where genuinely justified
+- [ ] `CLAUDE_PROJECT_DIR` used for project-relative paths, or `roots/list` implemented
+- [ ] `list_changed` notifications sent if the tool set changes at runtime
 
 ### Error Handling Checklist
 - [ ] Try-catch at multiple levels
@@ -1029,7 +1123,15 @@ volumes:
 
 ## References and Further Reading
 
+### Claude Code MCP Reference
+- [Connect Claude Code to tools via MCP](https://code.claude.com/docs/en/mcp) - Transports, scopes, auth, output limits, tool search, `_meta` annotations
+- [Scale with MCP tool search](https://code.claude.com/docs/en/mcp#scale-with-mcp-tool-search) - Deferral behavior and `ENABLE_TOOL_SEARCH`
+- [Environment variables](https://code.claude.com/docs/en/env-vars) - `MCP_TIMEOUT`, `MCP_TOOL_TIMEOUT`, `MAX_MCP_OUTPUT_TOKENS`
+- [Permissions](https://code.claude.com/docs/en/permissions) - How users restrict `mcp__server__tool`
+- [Managed MCP configuration](https://code.claude.com/docs/en/managed-mcp) - What administrators can block
+
 ### Security
+- [Claude Code security](https://code.claude.com/docs/en/security) - MCP threat model and prompt injection
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [Node.js Security Best Practices](https://nodejs.org/en/docs/guides/security/)
 - [API Security Checklist](https://github.com/shieldfy/API-Security-Checklist)
