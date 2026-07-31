@@ -147,8 +147,14 @@ Add to `.claude/settings.json`:
 ```json
 {
   "hooks": {
-    "preToolUse": ["npm test"],
-    "postToolUse": ["npm run format"]
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          { "type": "command", "command": "npm run format" }
+        ]
+      }
+    ]
   }
 }
 ```
@@ -264,18 +270,17 @@ your-project/
 **File**: `.claude/settings.json`
 ```json
 {
-  "model": "claude-sonnet-4-5",
+  "model": "sonnet",
+  "alwaysThinkingEnabled": true,
   "hooks": {
-    "preToolUse": [
-      "npm run lint",
-      "npm test"
-    ],
-    "postToolUse": [
-      "npm run format"
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          { "type": "command", "command": "npm run format" }
+        ]
+      }
     ]
-  },
-  "experimental": {
-    "thinking": true
   }
 }
 ```

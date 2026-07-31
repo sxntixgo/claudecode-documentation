@@ -434,51 +434,34 @@ This happens automatically—you just ask naturally!
 
 ## Popular MCP Servers
 
-Here are the most commonly used MCP servers:
+Here are servers that are widely used and that we've verified against their publishers' own documentation:
 
-### Official Servers
+### Vendor-Hosted Remote Servers
 
-**GitHub** ([Installation](2-installation.md#github))
-- Create/manage issues and PRs
-- Review code and leave comments
-- Check CI/CD status
-- Manage repositories
+These are HTTP servers run by the vendor. You add a URL; there's nothing to install.
 
-**Perplexity** ([Installation](2-installation.md#perplexity))
-- Web search with citations
-- Real-time information retrieval
-- Research assistance
-- Fact-checking with sources
+**Sentry** — production error and issue data. OAuth sign-in via `/mcp`.
+**GitHub** — issues, PRs, code review, CI status. Authenticates with a GitHub personal access token passed as a header.
+**Claude Code docs** — full-text search over the Claude Code documentation. No auth at all, which makes it the easiest first server to test with.
 
-**Context7** ([Installation](2-installation.md#context7))
-- Up-to-date code documentation
-- Framework-specific guidance
-- API references
-- Version-aware examples
+### Local Stdio Servers
 
-### Community Servers
+These run as a subprocess on your machine.
 
-**Sequential Thinking**
-- Break down complex tasks
-- Multi-step problem solving
-- Planning and architecture
+**Playwright** ([microsoft/playwright-mcp](https://github.com/microsoft/playwright-mcp)) — gives Claude a real browser it can navigate, click, and read.
+**DBHub** ([bytebase/dbhub](https://github.com/bytebase/dbhub)) — connects Claude to PostgreSQL, MySQL, SQL Server, and SQLite through a connection string.
+**Filesystem** and **Sequential Thinking** — reference servers maintained in the [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) repository.
+**Context7** ([upstash/context7](https://github.com/upstash/context7)) — version-aware library and framework documentation. Available as both a stdio package and a hosted HTTP endpoint.
 
-**Database Connectors**
-- PostgreSQL, MySQL, MongoDB
-- Natural language queries
-- Schema exploration
+### Where to Find More
 
-**Cloud Services**
-- AWS, Google Cloud, Azure
-- Resource management
-- Deployment automation
+- **[Anthropic Directory](https://claude.ai/directory)** — connectors Anthropic has reviewed against its listing criteria. Anything listed there can be added with `claude mcp add`.
+- **[Docker MCP Catalog](https://hub.docker.com/u/mcp)** — 200+ containerized MCP servers published under Docker's `mcp` namespace.
+- **[modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)** — the protocol project's reference implementations.
 
-**200+ More via Docker**
-- Pre-built, containerized
-- One-click installation
-- Automatic updates
+> ⚠️ There is no built-in server registry inside Claude Code that you can browse and install from. Discovery happens through the sources above.
 
-See the complete catalog in [Popular MCP Servers](3-popular-servers.md).
+See exact install commands in [Popular MCP Servers](3-popular-servers.md).
 
 ---
 
@@ -547,15 +530,19 @@ MCP servers extend Claude Code by connecting it to external tools and services t
 - 📚 Access real-time information
 
 **Common Servers**:
-- GitHub (code hosting)
-- Perplexity (web search)
-- Context7 (documentation)
-- 200+ via Docker
+- GitHub (code hosting, remote HTTP + PAT header)
+- Sentry (error monitoring, remote HTTP + OAuth)
+- Playwright (browser control, local stdio)
+- Context7 (library documentation, stdio or HTTP)
+
+**Tool naming**: `mcp__<server>__<tool>` — for example `mcp__github__create_issue`
+
+**Context cost**: tool definitions are deferred by default (tool search), so only names load at session start
 
 **Security**:
-- Use environment variables for tokens
-- Never hardcode credentials
-- Review server permissions
+- Use environment variables and `${VAR}` expansion for tokens
+- Never hardcode credentials in a committed `.mcp.json`
+- Review a server before connecting it — MCP servers are not audited by Anthropic
 
 ---
 
