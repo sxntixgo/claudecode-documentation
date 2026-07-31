@@ -1026,11 +1026,17 @@ There is no `dependencies` field and no dependency resolution between skills. A 
 needs another one's behavior should say so in its instructions, and a skill that needs an MCP
 server should name the tool with its server prefix.
 
-Use fully qualified MCP tool names so the tool resolves:
+Name MCP tools with their server prefix so the right one resolves:
 
 ```markdown
 Use the GitHub:create_issue tool to open the issue.
 ```
+
+> 📌 **Two prefixes, two contexts — both correct.** In a skill's written instructions, use
+> `ServerName:tool_name` as above. In anything that *matches* a tool by name — a permission
+> rule, a subagent's `tools` list, a hook matcher — use the runtime form
+> `mcp__<server>__<tool>`, so `mcp__github__create_issue`. Seeing both is not a typo. See
+> [MCP Servers](../01-mcp-servers/1-overview.md) for the runtime naming.
 
 Then make sure the server is actually configured:
 
