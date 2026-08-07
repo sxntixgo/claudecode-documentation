@@ -406,7 +406,7 @@ graph TD
 |----------|---------|
 | [CHANGELOG.md](CHANGELOG.md) | Version history and updates |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute to this documentation |
-| [DOCUMENTATION_REVIEW_PLAN.md](DOCUMENTATION_REVIEW_PLAN.md) | Documentation review report and action plan |
+| [DOCUMENTATION_REVIEW_PLAN.md](https://github.com/sxntixgo/claudecode-documentation/blob/main/DOCUMENTATION_REVIEW_PLAN.md) | Documentation review report and action plan |
 
 ---
 

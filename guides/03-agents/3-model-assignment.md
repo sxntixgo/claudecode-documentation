@@ -594,7 +594,7 @@ Learn to build specialized agents with custom capabilities and model assignments
 - **Community Discussions**: Search [GitHub Discussions](https://github.com/anthropics/claude-code/discussions) for real-world model performance experiences
 
 ### Related Topics
-- [Thinking Modes](../08-thinking/) - Control reasoning depth for better cost/quality trade-offs
+- [Thinking Modes](../08-thinking/1-overview.md) - Control reasoning depth for better cost/quality trade-offs
 - [Skills Model Assignment](../04-skills/4-model-assignment.md) - Similar techniques for skills
 
 ---
