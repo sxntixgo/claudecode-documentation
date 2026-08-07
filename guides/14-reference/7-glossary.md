@@ -21,19 +21,14 @@ Terms are organized alphabetically. Each entry includes:
 ### Agent
 **Definition**: A specialized AI assistant with specific capabilities and constraints. Agents can be configured with different models, tool permissions, and file path access restrictions.
 
-**Example**:
-```json
-{
-  "agents": {
-    "frontend-agent": {
-      "model": "haiku",
-      "tools": ["Read", "Write"],
-      "constraints": {
-        "allowedPaths": ["src/components/**"]
-      }
-    }
-  }
-}
+**Example** (`.claude/agents/frontend-agent.md`):
+```markdown
+---
+name: frontend-agent
+description: Builds and modifies React components
+model: haiku
+tools: Read, Write, Edit
+---
 ```
 
 **Types**: Explore (read-only), General-Purpose (read/write), Plan (architecture)
@@ -41,32 +36,31 @@ Terms are organized alphabetically. Each entry includes:
 **See Also**: [Agents Guide](../03-agents/1-overview.md)
 
 ### API Reference
-**Definition**: Complete technical specification of Claude Code configuration schemas (AGENT.md, SKILL.md, config.json).
+**Definition**: Complete technical specification of Claude Code configuration schemas (subagent files, SKILL.md, settings.json).
 
 **See Also**: [API Reference](../14-reference/1-api-reference.md)
 
 ### Approval Required
-**Definition**: A skill or agent feature that requires human confirmation before executing sensitive operations.
+**Definition**: Requiring human confirmation before a sensitive operation. There is no
+`approvalRequired` field — this is achieved with `permissions.ask` in settings.json, a
+`PreToolUse` hook that returns a `permissionDecision` of `ask`, or an instruction in the skill
+body telling Claude to stop and confirm.
+
+**See Also**: [Hooks](../11-hooks/1-overview.md)
+
+### Auto-Invocation
+**Definition**: Claude loading a skill on its own, without a `/command`. It is description-driven: Claude reads each skill's `description` (plus `when_to_use`, which is appended to it) and decides whether the request matches. There are no regex patterns and no confidence score. A `paths` glob narrows activation to matching files, `disable-model-invocation: true` turns auto-invocation off.
 
 **Example**:
 ```yaml
 ---
-name: database-migration-skill
-approvalRequired: true
+description: Reviews staged git changes for security, logic, and style issues before commit.
+when_to_use: review my changes, check this PR, look over the diff
 ---
 ```
 
-### Auto-Trigger
-**Definition**: A mechanism that automatically invokes a skill when the user's natural language matches specific keywords or patterns.
-
-**Example**:
-```yaml
----
-autoTrigger:
-  - pattern: "review.*code"
-  - pattern: "check.*security"
----
-```
+**Related Terms**: Description, Skill, Progressive Disclosure
+**See Also**: [Custom Skills](../04-skills/3-creating-skills.md)
 
 ---
 
@@ -156,20 +150,24 @@ npm test       # Run tests
 /usage                # Check token usage
 ```
 
-**See Also**: [Commands Reference](../10-keywords/commands.md)
+**See Also**: [Commands Reference](../10-keywords/2-slash-commands.md)
 
-### Config (Configuration)
-**Definition**: Settings file (`.claude/config.json`) that defines agents, models, hooks, and behavior of Claude Code.
+### Settings (Configuration)
+**Definition**: `settings.json` defines Claude Code's behavior — default model, permissions, environment variables, and hooks. It exists at four scopes, highest precedence first: managed (`managed-settings.json`, IT-deployed), `.claude/settings.local.json` (personal, gitignored), `.claude/settings.json` (project, committed), and `~/.claude/settings.json` (user, all projects).
 
-**Example**:
+**Example** (`.claude/settings.json`):
 ```json
 {
-  "defaultModel": "haiku",
-  "agents": {
-    "Explore": {"model": "haiku"}
+  "model": "sonnet",
+  "permissions": {
+    "deny": ["Read(./.env*)"]
   }
 }
 ```
+
+**Note**: Subagents and skills are **not** configured here. Each is a file that carries its own settings in YAML frontmatter — `.claude/agents/<name>.md` and `.claude/skills/<name>/SKILL.md` respectively. There is no `agents` or `skills` key in settings.json.
+
+**See Also**: [Model Assignment for Agents](../03-agents/3-model-assignment.md)
 
 ### Context
 **Definition**: Information provided to Claude to understand the project, including code, documentation, CLAUDE.md, and memory.
@@ -180,7 +178,7 @@ npm test       # Run tests
 - Memory (.claude/memory.md)
 - Previous conversation history
 
-**See Also**: [Context Management](../09-context/)
+**See Also**: [Context Management](../09-context/1-overview.md)
 
 ### Context Window
 **Definition**: The maximum number of tokens Claude can consider at once, including your input and output.
@@ -237,20 +235,19 @@ Comprehensive checks...
 - `"think hard"`: ~10K token budget
 - `"ultrathink"`: ~32K token budget
 
-**See Also**: [Thinking Modes](../08-thinking/)
+**See Also**: [Thinking Modes](../08-thinking/1-overview.md)
 
 ---
 
 ## F
 
 ### Frontmatter
-**Definition**: YAML metadata at the beginning of SKILL.md or AGENT.md files that defines configuration.
+**Definition**: YAML metadata at the beginning of SKILL.md or subagent files that defines configuration.
 
 **Example**:
 ```yaml
 ---
 name: code-review-skill
-version: 1.0.0
 model: sonnet
 description: Automated code reviews
 ---
@@ -259,7 +256,7 @@ description: Automated code reviews
 ### Function Calling
 **Definition**: When Claude invokes MCP tools to accomplish tasks (reading files, executing code, etc.).
 
-**See Also**: [MCP Servers](../01-mcp-servers/)
+**See Also**: [MCP Servers](../01-mcp-servers/1-overview.md)
 
 ---
 
@@ -305,7 +302,7 @@ description: Automated code reviews
 
 **Pricing** (2025): $1/M input, $5/M output
 
-**See Also**: [Model Comparison](../06-models/model-comparison.md)
+**See Also**: [Model Comparison](../06-models/1-overview.md)
 
 ### Hook
 **Definition**: Automated actions that trigger before or after specific tool usage.
@@ -328,7 +325,7 @@ description: Automated code reviews
 }
 ```
 
-**See Also**: [Hooks Reference](../10-keywords/hooks.md)
+**See Also**: [Hooks Reference](../11-hooks/1-overview.md)
 
 ### HIPAA (Health Insurance Portability)
 **Definition**: US healthcare privacy regulation requiring encryption and audit logs for health data.
@@ -353,7 +350,7 @@ description: Automated code reviews
 ### JSON Schema
 **Definition**: Format for defining the structure of JSON configuration files.
 
-**Used For**: AGENT.md schemas, SKILL.md frontmatter validation
+**Used For**: subagent and SKILL.md frontmatter
 
 ---
 
@@ -367,7 +364,7 @@ description: Automated code reviews
 - `"quick"`: Prefer faster response
 - `"deep"`: Comprehensive analysis
 
-**See Also**: [Keywords Reference](../10-keywords/)
+**See Also**: [Keywords Reference](../10-keywords/1-overview.md)
 
 ---
 
@@ -409,13 +406,13 @@ description: Automated code reviews
 **Definition**: A program that implements the Model Context Protocol to provide tools to Claude.
 
 **Example**: GitHub MCP provides PR management tools
-**See Also**: [MCP Servers](../01-mcp-servers/)
+**See Also**: [MCP Servers](../01-mcp-servers/1-overview.md)
 
 ### Model
 **Definition**: The underlying AI engine Claude Code uses (Haiku, Sonnet, or Opus).
 
 **Selection Factors**: Task complexity, cost, speed, quality
-**See Also**: [Model Selection](../06-models/)
+**See Also**: [Model Selection](../06-models/1-overview.md)
 
 ### Model Selection
 **Definition**: Process of choosing the right model for a task.
@@ -427,7 +424,7 @@ Complex architecture? → Opus
 Standard coding? → Sonnet
 ```
 
-**See Also**: [Model Selection Tree](1-model-selection-tree.md)
+**See Also**: [Model Selection Tree](5-model-selection-tree.md)
 
 ---
 
@@ -444,7 +441,7 @@ Standard coding? → Sonnet
 
 **Pricing** (2025): Premium pricing
 
-**See Also**: [Model Comparison](../06-models/model-comparison.md)
+**See Also**: [Model Comparison](../06-models/1-overview.md)
 
 ### OWASP Top 10
 **Definition**: List of 10 most critical web application security risks.
@@ -481,14 +478,14 @@ Standard coding? → Sonnet
 }
 ```
 
-**See Also**: [Hooks Reference](../10-keywords/hooks.md)
+**See Also**: [Hooks Reference](../11-hooks/1-overview.md)
 
 ### PreToolUse Hook
 **Definition**: Hook that executes before a tool is run, for validation or preparation.
 
 **Common Use**: Backups, validation, logging
 
-**See Also**: [Hooks Reference](../10-keywords/hooks.md)
+**See Also**: [Hooks Reference](../11-hooks/1-overview.md)
 
 ### Progressive Disclosure
 **Definition**: Design pattern that reveals information gradually based on user needs.
@@ -507,7 +504,7 @@ Standard coding? → Sonnet
 - Include context
 - State desired output format
 
-**See Also**: [Token Optimization](../12-optimization/strategies.md)
+**See Also**: [Token Optimization](../12-optimization/1-cost-optimization.md)
 
 ### Prompt Injection
 **Definition**: Security concern where user input attempts to manipulate Claude's instructions.
@@ -601,12 +598,12 @@ Optional advanced features...
 - Best For: Feature development, code review, testing
 - Context: 200K tokens
 
-**See Also**: [Model Comparison](../06-models/model-comparison.md)
+**See Also**: [Model Comparison](../06-models/1-overview.md)
 
 ### Stop Hook
 **Definition**: Hook that executes after Claude's response is complete, for cleanup or final validation.
 
-**See Also**: [Hooks Reference](../10-keywords/hooks.md)
+**See Also**: [Hooks Reference](../11-hooks/1-overview.md)
 
 ### Subagent
 **Definition**: Agent spawned by a primary agent to handle specific subtasks.
@@ -633,7 +630,7 @@ Optional advanced features...
 - `"think hard"`: ~10,000 tokens
 - `"ultrathink"`: ~31,999 tokens
 
-**See Also**: [Extended Thinking](../08-thinking/extended-thinking.md)
+**See Also**: [Extended Thinking](../08-thinking/1-overview.md)
 
 ### Token
 **Definition**: Unit of measurement for API usage. ~4 characters = 1 token.
@@ -645,7 +642,7 @@ Optional advanced features...
 
 **Cost**: Charged per million tokens
 
-**See Also**: [Token Optimization](../12-optimization/)
+**See Also**: [Token Optimization](../12-optimization/1-cost-optimization.md)
 
 ### Tool
 **Definition**: Capability available to Claude Code, either built-in (Read, Write) or from MCP servers.
@@ -653,7 +650,7 @@ Optional advanced features...
 **Built-in Tools**: Read, Write, Edit, Grep, Bash, Glob
 **MCP Tools**: Vary by server (GitHub, database queries, API calls)
 
-**See Also**: [MCP Servers](../01-mcp-servers/)
+**See Also**: [MCP Servers](../01-mcp-servers/1-overview.md)
 
 ---
 
@@ -706,12 +703,11 @@ const email = z.string().email().parse(input)
 ## Y
 
 ### YAML
-**Definition**: Human-readable data format used in frontmatter for AGENT.md and SKILL.md.
+**Definition**: Human-readable data format used in frontmatter for subagent files and SKILL.md.
 
 **Example**:
 ```yaml
 name: my-skill
-version: 1.0.0
 model: sonnet
 ```
 
@@ -737,8 +733,8 @@ model: sonnet
 ### Agents & Skills
 - Agent, Subagent, Skill
 - Explore Agent, General-Purpose Agent, Plan Agent
-- SKILL.md, AGENT.md
-- Progressive Disclosure, Auto-Trigger
+- SKILL.md, subagent files
+- Progressive Disclosure, Auto-Invocation
 
 ### Configuration
 - CLAUDE.md, Config, Frontmatter

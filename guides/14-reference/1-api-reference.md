@@ -14,9 +14,9 @@ This is your complete technical reference for all Claude Code configuration sche
 
 ## Table of Contents
 
-1. [AGENT.md Schema](#agentmd-schema)
+1. [Subagent Schema](#subagent-schema)
 2. [SKILL.md Schema](#skillmd-schema)
-3. [config.json Schema](#configjson-schema)
+3. [settings.json Schema](#settingsjson-schema)
 4. [Hook Specifications](#hook-specifications)
 5. [Slash Command Schema](#slash-command-schema)
 6. [CLAUDE.md Structure](#claudemd-structure)
@@ -25,207 +25,116 @@ This is your complete technical reference for all Claude Code configuration sche
 
 ---
 
-## AGENT.md Schema
+## Subagent Schema
 
 ### Overview
 
-Custom agents are defined using `AGENT.md` files with YAML frontmatter. Agents are specialized AI assistants with specific capabilities, constraints, and behaviors.
+A custom subagent is a single Markdown file with YAML frontmatter. There is no `subagent file` file
+and no registry — Claude Code discovers subagents by reading the directory, so the agent exists
+the moment the file does.
+
+| Scope | Path |
+|-------|------|
+| Project, shared via git | `.claude/agents/<name>.md` |
+| Personal, all projects | `~/.claude/agents/<name>.md` |
 
 ### Complete Schema
 
 ```yaml
 ---
 name: string (required)
-  # Unique identifier for the agent
-  # Example: "frontend-specialist", "security-auditor"
+  # Unique identifier, lowercase letters and hyphens. Cannot contain ":",
+  # which is reserved for plugin-scoped names. Hooks receive this as agent_type.
 
 description: string (required)
-  # Clear description of agent's purpose and capabilities
-  # Should be 1-2 sentences, action-oriented
-  # Example: "Specialized agent for React/TypeScript frontend development with focus on component architecture"
-
-model: "haiku" | "sonnet" | "opus" (optional)
-  # Model to use for this agent
-  # Default: inherits from parent or "sonnet"
-  # Choices:
-  #   - "haiku": Fast, cost-effective (recommended for searches, simple tasks)
-  #   - "sonnet": Balanced (recommended for standard coding)
-  #   - "opus": Maximum reasoning (recommended for complex architecture)
+  # When Claude should delegate to this subagent. This IS the routing logic —
+  # there is no rule table or pattern matcher, so be specific and action-oriented.
 
 tools: string[] (optional)
-  # Array of tool names this agent can access
-  # Available tools: "Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", etc.
-  # Default: all tools available
-  # Example: ["Read", "Grep", "Glob"] for read-only agents
+  # Tools the subagent may use. Inherits every tool available to subagents if
+  # omitted. If no entry resolves to a real tool, the subagent fails to launch.
+  # To preload skills, use the skills field rather than listing Skill here.
 
-constraints: object (optional)
-  allowedPaths: string[] (optional)
-    # Glob patterns for paths this agent can access
-    # Example: ["src/components/**", "src/pages/**"]
+model: string (optional)
+  # sonnet | opus | haiku | fable | a full model ID | inherit
+  # Defaults to inherit, meaning it runs on the main session's model.
 
-  deniedPaths: string[] (optional)
-    # Glob patterns for paths this agent cannot access
-    # Takes precedence over allowedPaths
-    # Example: ["src/server/**", ".env*", "**/*.private.*"]
+permissionMode: string (optional)
+  # default | acceptEdits | auto | dontAsk | bypassPermissions | plan
+  # Ignored for plugin subagents.
 
-  maxFileSize: number (optional)
-    # Maximum file size in bytes agent can read/write
-    # Default: unlimited
-    # Example: 1048576 (1MB)
+skills: string[] (optional)
+  # Skills to preload into the subagent's context at startup. The full skill
+  # content is injected, not just the description. The subagent can still invoke
+  # unlisted skills through the Skill tool.
 
-  readOnly: boolean (optional)
-    # If true, agent cannot modify files
-    # Default: false
-    # Use for security-sensitive agents
+hooks: object (optional)
+  # Lifecycle hooks scoped to this subagent. Ignored for plugin subagents.
 
-autoActions: object (optional)
-  beforeRead: Command[] (optional)
-    # Commands to run before reading files
-    # Example: [{"command": "git pull"}]
-
-  afterWrite: Command[] (optional)
-    # Commands to run after writing files
-    # Example: [{"command": "npx prettier --write {file}"}]
-
-  onError: Command[] (optional)
-    # Commands to run when agent encounters errors
-    # Example: [{"command": "notify-send 'Agent Error' '{error}'"}]
-
-timeout: number (optional)
-  # Maximum execution time in milliseconds
-  # Default: 120000 (2 minutes)
-  # Maximum: 600000 (10 minutes)
-
-contextWindow: number (optional)
-  # Maximum context window for this agent
-  # Default: inherits from model defaults
-  # Use to limit context for focused agents
+color: string (optional)
+  # Display color in the task list and transcript: red, blue, green, yellow,
+  # purple, orange, pink, or cyan.
 ---
 
 # Agent Instructions
 
-[Detailed instructions for how the agent should behave, written in markdown]
-
-## Capabilities
-
-- List specific capabilities
-- What this agent excels at
-- When to use this agent
-
-## Limitations
-
-- What this agent should NOT do
-- Tasks to delegate to other agents
-- Known constraints
-
-## Examples
-
-Provide concrete examples of tasks this agent handles well.
+[Instructions for how the agent should behave, in markdown]
 ```
+
+> ⚠️ **Fields that do not exist.** `constraints`, `allowedPaths`, `deniedPaths`, `maxFileSize`,
+> `readOnly`, `autoActions`, `timeout`, and `contextWindow` are not read. To restrict what an
+> agent can touch, limit `tools` in its frontmatter and set `permissions.deny` in
+> `.claude/settings.json`. To run a command after every edit, use a `PostToolUse`
+> [hook](../11-hooks/1-overview.md). There is no timeout field — narrow the task scope instead.
 
 ### Example: Frontend Specialist Agent
 
-```yaml
+`.claude/agents/frontend-specialist.md`:
+
+```markdown
 ---
 name: frontend-specialist
-description: React/TypeScript frontend development agent specializing in component architecture, hooks, and state management
+description: Builds and modifies React components, hooks, and client-side state. Use for any work under src/components/ or src/pages/.
 model: sonnet
-tools:
-  - Read
-  - Write
-  - Edit
-  - Bash
-  - Grep
-  - Glob
-constraints:
-  allowedPaths:
-    - "src/components/**"
-    - "src/pages/**"
-    - "src/hooks/**"
-    - "src/contexts/**"
-    - "src/styles/**"
-  deniedPaths:
-    - "src/server/**"
-    - "src/api/**"
-    - ".env*"
-  readOnly: false
-autoActions:
-  afterWrite:
-    - command: "npx prettier --write {file}"
-    - command: "npx eslint --fix {file}"
-timeout: 180000
+tools: Read, Write, Edit, Bash, Grep, Glob
+color: blue
 ---
 
-# Frontend Specialist Agent
+# Frontend Specialist
 
-## Capabilities
+## Scope
 
-I specialize in:
-- **React Components**: Creating functional components with TypeScript
-- **Hooks**: useState, useEffect, useContext, custom hooks
-- **State Management**: Context API, reducers, local state patterns
-- **Component Architecture**: Composition, props drilling solutions
-- **Styling**: CSS Modules, styled-components, Tailwind CSS
-- **Testing**: React Testing Library, component testing
+React components with TypeScript, hooks, Context-based state, CSS Modules and Tailwind,
+and React Testing Library tests.
 
 ## Approach
 
-1. **Type Safety First**: Always use TypeScript strict mode
-2. **Component Composition**: Prefer composition over inheritance
-3. **Performance**: Use memo, useCallback, useMemo when appropriate
-4. **Accessibility**: Follow WCAG 2.1 AA standards
-5. **Testing**: Write tests alongside components
+1. TypeScript strict mode; no `any`
+2. Composition over inheritance
+3. Reach for `memo`, `useCallback`, and `useMemo` only with a measured reason
+4. WCAG 2.1 AA for anything interactive
+5. Write the test alongside the component
 
-## Limitations
+## Out of scope
 
-I do NOT handle:
-- Backend API development (use backend-specialist agent)
-- Database queries (use data-specialist agent)
-- DevOps configuration (use devops-specialist agent)
-- Server-side rendering logic (use ssr-specialist agent)
-
-## Examples
-
-### Creating a Form Component
-
-```typescript
-interface LoginFormProps {
-  onSubmit: (credentials: {email: string; password: string}) => Promise<void>;
-  isLoading?: boolean;
-}
-
-export const LoginForm: React.FC<LoginFormProps> = ({onSubmit, isLoading}) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await onSubmit({email, password});
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-        aria-label="Email address"
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-        aria-label="Password"
-      />
-      <button type="submit" disabled={isLoading}>
-        {isLoading ? 'Logging in...' : 'Log In'}
-      </button>
-    </form>
-  );
-};
+Backend APIs, database queries, and deployment config. Say so and stop rather than
+guessing at them.
 ```
+
+To auto-format after every write, pair the agent with a hook in `.claude/settings.json`
+rather than an `autoActions` block:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [{ "type": "command", "command": "jq -r '.tool_input.file_path' | xargs npx prettier --write" }]
+      }
+    ]
+  }
+}
 ```
 
 ---
@@ -238,52 +147,81 @@ Skills are reusable instruction sets defined in `SKILL.md` files with YAML front
 
 ### Complete Schema
 
+All frontmatter fields are optional. Only `description` is recommended, since that is what
+Claude reads to decide whether the skill applies. A skill's command name comes from its
+**directory name**, not from `name`.
+
 ```yaml
 ---
-name: string (required)
-  # Unique identifier for the skill
-  # Use kebab-case: "api-documentation", "tdd-workflow"
+# Discovery — how Claude decides to use this skill
+description: string (recommended)
+  # What the skill does AND when to use it. Put the key use case first:
+  # description + when_to_use are truncated at 1,536 characters in the listing.
+  # Bad:  "document processing skill"
+  # Good: "Extracts tables from PDFs and converts them to CSV. Use when
+  #        working with PDF files or when the user mentions tables or extraction."
 
-version: string (optional, semver format)
-  # Semantic version number
-  # Example: "1.0.0", "2.1.3"
-  # Default: "1.0.0"
+when_to_use: string (optional)
+  # Extra trigger context — example requests or trigger phrases.
+  # Appended to description; counts toward the same 1,536-character cap.
 
-description: string (required, 100-200 characters recommended)
-  # Clear, specific description of what this skill does
-  # Include: action verbs, file types, specific use cases
-  # Bad: "document processing skill"
-  # Good: "extract tables from PDFs and convert to CSV format for data analysis workflows"
+name: string (optional)
+  # Display label in skill listings. Defaults to the directory name.
+  # For personal and project skills this does NOT change the command name.
+  # Max 64 chars, lowercase letters/numbers/hyphens, no "anthropic" or "claude".
 
+paths: string[] | string (optional)
+  # Glob patterns limiting when the skill auto-activates.
+  # Example: ["**/*.test.ts", "**/migrations/*.sql"]
+
+# Invocation control
+disable-model-invocation: boolean (optional, default false)
+  # true prevents Claude from auto-loading it; invoke manually with /name.
+
+user-invocable: boolean (optional, default true)
+  # false hides it from the / menu. For background knowledge, not commands.
+
+argument-hint: string (optional)
+  # Autocomplete hint. Example: "[issue-number]" or "[filename] [format]"
+
+arguments: string[] | string (optional)
+  # Named positional arguments for $name substitution in the body.
+
+# Model and reasoning
 model: string (optional)
-  # Default model for this skill
-  # Options: "claude-haiku-4-5", "claude-sonnet-4-5", "claude-opus-4-5"
-  # Example: "claude-haiku-4-5" for simple formatting tasks
-  #          "claude-opus-4-5" for complex architecture analysis
+  # sonnet | opus | haiku | fable | a full model ID | inherit
+  # NOTE: applies for the REMAINDER OF THE CURRENT TURN only. It is not saved
+  # to settings; the session model resumes on your next prompt.
 
-modelOverrides: object (optional)
-  # Named model configurations for different use cases
-  # Allows users to invoke skill with different models
-  # Example:
-  #   quick: "claude-haiku-4-5"
-  #   standard: "claude-sonnet-4-5"
-  #   deep: "claude-opus-4-5"
+effort: string (optional)
+  # low | medium | high | xhigh | max. Available levels depend on the model.
+  # Inherits the session effort level if omitted.
 
-dependencies: string[] (optional)
-  # List of other skills this skill depends on
-  # Example: ["tdd-workflow", "code-formatter"]
+# Tool access
+allowed-tools: string[] | string (optional)
+  # Tools usable without a permission prompt during the invoking turn.
+  # The grant clears on your next message.
 
-tags: string[] (optional)
-  # Categories/tags for skill discovery
-  # Example: ["testing", "python", "api"]
+disallowed-tools: string[] | string (optional)
+  # Tools removed from the pool while this skill is active.
 
-author: string (optional)
-  # Skill author name or organization
-  # Example: "Anthropic", "Your Name"
+# Execution context
+context: string (optional)
+  # Set to "fork" to run in a forked subagent context, keeping the skill's
+  # reads out of the main conversation's context window.
 
-license: string (optional)
-  # License for the skill
-  # Example: "MIT", "Apache-2.0"
+agent: string (optional)
+  # Which subagent type to use. Only applies with context: fork.
+
+background: boolean (optional, default true)
+  # Only applies with context: fork. false waits for the result in the
+  # invoking turn instead of running in the background.
+
+hooks: object (optional)
+  # Lifecycle hooks scoped to this skill.
+
+shell: string (optional)
+  # bash (default) or powershell, for inline shell commands in the body.
 ---
 
 # Skill Name
@@ -357,29 +295,18 @@ How to verify the skill executed correctly:
 
 ```yaml
 ---
-name: code-review
-version: 2.1.0
-description: Comprehensive code review covering quality, security, performance, and best practices with configurable depth levels
-model: claude-sonnet-4-5
-modelOverrides:
-  quick: claude-haiku-4-5
-  standard: claude-sonnet-4-5
-  deep: claude-opus-4-5
-tags: ["code-quality", "security", "best-practices", "review"]
-author: "Anthropic"
-license: "MIT"
+description: Reviews staged changes for correctness, security, and style issues. Use before committing or when the user asks for a code review.
+model: sonnet
+effort: medium
+allowed-tools: Read Grep Bash(git diff *) Bash(git status *)
 ---
 
 # Code Review Skill
 
 ## Overview
 
-This skill provides structured code review at three levels:
-- **Quick**: Fast surface-level review for syntax, obvious issues (~5 min, Haiku)
-- **Standard**: Balanced review covering quality, security, performance (~15 min, Sonnet)
-- **Deep**: Comprehensive architectural review with security audit (~45 min, Opus)
-
-Use this skill for pull request reviews, pre-merge checks, or periodic code audits.
+Reviews the staged diff for correctness, security, and style. Use for pull request reviews,
+pre-merge checks, or periodic code audits.
 
 ## Prerequisites
 
@@ -532,94 +459,76 @@ After code review:
 
 ---
 
-## config.json Schema
+## settings.json Schema
 
 ### Overview
 
-The `.claude/config.json` file configures Claude Code behavior at the project level, including agent settings, model defaults, hooks, and cost tracking.
+`settings.json` is Claude Code's configuration file. It holds your model selection, permission rules, environment variables, and hooks. It is plain JSON, and it exists in four scopes that layer on top of one another.
 
-### Complete Schema
+There is no `config.json` — that filename has never been part of Claude Code.
 
-```json
-{
-  "agents": {
-    "agent-name": {
-      "model": "haiku" | "sonnet" | "opus",
-      "description": "string",
-      "timeout": number,
-      "tools": string[],
-      "constraints": {
-        "allowedPaths": string[],
-        "deniedPaths": string[]
-      }
-    }
-  },
+**Scopes and precedence** (highest wins; a higher scope overrides the same key set lower down):
 
-  "defaultModel": "haiku" | "sonnet" | "opus",
+| Precedence | Location | What it is |
+|------------|----------|------------|
+| 1 (highest) | `managed-settings.json` in a system directory | Managed settings deployed by IT — cannot be overridden |
+| 2 | Command line arguments | Applies to the current invocation only |
+| 3 | `.claude/settings.local.json` | Project settings, personal to you, gitignored |
+| 4 | `.claude/settings.json` | Project settings, committed to git and shared with the team |
+| 5 (lowest) | `~/.claude/settings.json` | Your user settings, applied across all projects |
 
-  "costTracking": {
-    "enabled": boolean,
-    "dailyBudget": number,
-    "alertThreshold": number (0.0-1.0),
-    "logFile": "string (path)"
-  },
+**Related files that are *not* settings**:
 
-  "hooks": {
-    "PreToolUse": HookConfig[],
-    "PostToolUse": HookConfig[],
-    "Notification": HookConfig[],
-    "Stop": HookConfig[]
-  },
+| File | Purpose |
+|------|---------|
+| `.mcp.json` | Project MCP server definitions |
+| `~/.claude.json` | OAuth credentials and MCP state |
+| `CLAUDE.md` | Project memory and conventions — instructions, not configuration |
 
-  "projectContext": {
-    "name": "string",
-    "description": "string",
-    "techStack": string[],
-    "conventions": object
-  },
+### Available Keys
 
-  "experimentalFeatures": {
-    "featureName": boolean
-  }
-}
-```
+| Key | Purpose |
+|-----|---------|
+| `model` | Default model for the session (`haiku`, `sonnet`, `opus`, ...) |
+| `availableModels` | Models offered in the model picker |
+| `enforceAvailableModels` | Restrict selection to `availableModels` |
+| `fallbackModel` | Model used when the primary is unavailable |
+| `effortLevel` | Default reasoning effort |
+| `alwaysThinkingEnabled` | Keep extended thinking on by default |
+| `fastMode` | Optimize for speed |
+| `permissions` | `allow` / `ask` / `deny` rule arrays |
+| `env` | Environment variables exported into every session |
+| `hooks` | Lifecycle hook definitions |
+| `disableAllHooks` | Kill switch for all hooks |
+| `autoCompactEnabled` | Automatic context compaction |
+| `cleanupPeriodDays` | Retention window for local session data |
+| `agent` | Run the main thread as this named subagent (a string, not a map) |
+| `editorMode` | Editor keybinding mode |
+| `attribution` | Commit and PR attribution behavior |
+| `autoMemoryEnabled` | Automatic memory capture |
+| `allowedMcpServers` / `deniedMcpServers` | MCP server allowlist / denylist |
+| `enableAllProjectMcpServers` | Auto-approve MCP servers from `.mcp.json` |
+| `outputStyle` | Response output style |
+
+> ⚠️ Note the singular `agent` key. There is no `agents` object — per-subagent settings live in the subagent's own file, not here. See [subagent file Schema](#agentmd-schema).
 
 ### Example Configuration
 
+`.claude/settings.json`:
+
 ```json
 {
-  "agents": {
-    "Explore": {
-      "model": "haiku",
-      "description": "Fast codebase exploration",
-      "timeout": 120000
-    },
-    "general-purpose": {
-      "model": "sonnet",
-      "description": "Balanced coding tasks"
-    },
-    "Plan": {
-      "model": "sonnet",
-      "description": "Architecture planning"
-    },
-    "frontend-specialist": {
-      "model": "sonnet",
-      "tools": ["Read", "Write", "Edit", "Grep", "Glob"],
-      "constraints": {
-        "allowedPaths": ["src/components/**", "src/pages/**"],
-        "deniedPaths": ["src/server/**", ".env*"]
-      },
-      "timeout": 180000
-    }
+  "model": "sonnet",
+  "fallbackModel": "haiku",
+
+  "permissions": {
+    "allow": ["Bash(npm run test:*)", "Read(./src/**)"],
+    "ask": ["Bash(git push:*)"],
+    "deny": ["Read(./.env)"]
   },
 
-  "defaultModel": "sonnet",
-
-  "costTracking": {
-    "enabled": true,
-    "dailyBudget": 100000,
-    "alertThreshold": 0.8,
-    "logFile": ".claude/cost-log.json"
+  "env": {
+    "NODE_ENV": "development"
   },
 
   "hooks": {
@@ -639,22 +548,49 @@ The `.claude/config.json` file configures Claude Code behavior at the project le
     }]
   },
 
-  "projectContext": {
-    "name": "My Web App",
-    "description": "React TypeScript web application",
-    "techStack": ["React", "TypeScript", "Node.js", "PostgreSQL"],
-    "conventions": {
-      "indentation": "2 spaces",
-      "quotes": "single",
-      "semicolons": true
-    }
-  },
-
-  "experimentalFeatures": {
-    "enhancedContextManagement": true
-  }
+  "autoCompactEnabled": true,
+  "cleanupPeriodDays": 30
 }
 ```
+
+### Where Per-Agent and Per-Skill Models Live
+
+Model choice for an individual subagent or skill is *not* a settings key. It goes in the YAML frontmatter of that component's own file.
+
+```yaml
+# .claude/agents/explore.md
+---
+name: explore
+description: Fast codebase exploration
+model: haiku
+---
+```
+
+```yaml
+# .claude/skills/my-skill/SKILL.md
+---
+name: my-skill
+description: Deep architectural analysis
+model: opus
+---
+```
+
+A skill's `model` override applies for the rest of the current turn only. It is never written back to settings, and the session model resumes on your next prompt.
+
+### Cost and Usage Tracking
+
+There is no cost-tracking key and no cost log file. Usage is inspected through commands and the Console:
+
+- `/usage` — token counts and locally computed cost for the session. On Pro, Max, Team, and Enterprise plans it also attributes recent usage to skills, subagents, plugins, and individual MCP servers as a percentage of total, and flags any behavior accounting for 10% or more. Press `d` for a 24-hour window or `w` for 7 days.
+- `/context` — what is currently occupying the context window.
+- [Console usage page](https://platform.claude.com/usage) — authoritative billing. The `/usage` dollar figure is computed locally at list rates and may differ from your bill.
+- OpenTelemetry export — per-user token and cost metrics streamed into your own observability stack. Works on every setup.
+
+Session totals reset when `/clear` starts a new session.
+
+### Project Conventions Belong in CLAUDE.md
+
+Project name, description, tech stack, and coding conventions are not settings keys. Put them in `CLAUDE.md`, which Claude reads as memory at the start of every session. See [CLAUDE.md Structure](#claudemd-structure).
 
 ---
 
@@ -804,7 +740,6 @@ model: "haiku" | "sonnet" | "opus" (optional)
   # Model to use for this command
   # Default: inherits from config
 
-options: array (optional)
   # Command-line style options
   - name: "option-name"
     type: "boolean" | "string" | "number"
@@ -831,30 +766,13 @@ Show example usages to guide Claude's behavior.
 
 ### Example: Code Review Command
 
-```yaml
+````
 ---
 command: review
 description: Comprehensive code review with configurable depth
 usage: /review [--quick | --standard | --deep] <file-or-directory>
 skill: code-review
 model: sonnet
-options:
-  - name: quick
-    type: boolean
-    default: false
-    description: Fast surface-level review
-  - name: standard
-    type: boolean
-    default: true
-    description: Balanced review (default)
-  - name: deep
-    type: boolean
-    default: false
-    description: Comprehensive architectural review
-  - name: security-focus
-    type: boolean
-    default: false
-    description: Focus primarily on security issues
 ---
 
 # Code Review Command
@@ -895,7 +813,7 @@ When this command is invoked:
 # Review all changed files
 /review
 ```
-```
+````
 
 ---
 
@@ -1125,7 +1043,6 @@ You can import additional context files:
 | Variable | Description | Example |
 |----------|-------------|---------|
 | `CLAUDE_DEFAULT_MODEL` | Default model for all operations | `sonnet`, `haiku`, `opus` |
-| `CLAUDE_CONFIG_PATH` | Custom path to config.json | `~/.config/claude/config.json` |
 | `CLAUDE_MEMORY_PATH` | Custom path to memory files | `~/.config/claude/memory/` |
 | `CLAUDE_HOOKS_TIMEOUT` | Default hook timeout (ms) | `60000` |
 
@@ -1168,23 +1085,27 @@ Required environment variables:
 
 | File/Directory | Purpose | Platform |
 |----------------|---------|----------|
-| `~/.config/claude/` | Global configuration | Linux/macOS |
-| `~/Library/Application Support/Claude/` | Global configuration | macOS |
-| `%APPDATA%\Claude\` | Global configuration | Windows |
+| `~/.claude/` | User-level configuration | All |
+| `~/.claude/settings.json` | User settings, all projects | All |
+| `~/.claude.json` | OAuth credentials and MCP state | All |
 | `.claude/` | Project-specific configuration | All |
-| `.claude/config.json` | Project configuration | All |
+| `.claude/settings.json` | Project settings, committed to git | All |
+| `.claude/settings.local.json` | Project settings, personal and gitignored | All |
 | `.claude/memory.md` | Project memory | All |
 | `.claude/skills/` | Custom skills | All |
 | `.claude/commands/` | Slash commands | All |
+| `.mcp.json` | Project MCP servers | All |
+
+Settings paths are fixed per scope. There is no environment variable or flag that redirects them elsewhere.
 
 ### Project-Level Files
 
 ```
 .claude/
-├── config.json                    # Main configuration
+├── settings.json                  # Project settings (committed)
+├── settings.local.json            # Personal overrides (gitignored)
 ├── CLAUDE.md                      # Project context
 ├── memory.md                      # Session memory
-├── cost-log.json                  # Cost tracking (if enabled)
 ├── skills/                        # Custom skills
 │   ├── my-skill/
 │   │   └── SKILL.md
@@ -1205,7 +1126,7 @@ Required environment variables:
 
 ### Related Guides
 
-- [Creating Custom Agents](../03-agents/4-custom-agents.md) - Using AGENT.md schema
+- [Creating Custom Agents](../03-agents/4-custom-agents.md) - Using subagent file schema
 - [Creating Custom Skills](../04-skills/3-creating-skills.md) - Using SKILL.md schema
 - [Creating Slash Commands](../10-keywords/2-slash-commands.md) - Using command schema
 - [CLAUDE.md Files](../09-context/2-claude-md.md) - Project context structure

@@ -95,17 +95,24 @@ claude --model=haiku "Audit code for security vulnerabilities"
 
 ## Configuration Examples
 
-### Agent Configuration
+### Subagent Configuration
 
-`.claude/config.json`:
+Each subagent carries its own model. `.claude/agents/code-searcher.md`:
+```markdown
+---
+name: code-searcher
+description: Locates files, symbols, and usage patterns across the codebase
+model: haiku
+tools: Read, Glob, Grep
+---
+
+Report file paths with line numbers. Do not modify files.
+```
+
+To make Haiku the session default instead, set it in `.claude/settings.json`:
 ```json
 {
-  "agents": {
-    "Explore": {
-      "model": "haiku",
-      "description": "Fast searches don't need Sonnet"
-    }
-  }
+  "model": "haiku"
 }
 ```
 
@@ -116,7 +123,6 @@ claude --model=haiku "Audit code for security vulnerabilities"
 ---
 name: code-formatter
 model: haiku  # Perfect for rule-based formatting
-costEstimate: 3000
 ---
 ```
 

@@ -505,13 +505,6 @@ tools:
   - Edit
   - Grep
   - Glob
-constraints:
-  allowedPaths:
-    - "src/components/**"
-    - "src/pages/**"
-  deniedPaths:
-    - "src/server/**"
-    - ".env*"
 ---
 
 # Frontend Specialist
@@ -530,17 +523,9 @@ I specialize in React component development with TypeScript.
 - Write tests alongside components
 ```
 
-**2. Configure in `.claude/config.json`**:
-```json
-{
-  "agents": {
-    "frontend-specialist": {
-      "model": "sonnet",
-      "timeout": 180000
-    }
-  }
-}
-```
+**2. No settings entry needed**:
+
+Everything about a subagent — its model, tools, and permissions — lives in that file's frontmatter. `settings.json` has no `agents` key. Dropping the file into `.claude/agents/` (or `~/.claude/agents/` for all projects) is all the registration required.
 
 **3. Use the agent**:
 ```bash
@@ -628,8 +613,7 @@ You: "Use backend-specialist to create login API endpoint"
 - Clear conversation history
 
 **Solutions**:
-- Break tasks into smaller pieces
-- Increase timeout in config
+- Break tasks into smaller pieces (there is no agent timeout setting to raise)
 - Use faster model (Haiku)
 - Reduce context size
 
@@ -649,8 +633,11 @@ You: "Use Explore agent to find all API routes"
 
 **2. Check configuration**:
 ```bash
-# Verify agent config loaded
-cat .claude/config.json | jq .agents
+# Subagents are files, not settings entries — list them
+ls .claude/agents/ ~/.claude/agents/
+
+# Inspect a subagent's frontmatter
+head -10 .claude/agents/frontend.md
 ```
 
 **3. Monitor execution**:
@@ -744,10 +731,8 @@ Create `.claude/skills/code-review/SKILL.md`:
 ```yaml
 ---
 name: code-review
-version: 1.0.0
 description: Comprehensive code review covering quality, security, and performance with configurable depth
 model: claude-sonnet-4-5
-tags: ["code-quality", "security", "review"]
 ---
 
 # Code Review Skill
@@ -820,7 +805,6 @@ You: "Review src/api/users.ts for code quality"
 ```yaml
 # Add specific keywords user might mention
 description: "API documentation generator for REST endpoints with OpenAPI/Swagger output including curl examples"
-tags: ["api", "rest", "swagger", "documentation", "curl"]
 ```
 
 **3. Wrong directory**:
@@ -862,7 +846,6 @@ You: "Generate API documentation with OpenAPI spec"
 ---
 name: tdd-workflow
 description: Test-driven development workflow
-dependencies: ["testing-utils"]
 ---
 
 # TDD Workflow
@@ -922,13 +905,13 @@ You: "Standard code review of medium file"
 You: "Deep code review of large refactoring"
 ```
 
-**4. Model overrides** (if configured):
+**4. Check the skill's own `model` and `effort`** — a skill has exactly one model, set in its
+frontmatter, and it applies for the remainder of the invoking turn:
 ```yaml
-modelOverrides:
-  quick: claude-haiku-4-5
-  standard: claude-sonnet-4-5
-  deep: claude-opus-4-5
+model: sonnet
+effort: low
 ```
+For a quick pass and a deep pass, that is two skills, not one skill with two models.
 
 ```bash
 # Test each override
@@ -1079,28 +1062,36 @@ You: "Use Opus model to design authentication architecture"
 
 **Yes!** This is a powerful cost-optimization strategy.
 
-**Configuration** (`.claude/config.json`):
-```json
-{
-  "agents": {
-    "Explore": {
-      "model": "haiku"  // Fast searches
-    },
-    "general-purpose": {
-      "model": "sonnet"  // Standard coding
-    },
-    "Plan": {
-      "model": "opus"  // Complex planning
-    },
-    "frontend-specialist": {
-      "model": "sonnet"
-    },
-    "quick-formatter": {
-      "model": "haiku"  // Simple formatting
-    }
-  }
-}
+**Configuration**: set `model` in each subagent's frontmatter, in its own file under `.claude/agents/`. There is no central map of agents to models.
+
+```yaml
+# .claude/agents/explore.md — fast searches
+---
+name: explore
+description: Read-only codebase exploration
+model: haiku
+---
 ```
+
+```yaml
+# .claude/agents/plan.md — complex planning
+---
+name: plan
+description: Architecture and implementation planning
+model: opus
+---
+```
+
+```yaml
+# .claude/agents/quick-formatter.md — simple formatting
+---
+name: quick-formatter
+description: Mechanical reformatting of files
+model: haiku
+---
+```
+
+Omitting `model` leaves the subagent at `inherit`, meaning it runs on whatever model the session is using. The session default comes from `"model"` in `settings.json`.
 
 **Cost savings**:
 ```
@@ -1423,9 +1414,6 @@ PostgreSQL with Prisma ORM
 {
   "agents": {
     "frontend-only": {
-      "constraints": {
-        "allowedPaths": ["src/frontend/**"]
-      }
     }
   }
 }
@@ -1585,7 +1573,7 @@ npm run build    # Production build
   "agents": {
     "Explore": {"model": "haiku"}
   },
-  "defaultModel": "haiku"
+  "model": "haiku"
 }
 ```
 
@@ -1604,9 +1592,6 @@ npm run build    # Production build
 **4. Use focused agents** with path constraints:
 ```json
 {
-  "constraints": {
-    "allowedPaths": ["src/components/**"]
-  }
 }
 ```
 
@@ -1626,16 +1611,11 @@ npm run build    # Production build
 ✅ "Fix these three files: file1, file2, file3"
 ```
 
-**9. Configure cost tracking**:
-```json
-{
-  "costTracking": {
-    "enabled": true,
-    "dailyBudget": 50000,
-    "alertThreshold": 0.8
-  }
-}
-```
+**9. Track what you actually spend** with `/usage`
+
+There is no cost-tracking or budget key in settings. `/usage` reports session tokens and
+cost, and on paid plans attributes recent usage to individual skills, subagents, plugins,
+and MCP servers.
 
 **10. Use Explore agent** for read-only tasks (cheaper, faster)
 
@@ -1650,36 +1630,29 @@ npm run build    # Production build
 **Optimal configuration** (balances cost + quality):
 
 ```json
+Two layers, because settings has no per-agent key.
+
+`.claude/settings.json` sets the session default:
+```json
 {
-  "agents": {
-    "Explore": {
-      "model": "haiku",
-      "description": "Fast codebase searches"
-    },
-    "general-purpose": {
-      "model": "haiku",
-      "description": "Routine coding tasks",
-      "upgrade_to_sonnet_for": [
-        "complex refactoring",
-        "architecture changes",
-        "critical bug fixes"
-      ]
-    },
-    "Plan": {
-      "model": "sonnet",
-      "description": "Planning and architecture"
-    }
-  },
-
-  "defaultModel": "haiku",
-
-  "costTracking": {
-    "enabled": true,
-    "dailyBudget": 100000,
-    "alertThreshold": 0.8
-  }
+  "model": "haiku",
+  "fallbackModel": "sonnet"
 }
 ```
+
+Then each custom subagent pins its own model in its own file. `.claude/agents/planner.md`:
+```markdown
+---
+name: planner
+description: Plans architecture and multi-file changes before implementation
+model: sonnet
+---
+
+Produce a written plan with trade-offs before proposing code.
+```
+
+Built-in agents (Explore, Plan, general-purpose) have no file, so their models cannot be
+reassigned — Explore already runs on a fast, cheap model.
 
 **Rationale**:
 - **Explore → Haiku**: Searches don't need deep reasoning (3x savings)
@@ -1719,116 +1692,75 @@ Savings: $184.50/month (41%)
 
 ### How do I track my token usage?
 
-**Method 1: Enable cost tracking** (recommended):
+**Method 1: `/usage`** (recommended):
 
-**Configure** (`.claude/config.json`):
-```json
-{
-  "costTracking": {
-    "enabled": true,
-    "dailyBudget": 100000,
-    "alertThreshold": 0.8,
-    "logFile": ".claude/cost-log.json"
-  }
-}
-```
-
-**View logs**:
-```bash
-cat .claude/cost-log.json | jq .
-
-# Shows:
-# - Tokens per operation
-# - Cost per operation
-# - Model used
-# - Timestamp
-# - Daily totals
-```
-
-**Example log**:
-```json
-{
-  "date": "2025-01-15",
-  "operations": [
-    {
-      "timestamp": "2025-01-15T10:30:00Z",
-      "agent": "Explore",
-      "model": "haiku",
-      "inputTokens": 5000,
-      "outputTokens": 3000,
-      "cost": 0.02,
-      "task": "Find API endpoints"
-    }
-  ],
-  "dailyTotal": {
-    "cost": 8.45,
-    "tokensSaved": 45000,
-    "estimatedSavings": "65% vs all-Sonnet"
-  }
-}
-```
-
-**Method 2: Use `/usage` command**:
-```bash
+```text
 /usage
-
-# Shows:
-# - Current session tokens
-# - Today's usage
-# - Monthly usage
-# - Model distribution
 ```
 
-**Method 3: Claude Pro dashboard**:
-- Visit claude.com/account
-- View usage statistics
-- See remaining daily/monthly limits
+The Session block shows token counts and a locally computed cost, broken down by model:
+
+```text
+Total cost:            $0.55
+Total duration (API):  6m 20s
+Usage by model:
+   claude-sonnet-4-6:  1.2k input, 5.3k output, 940.0k cache read, 50.0k cache write ($0.55)
+```
+
+On a Pro, Max, Team, or Enterprise plan it also attributes recent usage to skills, subagents,
+plugins, and individual MCP servers as a percentage of the total, and flags any behavior
+accounting for 10% or more — long context and cache misses being the usual culprits. Press
+`d` or `w` for the 24-hour or 7-day window.
+
+Two caveats: the dollar figure is computed locally at list rates, so it ignores promotional or
+contracted pricing; and it is built from local session history, so usage from other machines
+or from claude.ai is not included. Totals reset when `/clear` starts a new session.
+
+**Method 2: `/context`** — shows what is occupying the context window right now, which is
+usually the reason a session got expensive.
+
+**Method 3: Console usage page** — [platform.claude.com/usage](https://platform.claude.com/usage)
+is the authoritative billing view.
+
+**Method 4: OpenTelemetry export** — streams per-user token and cost metrics into your own
+observability stack. The only option that works on every setup, including cloud providers.
 
 ---
 
 ### Can I set a daily budget?
 
-**Yes!** Configure in `.claude/config.json`:
+**Not locally.** Claude Code has no settings key that caps spend on your machine — no
+`dailyBudget`, no `alertThreshold`, no local enforcement. Anything claiming otherwise is
+describing a feature that does not exist.
 
-```json
-{
-  "costTracking": {
-    "enabled": true,
-    "dailyBudget": 50000,     // 50,000 tokens/day
-    "alertThreshold": 0.8,     // Alert at 80%
-    "logFile": ".claude/cost-log.json"
-  }
-}
+What does exist:
+
+| Where you work | Cap available |
+|----------------|---------------|
+| Teams or Enterprise plan | Seat allowance is the default ceiling. Turn on usage credits and set spend limits per organization, group, or member in admin settings. |
+| Claude Console (API) | Workspace spend limits, set per workspace in the Console. |
+| Bedrock, Google Cloud, Microsoft Foundry | Your cloud provider's budget controls. |
+
+So budget enforcement is an organization-level control, not a per-developer one.
+
+**What you can do locally** is watch usage and reduce it:
+
+```text
+/usage      # tokens, cost, and per-skill/subagent attribution
+/context    # what is occupying the window right now
 ```
 
-**How it works**:
+If `/usage` flags long context or cache misses at 10% or more of recent usage, that is your
+lever — see [Context Engineering](../09-context/4-context-engineering.md).
 
-**At 80% (40,000 tokens)**:
-```
-⚠️  [Claude]: You've used 80% of daily budget (40,000/50,000 tokens)
-```
+**Rough monthly expectations**, for planning rather than enforcement: across enterprise
+deployments the average is around $13 per developer per active day, or $150–250 per developer
+per month, with 90% of users staying under $30 per active day.
 
-**At 100% (50,000 tokens)**:
-```
-🛑 [Claude]: Daily budget reached (50,000/50,000 tokens)
-      Recommend upgrading to higher tier or waiting until tomorrow
-```
-
-**Budget doesn't hard-block** but provides warnings to manage usage.
-
-**Setting appropriate budgets**:
-
-| Usage Level | Daily Budget | Monthly Cost (estimated) |
-|-------------|--------------|--------------------------|
-| Light (personal) | 25,000 | ~$15-30 |
-| Medium (professional) | 100,000 | ~$60-120 |
-| Heavy (team) | 500,000 | ~$300-600 |
-
-**Tips**:
-- Start conservative, adjust based on actual usage
-- Set alerts at 70-80% to avoid surprises
-- Review logs weekly to optimize
-- Use Haiku by default to stretch budget
+**Habits that actually reduce spend**:
+- `/clear` between unrelated tasks, so you stop paying to carry old context
+- Match the model to the job rather than leaving Opus as the default
+- Move long procedures out of CLAUDE.md into skills, so they load only when used
 
 ---
 
@@ -1897,9 +1829,6 @@ Savings: Eliminates repeated context
 {
   "agents": {
     "frontend-only": {
-      "constraints": {
-        "allowedPaths": ["src/frontend/**"]
-      }
     }
   }
 }
@@ -1997,13 +1926,6 @@ command: review
 description: Code review with configurable depth
 usage: /review [--quick | --standard | --deep] <file>
 model: sonnet
-options:
-  - name: quick
-    type: boolean
-    default: false
-  - name: deep
-    type: boolean
-    default: false
 ---
 
 # Code Review Command
@@ -2183,9 +2105,6 @@ Performs quick review of users.ts
   "agents": {
     "strict-tester": {
       "description": "Never allows code without tests",
-      "constraints": {
-        "requireTests": true
-      }
     }
   }
 }

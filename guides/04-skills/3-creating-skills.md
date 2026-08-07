@@ -121,8 +121,8 @@ Expected output:
 # From your project root
 claude "Format my TypeScript files using the code-formatter skill"
 
-# Or with slash command (if configured)
-/format src/app.ts
+# Or invoke it directly — the command name is the directory name
+/code-formatter src/app.ts
 ```
 
 **Expected Behavior:**
@@ -166,42 +166,12 @@ claude "Format my TypeScript files using the code-formatter skill"
 
 ````markdown
 ---
-name: code-review
-version: 1.0.0
-author: Your Name <you@example.com>
-description: Automated code review with configurable depth
+description: Reviews code for correctness, style, security, and missing error handling. Use when the user asks for a code review, mentions reviewing a PR, or asks to check changes before committing.
+when_to_use: review this code, check my PR, look over these changes
 model: sonnet
-category: quality
-tags:
-  - code-review
-  - quality
-  - testing
-autoTrigger:
-  patterns:
-    - "review.*code"
-    - "check.*pr"
-    - "code.*review"
-  confidence: 0.85
-slashCommand: /code-review
-options:
-  - name: deep
-    type: boolean
-    default: false
-    description: Run comprehensive review
-  - name: security
-    type: boolean
-    default: false
-    description: Focus on security issues
-  - name: performance
-    type: boolean
-    default: false
-    description: Focus on performance
-dependencies:
-  - eslint
-  - prettier
-costEstimate:
-  quick: 5000
-  deep: 20000
+effort: medium
+argument-hint: "[file-or-directory]"
+allowed-tools: Read Grep Glob Bash(npx eslint *) Bash(npx prettier *)
 ---
 
 # Code Review Skill
@@ -564,66 +534,62 @@ When executing this skill:
 
 ### Complete Frontmatter Options
 
+Every field is optional. Only `description` is recommended, since it is what Claude reads to
+decide whether the skill applies.
+
 ```yaml
 ---
-# Required Fields
-name: string                    # Skill identifier (kebab-case)
-version: string                 # Semantic version (1.0.0)
-description: string             # Short description (< 100 chars)
+# Discovery — how Claude decides to use this skill
+description: string             # What it does AND when to use it. This is the trigger.
+when_to_use: string             # Extra trigger phrases; appended to description
+paths: string | string[]        # Globs; auto-activate only for matching files
+name: string                    # Display label in listings. Max 64 chars, lowercase +
+                                # hyphens. Does NOT set the command name.
 
-# Optional Metadata
-author: string                  # Author name <email>
-license: string                 # License (MIT, Apache-2.0, etc.)
-repository: string              # Git repository URL
-homepage: string                # Documentation URL
-category: string                # Category (quality, testing, docs, etc.)
-tags: string[]                  # Search tags
+# Invocation control
+disable-model-invocation: boolean  # true = never auto-load; manual /name only
+user-invocable: boolean         # false = hide from the / menu (background knowledge)
+argument-hint: string           # Autocomplete hint, e.g. "[issue-number]"
+arguments: string | string[]    # Named positional args for $name substitution
 
-# Model Configuration
-model: "haiku" | "sonnet" | "opus"  # Default model
-maxTokens: number               # Max tokens for skill execution
-temperature: number             # Model temperature (0.0-1.0)
+# Model and reasoning
+model: string                   # haiku | sonnet | opus | fable | full ID | inherit
+                                # Applies for the REMAINDER OF THE CURRENT TURN only;
+                                # not saved to settings
+effort: string                  # low | medium | high | xhigh | max
 
-# Auto-Triggering
-autoTrigger:
-  patterns: string[]            # Regex patterns to match
-  confidence: number            # Match threshold (0.0-1.0)
-  enabled: boolean              # Enable auto-trigger
+# Tool access
+allowed-tools: string | string[]     # Pre-approved for the invoking turn
+disallowed-tools: string | string[]  # Removed while this skill is active
 
-# Slash Command
-slashCommand: string            # Slash command (e.g., /code-review)
-aliases: string[]               # Command aliases
+# Execution context
+context: string                 # "fork" runs it in an isolated subagent context
+agent: string                   # Which subagent type, when context: fork
+background: boolean             # With context: fork, false waits for the result
 
-# Options/Flags
-options:
-  - name: string                # Option name
-    type: "boolean" | "string" | "number"
-    default: any                # Default value
-    description: string         # Help text
-    required: boolean           # Is required?
-
-# Dependencies
-dependencies: string[]          # Required tools (eslint, prettier, etc.)
-requiredTools: string[]         # Required Claude tools (Read, Bash, etc.)
-mcpServers: string[]            # Required MCP servers
-
-# Cost Estimation
-costEstimate:
-  [key: string]: number         # Token estimates for different modes
-
-# Agent Configuration
-agent:
-  type: string                  # Preferred agent (Explore, general-purpose)
-  tools: string[]               # Required tools for agent
-  constraints:
-    allowedPaths: string[]
-    deniedPaths: string[]
-
-# Testing
-testFiles: string[]             # Test file paths
-examples: string[]              # Example usage files
+# Other
+hooks: object                   # Lifecycle hooks scoped to this skill
+shell: string                   # bash (default) or powershell for inline commands
 ---
 ```
+
+**The command name comes from the directory**, not from `name`:
+`.claude/skills/code-review/SKILL.md` → `/code-review`.
+
+`description` and `when_to_use` are truncated together at **1,536 characters** in the skill
+listing, so lead with the primary use case.
+
+> ⚠️ **Fields that do not exist.** Older guides and generated examples sometimes show
+> `version`, `author`, `license`, `repository`, `homepage`, `category`, `tags`, `options`,
+> `dependencies`, `requiredTools`, `mcpServers`, `maxTokens`, `temperature`, `testFiles`,
+> `costEstimate`, `approvalRequired`, `autoTrigger`, or `slashCommand`. None of these are read.
+> They are silently ignored, which is why they are easy to keep copying — nothing errors.
+>
+> Where you want the behavior they imply: use separate skills instead of `options`, `effort`
+> instead of `temperature`, `allowed-tools` instead of `requiredTools`, and an `evals/`
+> directory instead of `testFiles`.
+
+---
 
 ---
 
@@ -744,25 +710,9 @@ Additional performance-specific instructions
 ````markdown
 ---
 name: tdd-workflow
-version: 2.0.0
-description: Test-Driven Development workflow with strict enforcement
+description: Guides a strict red-green-refactor Test-Driven Development cycle for a new feature.
+when_to_use: TDD, test-driven, write the test first, red green refactor
 model: sonnet
-category: testing
-autoTrigger:
-  patterns:
-    - "tdd.*"
-    - "test.*driven"
-  confidence: 0.9
-slashCommand: /tdd
-options:
-  - name: coverage
-    type: number
-    default: 80
-    description: Minimum test coverage percentage
-  - name: strict
-    type: boolean
-    default: true
-    description: Enforce TDD cycle strictly
 ---
 
 # TDD Workflow Skill
@@ -804,7 +754,8 @@ I will guide you through the TDD cycle:
 ## Example
 
 ```bash
-/tdd "Add user authentication"
+# Command name comes from the directory: .claude/skills/tdd-workflow/
+/tdd-workflow "Add user authentication"
 ```
 
 **Step 1: 🔴 Red**
@@ -884,27 +835,9 @@ Support different test types:
 ````markdown
 ---
 name: api-scaffold
-version: 1.0.0
-description: Generate REST API boilerplate with tests
+description: Generates REST API route, controller, model, and test boilerplate for a resource.
+when_to_use: scaffold an endpoint, generate CRUD routes, add a new API resource
 model: sonnet
-category: backend
-slashCommand: /api
-options:
-  - name: type
-    type: string
-    default: "rest"
-    description: API type (rest, graphql)
-  - name: auth
-    type: boolean
-    default: true
-    description: Include authentication
-  - name: tests
-    type: boolean
-    default: true
-    description: Generate tests
-dependencies:
-  - express
-  - jest
 ---
 
 # API Scaffold Skill
@@ -913,7 +846,8 @@ dependencies:
 
 ## Instructions
 
-When invoked with a resource name (e.g., `/api User`), generate:
+When invoked with a resource name (e.g., `/api-scaffold User` — the command name comes from the
+skill's directory), generate:
 
 ### 1. Route File
 
@@ -960,7 +894,7 @@ Generate OpenAPI/Swagger documentation
 ## Example
 
 ```bash
-/api User --auth=true --tests=true
+/api-scaffold User --auth=true --tests=true
 ```
 
 **Generated Files:**
@@ -1120,7 +1054,7 @@ Generate GraphQL schema, resolvers, and type definitions instead of REST routes.
 **Example:**
 
 ```bash
-/api User --type=graphql
+/api-scaffold User --type=graphql
 ```
 
 Generates:
@@ -1134,112 +1068,81 @@ Generates:
 
 ---
 
-## Testing Your Skills
+## Evaluating Your Skills
 
-### Test Framework Structure
+### Write Evaluations First
 
-Create `.claude/skills/your-skill/tests/`:
+The instinct is to write the skill, then check whether it works. Reverse that. Evaluations written first tell you what the skill needs to fix; evaluations written last tend to describe whatever the skill already happens to do.
 
-```
-your-skill/
-├── SKILL.md
-├── tests/
-│   ├── test.md           # Test cases
-│   ├── fixtures/         # Test data
-│   │   ├── input1.ts
-│   │   └── expected1.ts
-│   └── run-tests.sh      # Test runner
-└── config.json
-```
+1. **Find the gap.** Run Claude on a few representative tasks with no skill loaded. Write down the specific failures — the context it lacked, the step it skipped, the convention it got wrong.
+2. **Turn each failure into a test case.** Three is enough to start.
+3. **Record the baseline.** Note how Claude performed without the skill, so you have something to compare against.
+4. **Write the minimum instructions** that close those gaps and pass the cases.
+5. **Iterate.** Re-run, compare to baseline, refine.
+
+This keeps you from documenting problems you imagined instead of the ones you have.
 
 ### Test Case Format
 
-`.claude/skills/code-review/tests/test.md`:
+Evaluations live in an `evals/` directory inside the skill:
 
-```markdown
-# Code Review Skill Tests
+```text
+code-review/
+├── SKILL.md
+├── evals/
+│   ├── evals.json          # Test cases
+│   └── fixtures/           # Input files the cases reference
+│       ├── clean-code.ts
+│       └── sql-injection.ts
+└── reference/
+```
 
-## Test 1: Quick Review - Clean Code
+`evals/evals.json` holds the prompt, the expected result described in prose, and any input files:
 
-**Input:**
-```typescript
-// fixtures/clean-code.ts
-export function add(a: number, b: number): number {
-  return a + b
+```json
+{
+  "skill_name": "code-review",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review this file for security issues",
+      "expected_output": "Flags the string-interpolated SQL query and recommends parameterized queries",
+      "files": ["fixtures/sql-injection.ts"]
+    },
+    {
+      "id": 2,
+      "prompt": "Review this file for security issues",
+      "expected_output": "Reports no security issues; does not invent problems in correct code",
+      "files": ["fixtures/clean-code.ts"]
+    }
+  ]
 }
 ```
 
-**Command:** `/code-review`
+Note what `expected_output` is: a description of what a good answer contains, not the answer itself. Model output varies between runs, so a skill that works correctly will word the same finding differently each time. Comparing against fixed text — with `diff`, exact string match, or a snapshot — fails on rewording while missing real regressions in substance.
 
-**Expected Output:**
-- ✅ No syntax errors
-- ✅ Code style good
-- ✅ No issues found
+The second case above matters as much as the first. A review skill that flags problems in clean code is worse than no skill, and you will only notice if you test for it.
 
-**Actual Output:** [Fill during test]
+### Running Evaluations
 
-**Status:** ✅ Pass / ❌ Fail
+The `skill-creator` plugin runs the comparison loop for you:
 
----
-
-## Test 2: Quick Review - Security Issue
-
-**Input:**
-```typescript
-// fixtures/sql-injection.ts
-export function getUser(id: string) {
-  const query = `SELECT * FROM users WHERE id = '${id}'`
-  return db.query(query)
-}
+```text
+/plugin install skill-creator@claude-plugins-official
+/reload-plugins
 ```
 
-**Command:** `/code-review`
+Then ask Claude to evaluate the skill by name, such as `evaluate my code-review skill with skill-creator`. For each case it runs two subagents — one with the skill, one without — grades each assertion with evidence, and aggregates pass rate, token count, and duration so you can weigh the quality gain against the token cost.
 
-**Expected Output:**
-- ❌ SQL injection vulnerability at line 2
-- 💡 Suggestion: Use parameterized queries
+Run evaluations in a fresh session. Testing in the session where you wrote the skill measures your conversation rather than your SKILL.md, and hides exactly the instructions you forgot to write down.
 
-**Actual Output:** [Fill during test]
+**Before you share a skill**, verify:
 
-**Status:** ✅ Pass / ❌ Fail
-```
+- At least three evaluations exist and pass
+- The skill has been tested with every model you plan to run it on — instructions sufficient for Opus often underspecify for Haiku
+- The skill triggers on prompts it should, and stays quiet on prompts it should not
 
-### Automated Test Runner
-
-`.claude/skills/code-review/tests/run-tests.sh`:
-
-```bash
-#!/bin/bash
-
-echo "Running Code Review Skill Tests..."
-
-SKILL_DIR=".claude/skills/code-review"
-TESTS_DIR="$SKILL_DIR/tests"
-FIXTURES_DIR="$TESTS_DIR/fixtures"
-
-# Test 1: Clean code
-echo "Test 1: Clean Code Review..."
-claude --skill=code-review "$FIXTURES_DIR/clean-code.ts" > /tmp/test1-output.txt
-if grep -q "No issues found" /tmp/test1-output.txt; then
-  echo "✅ Test 1 PASS"
-else
-  echo "❌ Test 1 FAIL"
-fi
-
-# Test 2: Security issue
-echo "Test 2: Security Issue Detection..."
-claude --skill=code-review "$FIXTURES_DIR/sql-injection.ts" > /tmp/test2-output.txt
-if grep -q "SQL injection" /tmp/test2-output.txt; then
-  echo "✅ Test 2 PASS"
-else
-  echo "❌ Test 2 FAIL"
-fi
-
-# Cleanup
-rm /tmp/test1-output.txt /tmp/test2-output.txt
-
-echo "Tests complete!"
-```
+For baseline comparison, assertion design, trigger accuracy, and benchmarking in depth, see [Advanced Patterns](5-advanced-patterns.md#advanced-evaluation-patterns).
 
 ---
 
@@ -1325,7 +1228,6 @@ Just run the skill and it works!
 ```yaml
 ---
 name: code-review
-version: 1.2.0
 ---
 ```
 
@@ -1352,16 +1254,21 @@ name: code-review
 
 ---
 
-### 5. ✅ Document Cost
+### 5. ✅ Choose the Cheapest Model That Passes Your Evals
+
+There is no `costEstimate` field, and a number you wrote by hand would drift anyway. Declare
+the model and effort you actually want, then verify the choice against your eval set.
 
 **Good:**
 ```yaml
 ---
-costEstimate:
-  quick: 5000      # ~$0.08
-  deep: 20000      # ~$0.30
+description: Formats code with Prettier. Use when the user asks to format or clean up formatting.
+model: haiku
+effort: low
 ---
 ```
+
+Measure the result with `/usage`, which attributes recent usage to individual skills.
 
 **Bad:**
 ```yaml
@@ -1377,11 +1284,6 @@ costEstimate:
 **Good:**
 ```yaml
 ---
-options:
-  - name: coverage
-    type: number
-    default: 80
-    description: Minimum test coverage percentage
 ---
 ```
 
@@ -1445,21 +1347,12 @@ Run the formatter on the file.
 ### ❌ Pitfall 3: Unclear Options
 
 ```yaml
-options:
-  - name: mode
-    type: string
 ```
 
 **Problem:** What modes are valid? What do they do?
 
 **Fix:**
 ```yaml
-options:
-  - name: mode
-    type: string
-    default: "quick"
-    description: "Review mode: quick, standard, deep"
-    enum: ["quick", "standard", "deep"]
 ```
 
 ---
@@ -1497,11 +1390,16 @@ options:
 
 **Option 3: Team/Company Internal**
 
-1. Create internal Git repository
+1. Package the skills as a plugin and host a private marketplace in an internal repository
 2. Share install instructions:
-   ```bash
-   claude skills install git@internal.company.com/skills/company-standards
+   ```text
+   /plugin marketplace add <your-org>/<your-marketplace-repo>
+   /plugin install company-standards@<your-marketplace>
+   /reload-plugins
    ```
+   A marketplace in a private repository stays internal to people with repo access.
+3. Or, for a single project, commit `.claude/skills/` directly — teammates get the skills on
+   clone with nothing to install
 
 ---
 
@@ -1509,13 +1407,14 @@ options:
 
 ### Template 1: Simple Utility Skill
 
+Save as `.claude/skills/my-utility/SKILL.md` — the directory name is the command (`/my-utility`).
+
 ```markdown
 ---
 name: my-utility
-version: 1.0.0
-description: Short description of what it does
+description: Does [what], for [when]. This is what Claude reads to decide to invoke it.
+when_to_use: phrase a user would say, another phrasing
 model: haiku
-slashCommand: /utility
 ---
 
 # My Utility Skill
@@ -1538,20 +1437,14 @@ slashCommand: /utility
 
 ### Template 2: Code Generation Skill
 
+Save as `.claude/skills/generator-name/SKILL.md` — invoked as `/generator-name`.
+
 ```markdown
 ---
 name: generator-name
-version: 1.0.0
-description: Generate [what]
+description: Generates [what] with [features], including tests.
+when_to_use: scaffold [what], create a new [what], generate [what]
 model: sonnet
-slashCommand: /generate
-options:
-  - name: framework
-    type: string
-    default: "react"
-  - name: tests
-    type: boolean
-    default: true
 ---
 
 # [Generator Name] Skill
@@ -1577,17 +1470,14 @@ When invoked, generate:
 
 ### Template 3: Review/Audit Skill
 
+Save as `.claude/skills/review-type/SKILL.md` — invoked as `/review-type`.
+
 ```markdown
 ---
 name: review-type
-version: 1.0.0
-description: Review [what] for [criteria]
+description: Reviews [what] for [criteria] and reports issues by severity.
+when_to_use: review [what], audit [what], check [what] before merging
 model: sonnet
-slashCommand: /review
-options:
-  - name: deep
-    type: boolean
-    default: false
 ---
 
 # [Review Type] Skill
@@ -1635,13 +1525,14 @@ Learn to assign different models to skills for cost optimization.
 
 ### SKILL.md Minimal Template
 
+`.claude/skills/skill-name/SKILL.md` → `/skill-name`
+
 ```markdown
 ---
 name: skill-name
-version: 1.0.0
-description: One-line description
+description: One line covering what it does and when Claude should use it.
+when_to_use: example request, another example request
 model: sonnet
-slashCommand: /command
 ---
 
 # Skill Name
@@ -1666,7 +1557,7 @@ Which tools to use and when
 - [ ] Test error cases (missing files, etc.)
 - [ ] Test with different file types
 - [ ] Test cost estimates are accurate
-- [ ] Test auto-trigger patterns work
+- [ ] Test that Claude auto-invokes it from the phrasings in `description` / `when_to_use`
 
 ---
 

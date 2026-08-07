@@ -7,6 +7,71 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+**Prompt Engineering** (6 guides)
+- `guides/02-prompt-basics/` — the four-part prompt formula and seven core patterns
+- `guides/17-advanced-prompting/` — chain-of-thought, few-shot, context optimization, cost-aware prompting
+
+**Context Engineering**
+- `guides/09-context/4-context-engineering.md` — the runtime counterpart to the existing
+  CLAUDE.md authoring guides. Attention budget and context rot, subagent context isolation,
+  just-in-time retrieval, compaction versus clearing, and diagnosis with `/context` and `/usage`.
+
+**Loops and Scheduling**
+- `guides/03-agents/6-loops-and-scheduling.md` — the counterpart to orchestration: how a single
+  agent keeps going without a prompt each step. `/goal` (condition-driven, including the
+  evaluator's blind spot — it only sees the conversation), `/loop` (interval-driven, three
+  modes, `loop.md`), cron scheduling with its jitter and seven-day expiry, polling versus
+  Monitor and Channels, and the routines/desktop/`/loop` comparison for unattended work.
+
+**Orchestration**
+- `guides/03-agents/5-orchestration-patterns.md` — multi-agent topology using the
+  graph-engineering vocabulary, scoped to what Claude Code actually provides. Fan-out/fan-in,
+  pipelines, supervisor delegation, nested delegation, and verification, plus the real
+  concurrency limits and an explicit statement of where Claude Code stops.
+
+### Fixed — Documented APIs That Did Not Exist
+
+A verification pass against the official Claude Code documentation found several
+mechanisms documented throughout these guides that do not exist. Readers following them
+would have created files Claude Code never reads and run commands that do not resolve.
+
+- **`.claude/config.json`** (52 references, 23 files) — never a Claude Code file. Migrated to
+  `.claude/settings.json`, restructuring the schemas that do not map across: per-agent models
+  live in `.claude/agents/<name>.md` frontmatter, per-skill models in the skill's own
+  `SKILL.md`, and `hooks`/`permissions`/`env` stay as real settings keys.
+- **`costTracking`, `cost-log.json`, `budgets`, `teamBudgets`, `dailyBudget`** — no local cost
+  tracking or budget enforcement exists. Replaced with `/usage` (which does per-skill,
+  per-subagent, per-plugin attribution), `/context`, the Console usage page, and
+  OpenTelemetry export. Spend caps are organization-level only.
+- **`claude --skill=<name>` and `@claude/skill-testing`** — skills are invoked with
+  `/skill-name`, or `claude -p "/skill-name ..."` non-interactively. The npm package does not exist.
+- **`modelOverrides`** — a skill has one model. Cascades are separate skills, or the `effort` dial.
+- **Fabricated frontmatter fields** — removed `version`, `author`, `category`, `tags`,
+  `options`, `dependencies`, `requiredTools`, `mcpServers`, `costEstimate`, `approvalRequired`
+  from SKILL.md, and `constraints`/`allowedPaths`/`deniedPaths`/`timeout` from agent files.
+  Documented the real fields the guides had omitted, including `when_to_use`, `paths`,
+  `effort`, `disallowed-tools`, `user-invocable`, and `context: fork`.
+- **`CLAUDE_CONFIG_PATH`, `defaultModel`, `defaultSkillModel`** — settings paths are fixed per
+  scope; the model key is `model`.
+- **Exact-match skill testing** — `diff -q` and snapshot assertions were recommended against
+  model-generated output, which fails on harmless rewording while missing real regressions.
+  Replaced with the real evaluation framework: `evals/evals.json`, with-skill versus
+  without-skill baseline comparison, assertion plus rubric grading, benchmark pass rate
+  against tokens, and trigger-accuracy tuning via `skill-creator`.
+- **Unsourced quality benchmarks** — tables asserting figures such as "97% quality" with no
+  methodology, and contradicting themselves. Replaced with task-type guidance and
+  instructions to measure.
+
+### Changed
+- Model pricing updated to current rates (Haiku $1/$5, Sonnet $3/$15, Opus $5/$25 per 1M tokens)
+- `guides/05-commands/1-overview.md` documents that custom commands and skills are now one
+  system — `.claude/commands/deploy.md` and `.claude/skills/deploy/SKILL.md` both create `/deploy`
+- CLAUDE.md size guidance corrected to under 200 lines
+- Memory documentation corrected: there is no `.claude/memory.md`. Auto memory lives at
+  `~/.claude/projects/<project>/memory/`, where `MEMORY.md` loads at 200 lines or 25KB
+
 ### Planned
 - Go microservices template
 - Rust project template

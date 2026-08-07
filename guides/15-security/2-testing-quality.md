@@ -179,7 +179,6 @@ describe('MCP Server Performance', () => {
 ```markdown
 ---
 name: code-review-skill
-version: 1.0.0
 ---
 
 # Code Review Skill
@@ -742,7 +741,7 @@ export async function collectMetrics(): Promise<Metrics> {
 
 **Continue Learning**:
 - [Security Checklist](1-security-compliance.md) - Security testing
-- [Reference Guide](../14-reference/) - Testing patterns reference
+- [Reference Guide](../14-reference/1-api-reference.md) - Testing patterns reference
 
 **Action Items**:
 1. Set up Husky pre-commit hooks

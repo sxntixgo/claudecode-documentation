@@ -441,5 +441,28 @@ In the next guide, you'll learn ready-to-use templates for:
 
 ---
 
+## References & Further Reading
+
+### Official Documentation
+
+**Anthropic Resources** (Most Current):
+- [Anthropic Prompt Engineering Guide](https://docs.anthropic.com/claude/docs/prompt-engineering) - Official Claude prompting techniques and best practices
+- [Anthropic Prompt Library](https://docs.anthropic.com/claude/page/prompts) - 50+ production-ready prompt examples
+- [Claude API Documentation](https://docs.anthropic.com/claude/reference) - Technical reference for Claude integration
+
+### Security
+
+**Safe AI Usage**:
+- [OWASP Top 10 for LLMs](https://owasp.org/www-project-top-10-for-large-language-model-applications/) (Updated 2024)
+  - LLM01: Prompt Injection - Understanding and preventing malicious prompts
+  - LLM02: Insecure Output Handling - Safe processing of AI responses
+
+### Community Resources
+
+- [Model Context Protocol](https://modelcontextprotocol.io) - Official MCP documentation for extending Claude Code
+- [Claude Code GitHub Discussions](https://github.com/anthropics/claude-code/discussions) - Community patterns and solutions
+
+---
+
 **Questions or Feedback?**
 [Open an issue](https://github.com/anthropics/claude-code/issues)

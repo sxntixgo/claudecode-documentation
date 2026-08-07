@@ -79,7 +79,7 @@ graph TB
 | **What** | Specialized workers | Instruction manuals |
 | **Purpose** | Tool access + constraints | Workflows + best practices |
 | **Location** | `.claude/agents/` | `.claude/skills/` |
-| **Structure** | `AGENT.md` with tool configs | `SKILL.md` with instructions |
+| **Structure** | `<name>.md` with tool configs | `<dir>/SKILL.md` with instructions |
 | **Reusability** | Project-specific | Shareable across projects |
 | **Examples** | frontend-agent, api-agent | code-review, tdd-workflow |
 | **Invocation** | Auto-selected or `--agent=` | `/skill` command or auto-trigger |
@@ -483,13 +483,9 @@ graph LR
 **Frontmatter (YAML)**
 ```yaml
 name: code-review
-description: Automated code review with configurable depth
-version: 1.0.0
-author: Your Name
+description: Reviews code for security, logic, and style issues, at a configurable depth.
+when_to_use: review my code, check this PR, look over my changes
 model: sonnet  # Default model for this skill
-autoTrigger:
-  - pattern: "review.*code"
-  - pattern: "check.*pr"
 \```
 
 **Instructions**
@@ -509,6 +505,11 @@ Additional instructions revealed on demand.
 
 Real usage examples.
 ```
+
+**How the trigger works**: `description` *is* the trigger — Claude reads it to decide when to
+invoke the skill on its own. `when_to_use` is appended to the description and holds extra trigger
+phrasings or example requests. Add `paths` globs when the skill should only activate while working
+with matching files. There are no regex patterns and no confidence scores.
 
 ---
 
@@ -641,9 +642,15 @@ claude "Generate documentation for api/users.ts"
 
 ### Method 3: Explicit Skill Invocation
 
+```text
+# Invoke the skill by name, then give it the target
+/code-review Review src/auth.ts
+```
+
+Skills are invoked from inside a session with `/skill-name`. There is no CLI flag for selecting a skill — to invoke one non-interactively, pass the slash command to headless mode:
+
 ```bash
-# Use Skill tool directly
-claude --skill=code-review "Review src/auth.ts"
+claude -p "/code-review Review src/auth.ts"
 ```
 
 ---

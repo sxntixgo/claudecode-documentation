@@ -140,7 +140,7 @@ This guide catalogs official resources, community contributions, and learning ma
 ### Contributing to Documentation
 
 **This Documentation**:
-- See [CONTRIBUTING.md](../../../CONTRIBUTING.md)
+- See [CONTRIBUTING.md](../../CONTRIBUTING.md)
 - Submit issues and pull requests
 - Improve examples
 - Fix errors
@@ -148,7 +148,7 @@ This guide catalogs official resources, community contributions, and learning ma
 ### Contributing Skills
 
 **Creating Skills**:
-1. Follow [Skill Creation Guide](../../04-skills/2-creating-skills.md)
+1. Follow [Skill Creation Guide](../04-skills/3-creating-skills.md)
 2. Test thoroughly
 3. Document usage
 4. Submit to community repos
@@ -206,7 +206,7 @@ This guide catalogs official resources, community contributions, and learning ma
 ### Project Templates
 
 **Starter Templates**:
-- See [Examples Section](../../13-examples/1-overview.md)
+- See [Examples Section](../13-examples/1-overview.md)
 - React + TypeScript
 - Node.js API
 - Django
@@ -243,8 +243,8 @@ This guide catalogs official resources, community contributions, and learning ma
 ### Troubleshooting Resources
 
 1. **Check Documentation**:
-   - [Troubleshooting Guide](../../14-reference/2-troubleshooting.md)
-   - [FAQ](../../14-reference/3-faq.md)
+   - [Troubleshooting Guide](../14-reference/2-troubleshooting.md)
+   - [FAQ](../14-reference/3-faq.md)
 
 2. **Search GitHub Issues**:
    - Similar problems and solutions
@@ -295,9 +295,9 @@ This guide catalogs official resources, community contributions, and learning ma
 ## Related Guides
 
 - [Getting Started](../../README.md)
-- [CONTRIBUTING Guide](../../../CONTRIBUTING.md)
-- [Skill Creation](../../04-skills/2-creating-skills.md)
-- [MCP Overview](../../01-mcp-servers/1-overview.md)
+- [CONTRIBUTING Guide](../../CONTRIBUTING.md)
+- [Skill Creation](../04-skills/3-creating-skills.md)
+- [MCP Overview](../01-mcp-servers/1-overview.md)
 
 ---
 

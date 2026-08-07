@@ -851,5 +851,29 @@ You now have the seven essential patterns. Next, you'll learn how to apply these
 
 ---
 
+## References and Further Reading
+
+### Official Documentation
+
+**Anthropic Resources** (Most Current):
+- [Anthropic Prompt Library](https://docs.anthropic.com/claude/page/prompts) - 50+ production-ready examples organized by pattern (CREATE, FIX, REFACTOR, REVIEW, etc.)
+- [Anthropic Prompt Engineering Guide](https://docs.anthropic.com/claude/docs/prompt-engineering) - Official techniques for all prompt patterns
+
+### Security
+
+**Safe Prompt Usage**:
+- **"AI Security"** by Sean Murphy & Patrick Hall (O'Reilly, 2024)
+  - *Chapter 4*: Prompt injection attacks and defenses
+- [OWASP Top 10 for LLMs](https://owasp.org/www-project-top-10-for-large-language-model-applications/) (Updated 2024)
+  - LLM01: Prompt Injection - Security implications of prompt patterns
+  - LLM06: Sensitive Information Disclosure - Safe code review practices
+
+### Community Resources
+
+- [Claude Code Examples](https://github.com/anthropics/claude-code/tree/main/examples) - Real-world pattern usage
+- [Model Context Protocol](https://modelcontextprotocol.io) - Extending Claude Code with custom tools
+
+---
+
 **Questions or Feedback?**
 [Open an issue](https://github.com/anthropics/claude-code/issues)

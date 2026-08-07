@@ -13,7 +13,7 @@ You've learned what agents are and how each built-in type works. Now let's unloc
 By the end of this guide, you'll be able to:
 - Assign different models (Haiku, Sonnet, Opus) to specific agents
 - Reduce token costs by 50-60% through smart model selection
-- Configure `.claude/config.json` for optimal performance and cost
+- Set `model:` in a subagent's frontmatter for optimal performance and cost
 - Understand when to use each model for each agent type
 
 ---
@@ -101,62 +101,58 @@ graph LR
 
 ## How to Assign Models to Agents
 
-### Method 1: Configuration File (Recommended)
+### Method 1: `model:` in the Subagent's Frontmatter
 
-Create or edit `.claude/config.json` in your project:
+A subagent is a single Markdown file with YAML frontmatter, and the `model` field in that frontmatter decides which model the subagent runs on. There is no registry and no central agent list — **the file is the configuration.**
 
-```json
-{
-  "agents": {
-    "Explore": {
-      "model": "haiku"
-    },
-    "general-purpose": {
-      "model": "sonnet"
-    },
-    "Plan": {
-      "model": "sonnet"
-    }
-  },
-  "defaultModel": "sonnet"
-}
+`.claude/agents/code-searcher.md`:
+
+```markdown
+---
+name: code-searcher
+description: Locates files, symbols, and usage patterns across the codebase. Use for any "where is X" question.
+model: haiku
+---
+
+Search the codebase and report file paths with line numbers. Do not modify files.
 ```
 
 **What This Does:**
-- Explore Agent always uses Haiku (3x cheaper for searches)
-- General-Purpose Agent uses Sonnet (balanced for coding)
-- Plan Agent uses Sonnet (good for research + planning)
-- Any other operations default to Sonnet
+- Every delegation to `code-searcher` runs on Haiku, whatever the main session is using
+- Searches cost roughly a third as much, with no quality loss on mechanical lookups
+- Nothing else in your setup changes
 
-### Method 2: Task-Specific Override
+`model` accepts `sonnet`, `opus`, `haiku`, `fable`, a full model ID, or `inherit`. It defaults to `inherit`, meaning the subagent runs on whichever model the main session is on.
 
-You can override the model for a specific Task tool invocation:
+Where you put the file decides its reach:
 
-```javascript
-// In your code or CLAUDE.md
+| Location | Scope |
+|----------|-------|
+| `.claude/agents/<name>.md` | This project. Committed to git, so the whole team gets it. |
+| `~/.claude/agents/<name>.md` | Every project on your machine. |
+
+> 💡 **Built-in agents have no file to edit.** Explore, Plan, and general-purpose ship with Claude Code, so you cannot reassign their models this way — Explore already runs on a fast, cheap model for exactly the reason described above. When you want a search-style agent pinned to a particular model, define your own subagent as shown here.
+
+### Method 2: `model` in `.claude/settings.json`
+
+The `model` key in settings sets the default for the main thread, and therefore for every subagent left at `inherit`:
+
+```json
 {
-  "name": "Task",
-  "parameters": {
-    "subagent_type": "Explore",
-    "model": "haiku",  // Override: use Haiku for this search
-    "prompt": "Find all React components using useState"
-  }
+  "model": "sonnet"
 }
 ```
 
-### Method 3: Environment Variable
+**Priority Order** (highest first):
 
-Set a global default for your session:
+1. Command line arguments
+2. `model:` in the subagent's own frontmatter — for that subagent only
+3. `model` in `.claude/settings.local.json` (personal, gitignored)
+4. `model` in `.claude/settings.json` (project, committed)
+5. `model` in `~/.claude/settings.json` (user, all projects)
+6. Built-in default
 
-```bash
-export CLAUDE_DEFAULT_MODEL=sonnet
-```
-
-**Priority Order:**
-1. Task-specific override (highest priority)
-2. `.claude/config.json` agent settings
-3. Environment variable
-4. Built-in default (Sonnet)
+A managed `managed-settings.json` deployed by IT sits above all of these and cannot be overridden.
 
 ---
 
@@ -164,59 +160,80 @@ export CLAUDE_DEFAULT_MODEL=sonnet
 
 ### 🎯 Optimal Configuration for Most Projects
 
+A good starting set is three subagent files plus one settings key. Each file is complete as shown — the body is the agent's instructions.
+
+`.claude/agents/code-searcher.md` — searching is mechanical, so Haiku:
+
+```markdown
+---
+name: code-searcher
+description: Locates files, symbols, and usage patterns. Use for any "where is X" question.
+model: haiku
+tools: Read, Glob, Grep
+---
+
+Report file paths with line numbers. Do not modify files.
+```
+
+`.claude/agents/feature-builder.md` — implementation needs judgment, so Sonnet:
+
+```markdown
+---
+name: feature-builder
+description: Implements features and fixes bugs inside existing modules.
+model: sonnet
+---
+
+Follow existing conventions in the files you touch. Run the test suite before reporting done.
+```
+
+`.claude/agents/architect.md` — design mistakes compound, so Opus:
+
+```markdown
+---
+name: architect
+description: Designs system architecture and plans cross-cutting refactorings. Use before writing code for anything touching many modules.
+model: opus
+---
+
+Produce a written plan with trade-offs before proposing any code.
+```
+
+`.claude/settings.json` — everything not delegated to one of the above:
+
 ```json
 {
-  "agents": {
-    "Explore": {
-      "model": "haiku",
-      "description": "Fast, cheap searches - Haiku is perfect"
-    },
-    "general-purpose": {
-      "model": "sonnet",
-      "description": "Balanced for most coding tasks"
-    },
-    "Plan": {
-      "model": "sonnet",
-      "description": "Planning needs good reasoning, Sonnet excels"
-    }
-  },
-  "defaultModel": "sonnet",
-  "costTracking": {
-    "enabled": true,
-    "dailyBudget": 100000
-  }
+  "model": "sonnet"
 }
 ```
 
-### 📊 Advanced: Dynamic Model Selection
+**On budgets:** there is no cost-tracking or daily-budget key in settings — no configuration will cap your spend. Track it after the fact with `/usage`, which reports session token counts, a locally computed cost, and (on Pro, Max, Team, and Enterprise plans) how much of your recent usage each individual subagent accounts for. See [Measuring Your Savings](#measuring-your-savings) below.
 
-For power users who want fine-grained control:
+### 📊 Advanced: Routing Between Models
+
+There is no conditional-rule mechanism — you cannot express "if this touches more than ten files, use Opus." Routing happens through **descriptions**, not rules. Claude reads each subagent's `description` and delegates based on it, so the way to get different models for different task shapes is to define one subagent per shape and make each description state precisely when it applies:
+
+| Subagent file | `model` | What its `description` should claim |
+|---------------|---------|-------------------------------------|
+| `.claude/agents/code-searcher.md` | `haiku` | Locating files and symbols; read-only |
+| `.claude/agents/feature-builder.md` | `sonnet` | Implementing features inside existing modules |
+| `.claude/agents/architect.md` | `opus` | Cross-cutting design, migrations, anything spanning many modules |
+
+Vague or overlapping descriptions are the usual reason a cheap agent gets handed work it cannot do. Be explicit about the boundary between them.
+
+Two related settings keys are worth knowing:
 
 ```json
 {
-  "agents": {
-    "Explore": {
-      "model": "haiku",
-      "maxTokens": 10000
-    },
-    "general-purpose": {
-      "defaultModel": "sonnet",
-      "modelRules": [
-        {
-          "condition": "fileCount > 10",
-          "model": "opus",
-          "reason": "Large refactorings need maximum reasoning"
-        },
-        {
-          "condition": "taskType === 'search'",
-          "model": "haiku",
-          "reason": "Searches don't need deep reasoning"
-        }
-      ]
-    }
-  }
+  "model": "sonnet",
+  "fallbackModel": "haiku",
+  "availableModels": ["sonnet", "haiku"],
+  "enforceAvailableModels": true
 }
 ```
+
+- `fallbackModel` — what to use when the primary model is unavailable.
+- `availableModels` with `enforceAvailableModels` — restricts which models can be selected at all, which is how you keep a team from reaching for Opus by accident.
 
 ---
 
@@ -229,24 +246,18 @@ For power users who want fine-grained control:
 **Daily Operations**: 50-70 agent calls
 
 **Configuration:**
+
+| Subagent file | `model` |
+|---------------|---------|
+| `.claude/agents/code-searcher.md` | `haiku` |
+| `.claude/agents/component-builder.md` | `sonnet` |
+| `.claude/agents/architect.md` | `sonnet` |
+
+With `.claude/settings.json` committed to the repo so all three developers share the default:
+
 ```json
 {
-  "agents": {
-    "Explore": {
-      "model": "haiku",
-      "timeout": 120000
-    },
-    "general-purpose": {
-      "model": "sonnet"
-    },
-    "Plan": {
-      "model": "sonnet"
-    }
-  },
-  "defaultModel": "haiku",
-  "projectContext": {
-    "description": "React TypeScript web app - prefer Haiku for simple tasks"
-  }
+  "model": "haiku"
 }
 ```
 
@@ -265,22 +276,18 @@ For power users who want fine-grained control:
 **Daily Operations**: 30-40 agent calls
 
 **Configuration:**
+
+| Subagent file | `model` | Why |
+|---------------|---------|-----|
+| `.claude/agents/code-searcher.md` | `haiku` | Lookups stay cheap |
+| `.claude/agents/service-builder.md` | `opus` | Complex business logic needs maximum reasoning |
+| `.claude/agents/api-architect.md` | `opus` | API contracts are hard to change later |
+
+`.claude/settings.json`:
+
 ```json
 {
-  "agents": {
-    "Explore": {
-      "model": "haiku"
-    },
-    "general-purpose": {
-      "model": "opus",
-      "reason": "Complex business logic needs maximum reasoning"
-    },
-    "Plan": {
-      "model": "opus",
-      "reason": "API architecture critical - use best model"
-    }
-  },
-  "defaultModel": "sonnet"
+  "model": "sonnet"
 }
 ```
 
@@ -299,23 +306,18 @@ For power users who want fine-grained control:
 **Daily Operations**: 15-20 agent calls
 
 **Configuration:**
+
+| Subagent file | `model` | Role |
+|---------------|---------|------|
+| `.claude/agents/example-finder.md` | `haiku` | Finding files and existing examples |
+| `.claude/agents/doc-writer.md` | `sonnet` | Writing prose and code examples |
+| `.claude/agents/outline-planner.md` | `sonnet` | Planning documentation structure |
+
+`.claude/settings.json`:
+
 ```json
 {
-  "agents": {
-    "Explore": {
-      "model": "haiku",
-      "description": "Finding files and examples"
-    },
-    "general-purpose": {
-      "model": "sonnet",
-      "description": "Writing docs and code examples"
-    },
-    "Plan": {
-      "model": "sonnet",
-      "description": "Planning documentation structure"
-    }
-  },
-  "defaultModel": "haiku"
+  "model": "haiku"
 }
 ```
 
@@ -367,15 +369,8 @@ graph TD
 ### ❌ Pitfall 1: Using Opus for Everything
 
 **The Mistake:**
-```json
-{
-  "agents": {
-    "Explore": { "model": "opus" },
-    "general-purpose": { "model": "opus" },
-    "Plan": { "model": "opus" }
-  }
-}
-```
+
+`model: opus` in every agent file, or `"model": "opus"` in `.claude/settings.json` so that every `inherit` agent picks it up too.
 
 **Why It's Wrong:**
 - Opus costs 3-5x more than Sonnet
@@ -383,16 +378,13 @@ graph TD
 - You'll hit Claude Pro usage limits faster
 - Quality improvement is marginal for simple tasks
 
-**The Fix:**
-```json
-{
-  "agents": {
-    "Explore": { "model": "haiku" },      // Searches don't need Opus
-    "general-purpose": { "model": "sonnet" }, // Sonnet handles 90% of tasks
-    "Plan": { "model": "opus" }           // Reserve Opus for critical planning
-  }
-}
-```
+**The Fix:** differentiate, and reserve Opus for the work where the gap actually shows.
+
+| Subagent file | `model` | Reasoning |
+|---------------|---------|-----------|
+| `.claude/agents/code-searcher.md` | `haiku` | Searches don't need Opus |
+| `.claude/agents/feature-builder.md` | `sonnet` | Sonnet handles 90% of tasks |
+| `.claude/agents/architect.md` | `opus` | Reserve Opus for critical planning |
 
 **Savings:** 60-70% reduction in token costs
 
@@ -401,11 +393,14 @@ graph TD
 ### ❌ Pitfall 2: Using Haiku for Complex Tasks
 
 **The Mistake:**
+
 ```json
 {
-  "defaultModel": "haiku"  // Everything uses Haiku
+  "model": "haiku"
 }
 ```
+
+Set in `.claude/settings.json` with no per-agent overrides, this hands *everything* to Haiku — including every subagent left at the default `inherit`.
 
 **Why It's Wrong:**
 - Haiku struggles with complex reasoning
@@ -413,16 +408,18 @@ graph TD
 - May need multiple iterations (costing more overall)
 - Architectural decisions suffer
 
-**The Fix:**
-```json
-{
-  "agents": {
-    "Explore": { "model": "haiku" },
-    "general-purpose": { "model": "sonnet" },  // Use Sonnet for coding
-    "Plan": { "model": "sonnet" }
-  }
-}
+**The Fix:** keep the cheap default if most of your work is mechanical, but pin the agents that do real reasoning so they stop inheriting it.
+
+```markdown
+<!-- .claude/agents/feature-builder.md -->
+---
+name: feature-builder
+description: Implements features and fixes bugs inside existing modules.
+model: sonnet
+---
 ```
+
+An explicit `model:` in frontmatter always wins over the settings default, so one line per agent is enough.
 
 **Quality Improvement:** 40-50% better code quality on complex tasks
 
@@ -431,14 +428,7 @@ graph TD
 ### ❌ Pitfall 3: Ignoring Task Context
 
 **The Mistake:**
-Using the same model for all General-Purpose Agent tasks:
-```json
-{
-  "agents": {
-    "general-purpose": { "model": "sonnet" }
-  }
-}
-```
+Funnelling everything through one general-purpose agent on one model, whether the task is a typo fix or an auth rewrite.
 
 **Why It's Suboptimal:**
 - Simple bug fixes don't need Sonnet
@@ -446,116 +436,100 @@ Using the same model for all General-Purpose Agent tasks:
 - One-size-fits-all wastes money or sacrifices quality
 
 **The Fix:**
-Use task-specific overrides:
-```javascript
-// Simple task - override to Haiku
-Task({
-  subagent_type: "general-purpose",
-  model: "haiku",
-  prompt: "Fix typo in README.md"
-})
+A subagent's model is fixed by its frontmatter — you cannot swap it per invocation. So split the work into two agents whose descriptions make the boundary obvious, and let Claude route.
 
-// Complex task - override to Opus
-Task({
-  subagent_type: "general-purpose",
-  model: "opus",
-  prompt: "Refactor authentication system to use OAuth 2.0"
-})
+`.claude/agents/quick-fixer.md`:
+
+```markdown
+---
+name: quick-fixer
+description: Small, self-contained edits — typos, renames, formatting, single-line fixes. Use when the change is obvious and confined to one file.
+model: haiku
+---
+
+Make the smallest change that satisfies the request. Do not refactor surrounding code.
 ```
+
+`.claude/agents/architect.md`:
+
+```markdown
+---
+name: architect
+description: Large refactorings and cross-cutting redesigns, such as migrating an auth system. Use when the change spans several modules or alters a contract.
+model: opus
+---
+
+Produce a written plan with trade-offs before proposing any code.
+```
+
+The descriptions are doing the routing work here, so the more concretely they describe their own boundary, the better the delegation.
 
 ---
 
 ## Performance vs. Cost Trade-offs
 
-### 📊 Benchmarks: Same Task, Different Models
+The useful pattern is not a fixed score per model — it is that **the quality gap between models widens as the task requires more judgment.** On mechanical work the models converge and the cheapest one wins. On open-ended design work they diverge sharply and paying more is rational.
 
-**Task**: "Find all React components using deprecated lifecycle methods"
+### How the gap behaves by task type
 
-| Model | Tokens Used | Cost | Time | Quality Score | Cost Efficiency |
-|-------|-------------|------|------|---------------|-----------------|
-| **Haiku 4.5** | 8,000 | $0.04 | 12s | 95% | ⭐⭐⭐⭐⭐ |
-| **Sonnet 4.5** | 8,500 | $0.13 | 18s | 95% | ⭐⭐⭐ |
-| **Opus 4.5** | 9,200 | $0.35 | 28s | 96% | ⭐ |
+**Locating things** — "find all React components using deprecated lifecycle methods"
 
-**Verdict**: Haiku wins for simple searches (same quality, 87% cheaper)
+The answer is verifiable and largely mechanical: search, filter, report. Models converge here because there is little room for judgment, so the cheapest model that can drive the search tools is usually the right call. This is why the Explore agent defaults to Haiku.
 
----
+**Applying a known transformation** — "refactor class components to functional components with hooks"
 
-**Task**: "Refactor class components to functional components with hooks"
+There is a correct general approach, but each file presents choices: what to do with lifecycle side effects, how to handle stale closures, when a `useCallback` is warranted. Weaker models tend to produce code that runs but subtly changes behavior. Sonnet is the usual starting point.
 
-| Model | Tokens Used | Cost | Time | Quality Score | Cost Efficiency |
-|-------|-------------|------|------|---------------|-----------------|
-| **Haiku 4.5** | 15,000 | $0.08 | 35s | 75% | ⭐⭐ |
-| **Sonnet 4.5** | 18,000 | $0.27 | 45s | 92% | ⭐⭐⭐⭐ |
-| **Opus 4.5** | 22,000 | $0.70 | 65s | 98% | ⭐⭐⭐⭐⭐ |
+**Open-ended design** — "design a microservices architecture for an e-commerce platform"
 
-**Verdict**: Sonnet wins for standard refactorings (best balance of quality + cost)
+No verifiable answer exists, the output is long, and early mistakes compound through everything downstream. This is where the strongest model earns its cost, because the expensive failure is not a wrong token — it is a plausible-looking design you build on for a month.
 
----
+### Measure the gap on your own work
 
-**Task**: "Design microservices architecture for e-commerce platform"
+Task-type guidance tells you where to start, not what to ship. Quality depends on your codebase, your conventions, and how specific your prompts are, so the crossover point moves.
 
-| Model | Tokens Used | Cost | Time | Quality Score | Cost Efficiency |
-|-------|-------------|------|------|---------------|-----------------|
-| **Haiku 4.5** | 25,000 | $0.13 | 60s | 65% | ⭐ |
-| **Sonnet 4.5** | 32,000 | $0.48 | 90s | 85% | ⭐⭐⭐ |
-| **Opus 4.5** | 40,000 | $1.20 | 120s | 97% | ⭐⭐⭐⭐⭐ |
+To find yours, run the same representative tasks through each candidate model and compare. What you are looking for:
 
-**Verdict**: Opus wins for architecture (quality justifies premium cost)
+| Signal | Reading |
+|--------|---------|
+| Output is equivalent on the cheaper model | Use the cheaper model |
+| Cheaper model fails only on your hardest cases | Cascade — cheap first, escalate on those |
+| Cheaper model fails broadly | The task needs the stronger model, or your prompt needs to be more specific |
+
+Use `/usage` to capture the token and cost side of the comparison. For skills specifically, the `skill-creator` plugin automates this into a pass-rate-versus-tokens benchmark; see [Evaluating Your Skills](../04-skills/3-creating-skills.md#evaluating-your-skills).
 
 ---
 
 ## Measuring Your Savings
 
-### Built-in Cost Tracking
+### Check usage with `/usage`
 
-Enable cost tracking in `.claude/config.json`:
+`/usage` is the built-in view. The Session block reports token counts and a locally computed cost for the current session, broken down by model:
 
-```json
-{
-  "costTracking": {
-    "enabled": true,
-    "dailyBudget": 100000,
-    "alertThreshold": 0.8,
-    "logFile": ".claude/cost-log.json"
-  }
-}
+```text
+Total cost:            $0.55
+Total duration (API):  6m 20s
+Usage by model:
+   claude-sonnet-4-6:  1.2k input, 5.3k output, 940.0k cache read, 50.0k cache write ($0.55)
 ```
 
-### Reading Cost Logs
+On a Pro, Max, Team, or Enterprise plan, `/usage` also attributes recent usage to subagents, skills, plugins, and individual MCP servers as a percentage of the total, and flags any behavior accounting for 10% or more — long context and cache misses being the common culprits. Press `d` or `w` to switch between 24-hour and 7-day windows.
 
-Check `.claude/cost-log.json`:
+The dollar figure is computed locally at standard list rates, so it does not account for promotional or contracted pricing and may differ from your bill. Treat it as a comparison tool rather than an invoice; for authoritative billing use the [Console usage page](https://platform.claude.com/usage).
 
-```json
-{
-  "date": "2025-12-20",
-  "operations": [
-    {
-      "timestamp": "2025-12-20T10:30:00Z",
-      "agent": "Explore",
-      "model": "haiku",
-      "inputTokens": 5000,
-      "outputTokens": 3000,
-      "cost": 0.02,
-      "task": "Find all API endpoints"
-    },
-    {
-      "timestamp": "2025-12-20T11:15:00Z",
-      "agent": "general-purpose",
-      "model": "sonnet",
-      "inputTokens": 8000,
-      "outputTokens": 6000,
-      "cost": 0.11,
-      "task": "Add user authentication"
-    }
-  ],
-  "dailyTotal": {
-    "cost": 0.13,
-    "tokensSaved": 12000,
-    "estimatedSavings": "62% vs. all-Sonnet baseline"
-  }
-}
-```
+Session totals reset when `/clear` starts a new session.
+
+### Establishing a baseline
+
+To know whether a model assignment saved anything, you need a before-and-after on comparable work:
+
+1. Run a representative day with your current assignment and record the `/usage` total.
+2. Change one assignment.
+3. Run comparable work and compare.
+
+Change one thing at a time. Switching three agents at once tells you the total moved but not which change was responsible.
+
+For per-user metrics across a team, use OpenTelemetry export, which streams token and cost data into your own observability stack and works regardless of how you authenticate.
 
 ---
 
@@ -571,39 +545,23 @@ Check `.claude/cost-log.json`:
 
 ### Configuration Templates
 
-**Cost-Optimized (Minimize Spending):**
-```json
-{
-  "agents": {
-    "Explore": { "model": "haiku" },
-    "general-purpose": { "model": "haiku" },
-    "Plan": { "model": "sonnet" }
-  },
-  "defaultModel": "haiku"
-}
-```
+Each template is the `model:` value to put in three subagent frontmatters, plus the `model` key for `.claude/settings.json`.
 
-**Balanced (Recommended):**
-```json
-{
-  "agents": {
-    "Explore": { "model": "haiku" },
-    "general-purpose": { "model": "sonnet" },
-    "Plan": { "model": "sonnet" }
-  },
-  "defaultModel": "sonnet"
-}
-```
+| | `code-searcher.md` | `feature-builder.md` | `architect.md` | `settings.json` `model` |
+|---|---|---|---|---|
+| **Cost-optimized** (minimize spending) | `haiku` | `haiku` | `sonnet` | `"haiku"` |
+| **Balanced** (recommended) | `haiku` | `sonnet` | `sonnet` | `"sonnet"` |
+| **Quality-focused** (premium projects) | `sonnet` | `opus` | `opus` | `"sonnet"` |
 
-**Quality-Focused (Premium Projects):**
+Agent files live in `.claude/agents/`. Omitting `model:` entirely leaves that agent at `inherit`, following the settings default.
+
+To hold a team to a cost ceiling, pair the cost-optimized row with:
+
 ```json
 {
-  "agents": {
-    "Explore": { "model": "sonnet" },
-    "general-purpose": { "model": "opus" },
-    "Plan": { "model": "opus" }
-  },
-  "defaultModel": "sonnet"
+  "model": "haiku",
+  "availableModels": ["haiku", "sonnet"],
+  "enforceAvailableModels": true
 }
 ```
 
@@ -636,7 +594,7 @@ Learn to build specialized agents with custom capabilities and model assignments
 - **Community Discussions**: Search [GitHub Discussions](https://github.com/anthropics/claude-code/discussions) for real-world model performance experiences
 
 ### Related Topics
-- [Thinking Modes](../08-thinking/) - Control reasoning depth for better cost/quality trade-offs
+- [Thinking Modes](../08-thinking/1-overview.md) - Control reasoning depth for better cost/quality trade-offs
 - [Skills Model Assignment](../04-skills/4-model-assignment.md) - Similar techniques for skills
 
 ---

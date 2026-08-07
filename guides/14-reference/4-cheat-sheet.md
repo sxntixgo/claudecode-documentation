@@ -45,11 +45,13 @@ Press [Tab]                     # Toggle extended thinking on/off
 | File/Directory | Purpose |
 |----------------|---------|
 | `CLAUDE.md` | Project context (root or .claude/) |
-| `.claude/config.json` | Agent, model, hook configuration |
-| `.claude/memory.md` | Session memory |
-| `.claude/skills/` | Custom skills |
-| `.claude/commands/` | Slash commands |
-| `.claude/agents/` | Custom agents |
+| `.claude/settings.json` | Project settings — model, permissions, env, hooks (committed) |
+| `.claude/settings.local.json` | Personal overrides (gitignored) |
+| `~/.claude/settings.json` | User settings, all projects |
+| `.claude/skills/<name>/SKILL.md` | Custom skills — each carries its own frontmatter |
+| `.claude/agents/<name>.md` | Custom subagents — each carries its own frontmatter |
+| `.claude/commands/` | Slash commands (merged into skills; still supported) |
+| `.mcp.json` | Project MCP servers |
 
 ---
 
@@ -97,21 +99,21 @@ Press [Tab]                     # Toggle extended thinking on/off
     "general-purpose": {"model": "sonnet"},
     "Plan": {"model": "sonnet"}
   },
-  "defaultModel": "haiku"
+  "model": "haiku"
 }
 ```
 
 ### Cost Tracking
-```json
-{
-  "costTracking": {
-    "enabled": true,
-    "dailyBudget": 100000,
-    "alertThreshold": 0.8,
-    "logFile": ".claude/cost-log.json"
-  }
-}
+
+No settings key tracks or caps cost. Use the commands:
+
+```text
+/usage      # tokens + cost; per-skill/subagent/plugin attribution on paid plans
+/context    # what is occupying the context window right now
 ```
+
+Spend limits exist at the organization level (Teams/Enterprise admin settings, or Console
+workspace limits), not in a local file.
 
 ### Auto-Format Hook
 ```json
@@ -161,16 +163,20 @@ npm run build    # Build
 
 ## Skill Frontmatter
 
+`.claude/skills/<name>/SKILL.md` — all fields optional; the command name comes from the
+directory, not from `name`:
+
 ```yaml
 ---
-name: skill-name
-version: 1.0.0
-description: Clear, specific description with keywords
-model: claude-sonnet-4-5
-modelOverrides:
-  quick: claude-haiku-4-5
-  deep: claude-opus-4-5
-tags: ["testing", "api"]
+description: What it does AND when to use it. This is what triggers the skill.
+when_to_use: Extra trigger phrases or example requests
+model: sonnet            # turn-scoped override, not saved to settings
+effort: medium           # low | medium | high | xhigh | max
+allowed-tools: Read Grep Bash(git diff *)
+disallowed-tools: AskUserQuestion
+paths: ["**/*.test.ts"]  # only auto-activate for matching files
+disable-model-invocation: true   # manual /name only
+context: fork            # run in an isolated subagent context
 ---
 ```
 
@@ -178,18 +184,22 @@ tags: ["testing", "api"]
 
 ## Agent Frontmatter
 
+`.claude/agents/<name>.md` — `name` and `description` are required:
+
 ```yaml
 ---
 name: agent-name
-description: Agent purpose
-model: sonnet
-tools: ["Read", "Write", "Edit", "Grep"]
-constraints:
-  allowedPaths: ["src/components/**"]
-  deniedPaths: [".env*", "**/*.private.*"]
-timeout: 180000
+description: When Claude should delegate to this subagent
+model: sonnet            # sonnet|opus|haiku|fable|full ID|inherit (default inherit)
+tools: Read, Grep, Glob  # omit to inherit all subagent tools
+permissionMode: default  # default|acceptEdits|auto|dontAsk|bypassPermissions|plan
+skills: code-conventions # preload skill content at startup
+color: blue
 ---
 ```
+
+Restrict file access with `permissions` in settings.json rather than agent frontmatter —
+there are no `allowedPaths`, `deniedPaths`, or `timeout` fields.
 
 ---
 
@@ -201,10 +211,6 @@ command: review
 description: Code review
 usage: /review [options] <file>
 model: sonnet
-options:
-  - name: quick
-    type: boolean
-    default: false
 ---
 
 # Command instructions here
@@ -297,12 +303,14 @@ claude mcp remove NAME && claude mcp add NAME
 # Restart Claude
 ```
 
-### Config Not Loading
+### Settings Not Applying
 ```bash
-ls .claude/config.json   # Verify exists
-cat .claude/config.json | jq .  # Validate JSON
-# Restart session
+cat .claude/settings.json | jq .   # Validate JSON
 ```
+Then check precedence — a higher-priority file may be overriding you. Highest first: managed
+settings, command-line arguments, `.claude/settings.local.json`, `.claude/settings.json`,
+`~/.claude/settings.json`. `model` and `outputStyle` are read once at startup, so restart the
+session after changing them.
 
 ### Skill Not Invoked
 - Check: `.claude/skills/SKILL-NAME/SKILL.md` exists
@@ -318,11 +326,10 @@ cat .claude/config.json | jq .  # Validate JSON
 
 ## Environment Variables
 
-```bash
-# System
-export CLAUDE_DEFAULT_MODEL=sonnet
-export CLAUDE_CONFIG_PATH=~/.config/claude/config.json
+Set the default model with `"model"` in settings.json, not an environment variable. Settings
+file locations are fixed per scope and cannot be redirected.
 
+```bash
 # MCP Servers
 export GITHUB_TOKEN=ghp_xxxxx
 export GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxxxx
@@ -448,4 +455,4 @@ Need planning? → Plan
 
 **Print This Page**: Bookmark for quick reference during development!
 
-**More Details**: See full guides at [Table of Contents](../TABLE_OF_CONTENTS.md)
+**More Details**: See full guides at [Table of Contents](../../TABLE_OF_CONTENTS.md)

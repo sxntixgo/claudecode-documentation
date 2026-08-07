@@ -77,7 +77,7 @@ Load context progressively:
 
 Only process relevant files:
 
-``bash
+```bash
 # Bad: Process everything
 "Review all files for security issues"
 Processes: 1,000 files, 500K tokens

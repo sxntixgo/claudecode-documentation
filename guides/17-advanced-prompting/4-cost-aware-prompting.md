@@ -250,23 +250,40 @@ Cost: $1.50
 
 ### Implementing Cascades in Skills
 
+A skill has exactly one `model`, and it cannot escalate itself mid-run. A cascade is therefore
+**separate skills**, each with its own model and a description saying when it applies:
+
 ```yaml
 # .claude/skills/code-review/SKILL.md
-name: cascading-code-review
-
-## Progressive Disclosure
-### Stage 1: Syntax Check (Haiku)
+---
+description: Quick syntax and style check of a diff. Use for routine pre-commit review.
 model: haiku
-prompt: "Quick syntax and style check"
-
-### Stage 2: Logic Review (Sonnet) - if issues found
-model: sonnet
-prompt: "Deep review: logic, security, edge cases"
-
-### Stage 3: Architecture (Opus) - if major refactor needed
-model: opus
-prompt: "Architecture and design review"
+effort: low
+---
 ```
+
+```yaml
+# .claude/skills/code-review-logic/SKILL.md
+---
+description: Deep review for logic bugs, edge cases, and security issues. Use when a quick review found problems or the change touches auth or data handling.
+model: sonnet
+effort: high
+---
+```
+
+```yaml
+# .claude/skills/code-review-architecture/SKILL.md
+---
+description: Architecture and design review covering scalability and maintainability. Use for changes spanning modules or introducing new patterns.
+model: opus
+effort: high
+---
+```
+
+You escalate by invoking the next skill, and Claude can also select the right one on its own
+because each description states its trigger. Note that a skill's `model` applies only for the
+remainder of the invoking turn, so invoke an expensive skill in its own turn rather than after
+cheap work you did not want upgraded.
 
 ---
 
@@ -876,7 +893,7 @@ You now know how to:
 - **[Skills Guide](../04-skills/1-overview.md)** - Package your optimized prompts as reusable skills
 - **[Token Optimization](../12-optimization/1-cost-optimization.md)** - Apply system-wide cost strategies
 - **[Context Management](../09-context/2-claude-md.md)** - Use CLAUDE.md files to reduce prompt length
-- **[Model Selection](../06-models/1-choosing-models.md)** - Deep dive into when to use each model
+- **[Model Selection](../06-models/1-overview.md)** - Deep dive into when to use each model
 
 **See it in action**:
 - **[Examples](../13-examples/1-overview.md)** - Real-world prompt optimization examples
@@ -891,6 +908,29 @@ Within your first week of applying these techniques, you should see:
 - **Consistent quality** from well-designed prompts
 
 **Target ROI**: 10-20x return in first month through cost savings and efficiency gains
+
+---
+
+## References & Further Reading
+
+### Official Documentation
+
+**Anthropic Resources** (Most Current):
+- [Anthropic Prompt Engineering Guide](https://docs.anthropic.com/claude/docs/prompt-engineering) - Token optimization and cost-aware prompting strategies
+- [Anthropic API Pricing](https://www.anthropic.com/pricing) - Current model pricing (updated regularly)
+- [Anthropic Research Blog](https://www.anthropic.com/research) - Latest cost optimization research and techniques
+
+### Context Efficiency
+
+**Efficient Context Management**:
+- [Model Context Protocol Documentation](https://modelcontextprotocol.io) - Best practices for efficient context usage
+- [Model Context Protocol Specification](https://modelcontextprotocol.io/specification) - Technical deep dive into context optimization
+- [Claude Code Context Management](https://docs.anthropic.com/claude/docs/context-management) - CLAUDE.md patterns for token reduction
+
+### Community Resources
+
+- [Claude Code Cost Optimization Discussions](https://github.com/anthropics/claude-code/discussions) - Real-world cost savings strategies
+- [Anthropic Developer Forum](https://www.anthropic.com/developers) - Community patterns and benchmarks
 
 ---
 

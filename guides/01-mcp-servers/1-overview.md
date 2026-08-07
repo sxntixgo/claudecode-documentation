@@ -31,13 +31,13 @@ graph TB
         Built["Built-in Capabilities<br/>• Read/Write Files<br/>• Execute Commands<br/>• Code Generation"]
         Built --> MCP["MCP Protocol Layer"]
         MCP --> Server1["GitHub<br/>MCP Server"]
-        MCP --> Server2["Perplexity<br/>MCP Server"]
+        MCP --> Server2["Sentry<br/>MCP Server"]
         MCP --> Server3["Context7<br/>MCP Server"]
         MCP --> More["..."]
     end
 
     Server1 --> API1["GitHub<br/>API"]
-    Server2 --> API2["Web<br/>Search"]
+    Server2 --> API2["Error<br/>Monitoring"]
     Server3 --> API3["Docs<br/>Database"]
 
     style Claude fill:#e1f5ff
@@ -82,30 +82,32 @@ Claude:
 **Time saved**: 5-10 minutes per PR creation
 **Context switches**: Eliminated
 
-### Scenario 2: Real-Time Research (Always Current Information)
+### Scenario 2: Live System State (Not Training Data)
 
 **Without MCP**:
 ```bash
-> "What's the latest best practice for React Server Components?"
-Claude: "Based on my training data from early 2024..."
-# Information might be outdated!
+> "Why is checkout failing in production?"
+Claude: "I can't see your production errors. Paste a stack trace and I'll take a look."
+
+# You switch to Sentry, filter, copy a trace, paste it back...
 ```
 
-**With Perplexity MCP Server**:
+**With Sentry MCP Server**:
 ```bash
-> "What's the latest best practice for React Server Components?"
+> "What are the most common errors in the last 24 hours?"
 Claude:
-  [Searches web via Perplexity]
+  [Queries Sentry]
 
-  "According to the React docs updated last week and recent blog posts:
-   1. Always use 'use server' directive...
-   2. New async/await patterns introduced in React 19..."
+  "Three issues account for 84% of events since yesterday:
+   1. TypeError in checkout.js — 1,203 events, first seen after deploy a1b2c3d
+   2. Timeout calling payments-api — 340 events
+   3. Null session in /account — 118 events
 
-  Sources: [Links to latest articles]
+   The first one is new as of this morning's deploy. Want me to look at that diff?"
 ```
 
-**Benefit**: Always current, sourced information
-**Confidence**: Know your answers are up-to-date
+**Benefit**: Claude reasons over your actual system state, not a description of it
+**Confidence**: No transcription errors from copy-pasting between tools
 
 ### Scenario 3: Code Documentation (Instant Context)
 
@@ -156,12 +158,13 @@ MCP (Model Context Protocol) is a standardized way for AI assistants to communic
 **Key Components**:
 1. **Client**: Claude Code (initiates requests)
 2. **Protocol**: MCP (standardized communication)
-3. **Server**: External tool (GitHub, Perplexity, etc.)
+3. **Server**: External tool (GitHub, Sentry, a database, etc.)
 4. **Data**: Structured information exchange
 
-```
-Claude Code  →  MCP Request   →  GitHub Server
-             ←  MCP Response  ←
+```mermaid
+graph LR
+    CC["Claude Code<br/>(MCP client)"] -->|"MCP request"| GH["GitHub<br/>MCP server"]
+    GH -->|"MCP response"| CC
 ```
 
 ### Step 2: Server Types
@@ -171,7 +174,7 @@ MCP servers come in different flavors:
 | Server Type | Purpose | Examples |
 |-------------|---------|----------|
 | **API Integrations** | Connect to web services | GitHub, GitLab, Jira |
-| **Search Tools** | Query knowledge bases | Perplexity, Context7 |
+| **Search Tools** | Query knowledge bases | Context7, Claude Code docs server |
 | **Database Access** | Query/modify data | PostgreSQL, MongoDB connectors |
 | **File Systems** | Access external files | Cloud storage (S3, Dropbox) |
 | **Custom Tools** | Your specific needs | Internal APIs, proprietary systems |
@@ -206,26 +209,58 @@ sequenceDiagram
 
 ### Step 4: Authentication & Security
 
-MCP servers handle sensitive operations, so security matters:
+MCP servers handle sensitive operations, so security matters. Claude Code supports four authentication styles:
 
-**Authentication Methods**:
-- **API Tokens**: Personal access tokens (GitHub, GitLab)
-- **OAuth**: User authorization flows (Google, Microsoft)
-- **Environment Variables**: Secure credential storage
-- **Config Files**: Encrypted local configuration
+| Style | How it works | Typical servers |
+|-------|--------------|-----------------|
+| **OAuth 2.0** | Add the server, then run `/mcp` inside a session and sign in through your browser. Tokens are stored securely and refreshed automatically | Sentry, Linear, Notion |
+| **Static token header** | Pass the token when you add the server: `--header "Authorization: Bearer <token>"` | GitHub |
+| **Environment variables** | Pass secrets to a local stdio server with `--env KEY=value`, or the `env` field of its config entry | Database and CLI-backed servers |
+| **Dynamic headers** | A `headersHelper` command generates headers at connection time, for Kerberos, short-lived tokens, or internal SSO | Internal/enterprise servers |
 
 **Security Best Practices**:
 ```bash
-# ✅ Good: Store tokens in environment variables
-export GITHUB_TOKEN="ghp_..."
+# ✅ Good: reference an environment variable, so the secret never
+#          lands in a file you might commit
+claude mcp add my-server -e API_KEY=${MY_API_KEY} -- npx -y my-mcp-server
 
-# ❌ Bad: Hardcode tokens in config files
+# ❌ Bad: a literal secret pasted into a checked-in .mcp.json
 {
-  "github_token": "ghp_..."  # Don't do this!
+  "mcpServers": {
+    "my-server": { "env": { "API_KEY": "sk-actual-key" } }
+  }
 }
 ```
 
+`.mcp.json` supports `${VAR}` and `${VAR:-default}` expansion, so a team can share one config file while each developer supplies their own credentials.
+
+> ⚠️ **Trust matters.** Anthropic reviews connectors listed in the [Anthropic Directory](https://claude.ai/directory), but does not security-audit arbitrary MCP servers. A server that fetches external content can expose you to [prompt injection](https://code.claude.com/docs/en/security#protect-against-prompt-injection). Review a server before connecting it.
+
 We'll cover secure configuration in the [Installation Guide](2-installation.md).
+
+---
+
+### Step 5: How MCP Tools Reach Claude
+
+Two details are worth knowing up front, because they shape everything else in this section.
+
+**Tools are namespaced.** Every MCP tool is exposed to Claude under a fully qualified name of the form `mcp__<server>__<tool>`. A `create_issue` tool on a server you named `github` is `mcp__github__create_issue`. You use that same fully qualified name anywhere a tool is referenced — permission rules, a subagent's `tools` list, or a hook matcher.
+
+**Tool definitions are deferred by default.** Claude Code does *not* load every MCP tool's full schema into your context at session start. Only tool names and each server's instructions load; Claude searches for and pulls in a tool's definition when a task actually needs it. This is called **tool search**, and it's on by default.
+
+```mermaid
+graph LR
+    Start["Session start"] --> Names["Tool names +<br/>server instructions<br/>load into context"]
+    Names --> Task["You ask for<br/>something"]
+    Task --> Search["Claude searches<br/>for a matching tool"]
+    Search --> Load["Only that tool's<br/>definition enters context"]
+    Load --> Call["Tool is called"]
+
+    style Names fill:#fff9e6
+    style Load fill:#d4f4dd
+```
+
+The practical consequence: **adding another MCP server costs far less context than you might expect.** The old advice of "keep your server count low or you'll burn your whole context window on tool schemas" no longer describes the default behavior. See [MCP Best Practices](5-best-practices.md) for the cases where this doesn't apply and what the real cost drivers are.
 
 ---
 
@@ -241,9 +276,7 @@ Let's see the difference MCP servers make:
 | Query database | Write SQL, run query, parse | `Ask in natural language` | ~5-10 min |
 | Check CI/CD status | Open browser, navigate, check | `Ask Claude for status` | ~2-3 min |
 
-**Daily Impact**: 30-60 minutes saved per developer
-**Yearly Impact**: 125-250 hours saved per developer
-**Context Switches**: Reduced by 70-80%
+> 📏 **About these numbers**: the times above are illustrative estimates for the manual workflows they replace, not measured benchmarks. Your own savings depend on how often you do each task and how fast the underlying service responds. Treat them as a way to reason about *which* servers are worth adding, not as a figure to quote.
 
 ---
 
@@ -338,17 +371,24 @@ MCP uses JSON-RPC 2.0 for communication:
 }
 ```
 
-**Response**:
+**Response**: a `tools/call` result is always a `content` array of typed blocks, not a bare object. That's what lets any client render any server's output:
+
 ```json
 {
   "jsonrpc": "2.0",
   "result": {
-    "issue_number": 123,
-    "url": "https://github.com/owner/repo/issues/123"
+    "content": [
+      {
+        "type": "text",
+        "text": "Created issue #123: https://github.com/owner/repo/issues/123"
+      }
+    ]
   },
   "id": 1
 }
 ```
+
+A tool that failed sets `"isError": true` alongside `content`, so Claude sees the failure message and can react to it rather than the call disappearing.
 
 ### Server Implementation
 
@@ -386,66 +426,61 @@ MCP servers expose tools and resources:
 }
 ```
 
+You reference a resource in a prompt with an `@` mention, using the form `@server:protocol://resource/path`:
+
+```text
+Can you analyze @github:issue://123 and suggest a fix?
+```
+
+Type `@` to see resources from all connected servers alongside your files. Referenced resources are fetched and attached automatically.
+
+**Prompts**: servers can also expose prompts, which show up in the `/` menu as `/mcp__servername__promptname` and accept space-separated arguments.
+
 ### Claude's Tool Selection
 
 When you make a request, Claude:
 1. **Analyzes intent**: What are you trying to do?
-2. **Evaluates available tools**: Which MCP servers can help?
-3. **Selects optimal tool**: Best match for the task
-4. **Constructs parameters**: Formats the request
-5. **Interprets results**: Presents response clearly
+2. **Searches for candidate tools**: with tool search on (the default), only tool *names* are in context, so Claude issues a search to pull in the definitions that look relevant
+3. **Selects optimal tool**: best match for the task
+4. **Constructs parameters**: formats the request against the schema it just loaded
+5. **Interprets results**: presents the response clearly
 
 This happens automatically—you just ask naturally!
+
+> 🔍 **Why the search step exists**: without it, every tool from every connected server would need its full JSON Schema in context on every single request, whether or not you use it. Deferring definitions is what makes running a dozen servers practical.
 
 ---
 
 ## Popular MCP Servers
 
-Here are the most commonly used MCP servers:
+Here are servers that are widely used and that we've verified against their publishers' own documentation:
 
-### Official Servers
+### Vendor-Hosted Remote Servers
 
-**GitHub** ([Installation](installation.md#github))
-- Create/manage issues and PRs
-- Review code and leave comments
-- Check CI/CD status
-- Manage repositories
+These are HTTP servers run by the vendor. You add a URL; there's nothing to install.
 
-**Perplexity** ([Installation](installation.md#perplexity))
-- Web search with citations
-- Real-time information retrieval
-- Research assistance
-- Fact-checking with sources
+**Sentry** — production error and issue data. OAuth sign-in via `/mcp`.
+**GitHub** — issues, PRs, code review, CI status. Authenticates with a GitHub personal access token passed as a header.
+**Claude Code docs** — full-text search over the Claude Code documentation. No auth at all, which makes it the easiest first server to test with.
 
-**Context7** ([Installation](installation.md#context7))
-- Up-to-date code documentation
-- Framework-specific guidance
-- API references
-- Version-aware examples
+### Local Stdio Servers
 
-### Community Servers
+These run as a subprocess on your machine.
 
-**Sequential Thinking**
-- Break down complex tasks
-- Multi-step problem solving
-- Planning and architecture
+**Playwright** ([microsoft/playwright-mcp](https://github.com/microsoft/playwright-mcp)) — gives Claude a real browser it can navigate, click, and read.
+**DBHub** ([bytebase/dbhub](https://github.com/bytebase/dbhub)) — connects Claude to PostgreSQL, MySQL, SQL Server, and SQLite through a connection string.
+**Filesystem** and **Sequential Thinking** — reference servers maintained in the [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) repository.
+**Context7** ([upstash/context7](https://github.com/upstash/context7)) — version-aware library and framework documentation. Available as both a stdio package and a hosted HTTP endpoint.
 
-**Database Connectors**
-- PostgreSQL, MySQL, MongoDB
-- Natural language queries
-- Schema exploration
+### Where to Find More
 
-**Cloud Services**
-- AWS, Google Cloud, Azure
-- Resource management
-- Deployment automation
+- **[Anthropic Directory](https://claude.ai/directory)** — connectors Anthropic has reviewed against its listing criteria. Anything listed there can be added with `claude mcp add`.
+- **[Docker MCP Catalog](https://hub.docker.com/u/mcp)** — 200+ containerized MCP servers published under Docker's `mcp` namespace.
+- **[modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)** — the protocol project's reference implementations.
 
-**200+ More via Docker**
-- Pre-built, containerized
-- One-click installation
-- Automatic updates
+> ⚠️ There is no built-in server registry inside Claude Code that you can browse and install from. Discovery happens through the sources above.
 
-See the complete catalog in [Popular MCP Servers](3-popular-servers.md).
+See exact install commands in [Popular MCP Servers](3-popular-servers.md).
 
 ---
 
@@ -514,15 +549,19 @@ MCP servers extend Claude Code by connecting it to external tools and services t
 - 📚 Access real-time information
 
 **Common Servers**:
-- GitHub (code hosting)
-- Perplexity (web search)
-- Context7 (documentation)
-- 200+ via Docker
+- GitHub (code hosting, remote HTTP + PAT header)
+- Sentry (error monitoring, remote HTTP + OAuth)
+- Playwright (browser control, local stdio)
+- Context7 (library documentation, stdio or HTTP)
+
+**Tool naming**: `mcp__<server>__<tool>` — for example `mcp__github__create_issue`
+
+**Context cost**: tool definitions are deferred by default (tool search), so only names load at session start
 
 **Security**:
-- Use environment variables for tokens
-- Never hardcode credentials
-- Review server permissions
+- Use environment variables and `${VAR}` expansion for tokens
+- Never hardcode credentials in a committed `.mcp.json`
+- Review a server before connecting it — MCP servers are not audited by Anthropic
 
 ---
 
@@ -560,25 +599,22 @@ MCP provides a standardized protocol that Claude Code understands natively. Inst
 Want to dive deeper? Here are some excellent resources:
 
 ### 📚 Official Documentation
-- [Model Context Protocol Specification](https://modelcontextprotocol.io) - Complete protocol reference
-- [Claude Code MCP Guide](https://code.claude.com/docs/en/mcp) - Official Claude Code integration docs
-- [Introducing MCP](https://anthropic.com/news/model-context-protocol) - Anthropic's announcement
-- [Code Execution with MCP](https://www.anthropic.com/engineering/code-execution-with-mcp) - Architecture and optimization patterns
-- [Introduction to MCP Course](https://anthropic.skilljar.com/introduction-to-model-context-protocol) - Official Anthropic course
+- [Connect Claude Code to tools via MCP](https://code.claude.com/docs/en/mcp) - The full Claude Code MCP reference
+- [MCP quickstart](https://code.claude.com/docs/en/mcp-quickstart) - Connect one server end to end
+- [Model Context Protocol](https://modelcontextprotocol.io/introduction) - Protocol introduction
 - [Build an MCP Server Tutorial](https://modelcontextprotocol.io/docs/develop/build-server) - Step-by-step guide
+- [Anthropic Directory](https://claude.ai/directory) - Reviewed connectors you can add with `claude mcp add`
+- [Introducing MCP](https://www.anthropic.com/news/model-context-protocol) - Anthropic's announcement
 
 ### 🔗 Related Topics
 - [Installing MCP Servers](2-installation.md) - Hands-on setup next
 - [Agents Overview](../03-agents/1-overview.md) - How agents use MCP tools
 - [Skills Overview](../04-skills/1-overview.md) - Skills that leverage MCP capabilities
+- [Permissions reference](https://code.claude.com/docs/en/permissions) - How `mcp__server__tool` rules work
 
 ### 💬 Community & Support
-- [MCP GitHub Discussions](https://github.com/modelcontextprotocol/specification/discussions) - Ask questions
-- [Claude Code Discord](https://discord.gg/anthropic) - Community help
+- [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) - Reference server implementations and their issue trackers
 - [Stack Overflow Tag: mcp](https://stackoverflow.com/questions/tagged/mcp) - Q&A
-
-### 📖 Academic/Technical Papers (Advanced)
-- [Model Context Protocol: Specification v1.0](https://modelcontextprotocol.io/spec) - Technical specification
 
 ---
 

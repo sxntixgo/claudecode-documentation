@@ -89,17 +89,17 @@ graph TD
 
 ## Configuring Model Assignment
 
-### Method 1: SKILL.md Frontmatter (Recommended)
+There is exactly one place to assign a model to a skill: the `model` field in the YAML
+frontmatter of that skill's own `SKILL.md`. No settings file has a per-skill model key.
 
-Set the default model in your skill's frontmatter:
+### The `model` Field
 
 `.claude/skills/code-formatter/SKILL.md`:
 ```yaml
 ---
 name: code-formatter
-version: 1.0.0
 description: Format code with Prettier/Black
-model: haiku  # ← Default model for this skill
+model: haiku  # ← Runs this skill on Haiku
 ---
 
 # Code Formatter Skill
@@ -107,78 +107,69 @@ model: haiku  # ← Default model for this skill
 This skill runs formatters - no deep reasoning needed, so Haiku is perfect!
 ```
 
-### Method 2: Progressive Model Selection
+Accepted values are `haiku`, `sonnet`, `opus`, `fable`, or a full model ID.
 
-Use different models for different complexity levels:
+> ⚠️ **The override is scoped to the turn, not to the skill.**
+> Invoking a skill with `model: haiku` switches the model for the remainder of the current
+> turn — including work Claude does after the skill finishes. It is **not** written to your
+> settings, and your session model resumes on the next prompt. So this is not a permanent
+> per-skill assignment; it is a per-invocation one that the frontmatter requests every time.
 
-`.claude/skills/code-review/SKILL.md`:
+Two consequences worth internalizing:
+
+- A cheap skill invoked in the middle of an expensive task downgrades the rest of that task.
+  If the follow-up work needs Sonnet, invoke the Haiku skill in its own turn.
+- Nothing drifts. You never have to clean up a model setting a skill left behind.
+
+### Pairing `model` with `effort`
+
+`SKILL.md` also accepts an `effort` field — `low`, `medium`, `high`, `xhigh`, or `max` — which
+controls how much reasoning the model spends before answering. It is the finer-grained dial,
+and reaching for it first often beats jumping a model tier:
+
 ```yaml
 ---
 name: code-review
-version: 2.0.0
-description: Code review with configurable depth
-model: haiku  # Default for quick reviews
-modelOverrides:
-  quick: haiku      # Quick review: 5K tokens
-  standard: sonnet  # Standard review: 10K tokens
-  deep: opus        # Deep review: 25K tokens
+description: Review a diff for correctness, style, and obvious bugs
+model: sonnet
+effort: low     # Shallow pass; raise to high for architecture-level review
 ---
-
-# Code Review Skill
-
-## Quick Review (Default - Haiku)
-
-Fast syntax and style checking
-
-<details>
-<summary>Standard Review (Sonnet)</summary>
-
-Comprehensive code quality analysis
-
-</details>
-
-<details>
-<summary>Deep Review (Opus)</summary>
-
-Architecture and design patterns analysis
-
-</details>
 ```
 
-### Method 3: Global Configuration Override
+A Sonnet-at-`low` review and a Sonnet-at-`high` review are genuinely different tools. Try
+moving `effort` before you move `model`.
 
-Override in `.claude/config.json`:
+### Different Depths Mean Different Skills
+
+A single skill has one `model` value. There is no mechanism for a skill to select among
+several models based on how the user invoked it. When you want a quick pass and a deep pass,
+ship two skills:
+
+```
+.claude/skills/code-review/SKILL.md         # model: haiku,  effort: low
+.claude/skills/code-review-deep/SKILL.md    # model: opus,   effort: high
+```
+
+Each one gets a `description` that says plainly when it applies, which is also what lets
+Claude pick the right one on its own.
+
+### Setting the Session Default
+
+Everything a skill does not override comes from the session model, which you set in
+`.claude/settings.json`:
 
 ```json
 {
-  "skills": {
-    "code-formatter": {
-      "model": "haiku",
-      "enabled": true
-    },
-    "code-review": {
-      "model": "sonnet",
-      "enabled": true,
-      "modelOverrides": {
-        "quick": "haiku",
-        "deep": "opus"
-      }
-    },
-    "api-scaffold": {
-      "model": "sonnet",
-      "enabled": true
-    }
-  },
-  "defaultSkillModel": "sonnet"
+  "model": "sonnet",
+  "fallbackModel": "haiku"
 }
 ```
 
-**Priority Order:**
-1. Invocation-time override (highest)
-2. `.claude/config.json` skill-specific settings
-3. SKILL.md frontmatter `model` field
-4. Agent's default model
-5. Global default (Sonnet)
+**Which model actually runs:**
+1. A skill's frontmatter `model` — for the remainder of the turn that invoked it
+2. Otherwise the session model, resolved by settings precedence (highest first):
+   managed settings → command-line arguments → `.claude/settings.local.json` →
+   `.claude/settings.json` → `~/.claude/settings.json`
 
 ---
 
@@ -188,19 +179,16 @@ Override in `.claude/config.json`:
 
 **Why Haiku:** No reasoning needed, just rule application
 
-**Examples:**
+**Examples** (each in its own `SKILL.md` frontmatter):
 ```yaml
-# code-formatter
+# code-formatter/SKILL.md — typically 3-5K tokens
 model: haiku
-costEstimate: 3000-5000 tokens
 
-# spell-checker
+# spell-checker/SKILL.md — typically 2-4K tokens
 model: haiku
-costEstimate: 2000-4000 tokens
 
-# import-sorter
+# import-sorter/SKILL.md — typically 1-3K tokens
 model: haiku
-costEstimate: 1000-3000 tokens
 ```
 
 **Savings:** 66% compared to Sonnet
@@ -213,21 +201,18 @@ costEstimate: 1000-3000 tokens
 
 **Examples:**
 ```yaml
-# test-generator
+# test-generator/SKILL.md
 model: sonnet
-modelOverrides:
-  simple: haiku      # Simple unit tests
-  standard: sonnet   # Integration tests
-  complex: opus      # E2E test scenarios
+effort: medium   # Drop to low for straightforward unit tests
 
-# tdd-workflow
-model: sonnet  # Needs to understand behavior
+# tdd-workflow/SKILL.md
+model: sonnet    # Needs to understand behavior
 
-# coverage-analyzer
-model: haiku   # Just parses coverage reports
+# coverage-analyzer/SKILL.md
+model: haiku     # Just parses coverage reports
 ```
 
-**Savings:** 30-50% with smart overrides
+**Savings:** 30-50%, mostly from pulling the mechanical skills down to Haiku
 
 ---
 
@@ -237,17 +222,14 @@ model: haiku   # Just parses coverage reports
 
 **Examples:**
 ```yaml
-# readme-generator
-model: haiku
-modelOverrides:
-  basic: haiku       # Template-based README
-  comprehensive: sonnet  # Custom content
+# readme-generator/SKILL.md
+model: haiku     # Template-driven; ship a second skill for prose-heavy READMEs
 
-# api-docs
-model: haiku  # Extracting JSDoc/TSDoc
+# api-docs/SKILL.md
+model: haiku     # Extracting JSDoc/TSDoc
 
-# changelog-generator
-model: haiku  # Git log formatting
+# changelog-generator/SKILL.md
+model: haiku     # Git log formatting
 ```
 
 **Savings:** 50-60% compared to all-Sonnet
@@ -260,17 +242,19 @@ model: haiku  # Git log formatting
 
 **Examples:**
 ```yaml
-# secrets-scanner
-model: haiku  # Pattern matching only
+# secrets-scanner/SKILL.md
+model: haiku     # Pattern matching only
 
-# security-audit
-model: sonnet
-modelOverrides:
-  quick: sonnet     # OWASP Top 10
-  deep: opus        # Threat modeling
+# security-audit/SKILL.md
+model: sonnet    # OWASP Top 10 pass
+effort: high
 
-# vulnerability-scanner
-model: sonnet  # Dependency analysis
+# security-audit-threat-model/SKILL.md
+model: opus      # Separate skill; threat modeling is a different job
+effort: high
+
+# vulnerability-scanner/SKILL.md
+model: sonnet    # Dependency analysis
 ```
 
 **Savings:** 20-40% (security is critical, use premium models)
@@ -323,40 +307,31 @@ model: opus  # Complex analysis needed
 
 **Project**: Small startup, budget-conscious
 
-`.claude/config.json`:
+Because each skill declares its own model, a "configuration" is really just the set of values
+across your skill files. There is no central list, and no `defaultSkillModel` key — the
+session model in `.claude/settings.json` is what skills fall back to.
+
+Each row below is the `model` line in that skill's own `SKILL.md`:
+
+| Skill | Model | Why |
+|-------|-------|-----|
+| `code-formatter` | `haiku` | Rule application |
+| `spell-checker` | `haiku` | No reasoning |
+| `code-review` | `haiku` + `effort: low` | Surface pass is enough day to day |
+| `code-review-deep` | `sonnet` + `effort: high` | Separate skill for the thorough pass |
+| `test-generator` | `sonnet` | Needs to understand behavior |
+| `api-scaffold` | `sonnet` | Generation with judgment |
+
+`.claude/settings.json`:
 ```json
 {
-  "skills": {
-    "code-formatter": {
-      "model": "haiku",
-      "autoRun": true
-    },
-    "spell-checker": {
-      "model": "haiku"
-    },
-    "code-review": {
-      "model": "haiku",
-      "modelOverrides": {
-        "deep": "sonnet"
-      }
-    },
-    "test-generator": {
-      "model": "sonnet"
-    },
-    "api-scaffold": {
-      "model": "sonnet"
-    }
-  },
-  "defaultSkillModel": "haiku"
+  "model": "haiku",
+  "fallbackModel": "sonnet"
 }
 ```
 
-**Daily Usage:**
-- 15 formatting operations: Haiku (15 × $0.01 = $0.15)
-- 10 code reviews: Haiku (10 × $0.04 = $0.40)
-- 2 deep reviews: Sonnet (2 × $0.20 = $0.40)
-- 5 test generations: Sonnet (5 × $0.15 = $0.75)
-- **Total: $1.70/day vs. $4.50/day all-Sonnet = 62% savings**
+A Haiku session default suits this posture: anything that genuinely needs more says so in its
+own frontmatter, and everything else stays cheap by default.
 
 ---
 
@@ -364,42 +339,24 @@ model: opus  # Complex analysis needed
 
 **Project**: Large enterprise, quality > cost
 
-`.claude/config.json`:
+| Skill | Model | Why |
+|-------|-------|-----|
+| `code-formatter` | `haiku` | Still mechanical, still cheap |
+| `code-review` | `opus` + `effort: high` | Review quality is the point |
+| `security-audit` | `opus` | No compromises |
+| `test-generator` | `sonnet` | Good balance |
+| `api-scaffold` | `opus` | Public contract; mistakes are expensive |
+| `refactor-architect` | `opus` | Design mistakes compound |
+
+`.claude/settings.json`:
 ```json
 {
-  "skills": {
-    "code-formatter": {
-      "model": "haiku"
-    },
-    "code-review": {
-      "model": "opus",
-      "modelOverrides": {
-        "quick": "sonnet"
-      }
-    },
-    "security-audit": {
-      "model": "opus"
-    },
-    "test-generator": {
-      "model": "sonnet"
-    },
-    "api-scaffold": {
-      "model": "opus"
-    },
-    "refactor-architect": {
-      "model": "opus"
-    }
-  },
-  "defaultSkillModel": "sonnet"
+  "model": "sonnet"
 }
 ```
 
-**Daily Usage:**
-- Formatting: Haiku (cheap)
-- Code review: Opus (critical quality)
-- Security: Opus (no compromises)
-- Tests: Sonnet (good balance)
-- **Total: $8.50/day (premium quality, still 35% cheaper than blind Opus-everything)**
+Note that formatting stays on Haiku even here. Quality-focused does not mean paying premium
+rates for work with no judgment in it.
 
 ---
 
@@ -407,131 +364,98 @@ model: opus  # Complex analysis needed
 
 **Project**: Mid-size team, balance cost and quality
 
-`.claude/config.json`:
+| Skill | Model | Why |
+|-------|-------|-----|
+| `code-formatter`, `spell-checker` | `haiku` | Mechanical |
+| `code-review` | `sonnet` + `effort: low` | Lower effort before lower model |
+| `test-generator`, `api-scaffold` | `sonnet` | Standard coding work |
+| `security-audit`, `refactor-architect` | `opus` | Expensive to get wrong |
+
+`.claude/settings.json`:
 ```json
 {
-  "skills": {
-    "code-formatter": {
-      "model": "haiku"
-    },
-    "spell-checker": {
-      "model": "haiku"
-    },
-    "code-review": {
-      "model": "sonnet",
-      "modelOverrides": {
-        "quick": "haiku",
-        "deep": "opus"
-      }
-    },
-    "test-generator": {
-      "model": "sonnet"
-    },
-    "api-scaffold": {
-      "model": "sonnet"
-    },
-    "security-audit": {
-      "model": "opus"
-    },
-    "refactor-architect": {
-      "model": "opus"
-    }
-  },
-  "defaultSkillModel": "sonnet"
+  "model": "sonnet"
 }
 ```
 
-**Monthly Savings:** ~$120 (50% reduction)
+**Before adopting any of these**, measure. These are postures to test with your own eval set,
+not settings to copy — see [Performance vs. Cost Trade-offs](#performance-vs-cost-trade-offs)
+below.
 
 ---
 
 ## Measuring Skill Costs
 
-### Enable Cost Tracking
+### Attribute usage per skill with `/usage`
 
-`.claude/config.json`:
-```json
-{
-  "costTracking": {
-    "enabled": true,
-    "perSkill": true,
-    "logFile": ".claude/cost-log.json"
-  }
-}
+On a Pro, Max, Team, or Enterprise plan, `/usage` breaks down what counts against your plan limits and attributes recent usage to skills, subagents, plugins, and individual MCP servers, each as a percentage of the total. Press `d` or `w` to switch between the last 24 hours and the last 7 days.
+
+This is the fastest way to find out which skill is actually costing you money, and the answer is often not the one you assumed.
+
+The Session block at the top of `/usage` shows token counts and a locally computed dollar figure for the current session:
+
+```text
+Total cost:            $0.55
+Total duration (API):  6m 20s
+Usage by model:
+   claude-sonnet-4-6:  1.2k input, 5.3k output, 940.0k cache read, 50.0k cache write ($0.55)
 ```
 
-### View Cost Report
+Two caveats worth knowing before you rely on these numbers:
 
-`.claude/cost-log.json`:
-```json
-{
-  "date": "2025-12-20",
-  "skills": {
-    "code-formatter": {
-      "invocations": 25,
-      "model": "haiku",
-      "totalTokens": 75000,
-      "cost": 0.38,
-      "avgCostPerInvocation": 0.015
-    },
-    "code-review": {
-      "invocations": 12,
-      "modelBreakdown": {
-        "haiku": { "count": 8, "cost": 0.32 },
-        "sonnet": { "count": 3, "cost": 0.60 },
-        "opus": { "count": 1, "cost": 0.85 }
-      },
-      "totalCost": 1.77,
-      "avgCostPerInvocation": 0.15
-    }
-  },
-  "totalDailyCost": 4.25,
-  "projectedMonthlyCost": 127.50,
-  "savingsVsAllSonnet": "58%"
-}
-```
+- The dollar figure is computed locally from token counts at standard list rates. It does not reflect promotional pricing or contracted discounts, so it may differ from your bill. For authoritative billing, use the [Console usage page](https://platform.claude.com/usage).
+- The breakdown is computed from local session history on one machine. Usage from other devices or from claude.ai is not included.
 
-### Generate Cost Report
+Session totals reset when `/clear` starts a new session.
 
-```bash
-# CLI command (if available)
-claude skills cost-report
+### See what is consuming context right now
 
-# Output:
-# Skill Cost Report (Last 30 Days)
-# ================================
-#
-# code-formatter (haiku):     $11.40  (750 invocations)
-# code-review (mixed):        $53.10  (360 invocations)
-# test-generator (sonnet):    $22.50  (150 invocations)
-# api-scaffold (sonnet):      $18.00  (60 invocations)
-# security-audit (opus):      $25.50  (30 invocations)
-# --------------------------------
-# Total:                      $130.50
-#
-# Estimated with all-Sonnet:  $285.00
-# Savings:                    $154.50 (54%)
-```
+`/context` shows what is currently occupying the context window. Use it when a skill feels expensive but you are not sure whether the cost is the skill itself or everything it dragged in alongside it.
+
+### Organization-wide reporting
+
+Per-skill attribution is a local view. For spend across a team, the mechanism depends on how you authenticate:
+
+| Setup | Where to look |
+|-------|---------------|
+| Teams or Enterprise plan | Spend report in org analytics, with CSV export |
+| Claude Console (API) | [Console usage page](https://platform.claude.com/usage) and the Claude Code Analytics API |
+| Bedrock, Google Cloud, or Microsoft Foundry | Your cloud billing console, or OpenTelemetry export |
+
+OpenTelemetry export works on every setup and is the only option that streams per-user token and cost metrics into your own observability stack in near real time.
 
 ---
 
 ## Performance vs. Cost Trade-offs
 
-### Benchmark: Code Review Skill
+Cost and latency scale predictably with model and mode: input and output pricing is published per model, and a deeper review reads more and writes more. Quality does not scale predictably, and it is the variable that decides whether a cheaper model is acceptable for a given skill.
 
-| Mode | Model | Tokens | Cost | Time | Quality | Cost Efficiency |
-|------|-------|--------|------|------|---------|-----------------|
-| **Quick** | Haiku | 5,000 | $0.03 | 15s | 85% | ⭐⭐⭐⭐⭐ |
-| **Quick** | Sonnet | 5,200 | $0.08 | 20s | 87% | ⭐⭐⭐ |
-| **Standard** | Haiku | 10,000 | $0.05 | 30s | 75% | ⭐⭐ |
-| **Standard** | Sonnet | 12,000 | $0.18 | 40s | 92% | ⭐⭐⭐⭐ |
-| **Deep** | Sonnet | 25,000 | $0.38 | 90s | 90% | ⭐⭐⭐ |
-| **Deep** | Opus | 30,000 | $0.90 | 120s | 97% | ⭐⭐⭐⭐⭐ |
+That means quality is the one number you have to measure on your own skill and your own codebase. A published figure would not transfer — review quality depends on your language, your conventions, and what your skill instructs Claude to look for.
 
-**Recommendations:**
-- ✅ Quick review: Haiku (same quality, 60% cheaper)
-- ✅ Standard review: Sonnet (best balance)
-- ✅ Deep review: Opus (quality worth the cost)
+### Measure it with a benchmark
+
+Run your eval set against each candidate model and compare pass rate alongside tokens and duration. The `skill-creator` plugin aggregates exactly these three into `benchmark.json`. See [Evaluating Your Skills](3-creating-skills.md#evaluating-your-skills) for the setup.
+
+What you are looking for is the point where a cheaper model stops being acceptable:
+
+| Signal | Reading |
+|--------|---------|
+| Pass rate holds within a point or two on the cheaper model | Use the cheaper model |
+| Pass rate drops but only on your hardest cases | Cascade — cheap model first, escalate on those cases |
+| Pass rate drops across the board | The skill needs more explicit instructions, or the task needs the stronger model |
+| Pass rate is identical with and without the skill | The skill is not earning its tokens |
+
+That last row is the one people skip. A skill can score well on every case and still be dead weight if Claude scored just as well without it.
+
+### Starting points
+
+Absent your own measurements, these are reasonable first guesses to test rather than conclusions to adopt:
+
+- **Mechanical, rule-checkable work** (formatting, lint-style checks, renaming) — start with Haiku
+- **Judgment over unfamiliar code** (review, refactoring proposals, test design) — start with Sonnet
+- **Multi-file reasoning with expensive mistakes** (architecture, security analysis) — start with Sonnet, escalate to Opus if your evals show a gap
+
+Test every skill against each model you intend to run it on. Instructions that are sufficient for Opus frequently underspecify for Haiku, which shows up as a pass-rate cliff rather than a gradual decline.
 
 ---
 
@@ -549,10 +473,12 @@ security-audit:
 
 **Fix:**
 ```yaml
-security-audit:
-  model: sonnet  # Minimum for security
-  modelOverrides:
-    deep: opus   # Critical security needs best model
+# security-audit/SKILL.md
+model: sonnet    # Minimum for security
+effort: high
+
+# security-audit-threat-model/SKILL.md
+model: opus      # Separate skill; threat modeling is a different job
 ```
 
 ---
@@ -577,25 +503,11 @@ code-formatter:
 
 ### ❌ Pitfall 3: Not Tracking Costs
 
-```yaml
-# Bad: No cost tracking
-{
-  "skills": { ... }
-  # No costTracking config
-}
-```
+**Problem:** You assign models by intuition, never check what they actually cost, and carry a wrong guess for months. You cannot optimize what you do not measure.
 
-**Problem:** Can't optimize what you don't measure
+**Fix:** Run `/usage` after a representative working session and read the per-skill breakdown. It takes seconds and routinely contradicts expectations — the skill you invoke constantly on Haiku is often cheaper than the one you invoke twice a week on Opus.
 
-**Fix:**
-```json
-{
-  "costTracking": {
-    "enabled": true,
-    "perSkill": true
-  }
-}
-```
+Check it again after changing an assignment. A change you never verified is a guess with extra steps.
 
 ---
 
@@ -609,10 +521,13 @@ code-review:
   model: sonnet  # Default safe choice
 
 # After measuring:
-code-review:
-  model: haiku   # Quick reviews work fine with Haiku!
-  modelOverrides:
-    deep: sonnet # Keep Sonnet for deep reviews
+# code-review/SKILL.md
+model: haiku     # Quick reviews work fine with Haiku
+effort: low
+
+# code-review-deep/SKILL.md
+model: sonnet    # Separate skill for the thorough pass
+effort: high
 ```
 
 ---
@@ -621,11 +536,10 @@ code-review:
 
 ```yaml
 # Match complexity to model
-skill-name:
-  model: haiku  # Default simple mode
-  modelOverrides:
-    standard: sonnet
-    deep: opus
+# One skill, one model. Progressive disclosure applies to the skill's
+# CONTENT (what files it loads), not to model selection.
+model: haiku
+effort: low
 ```
 
 ---
@@ -634,13 +548,9 @@ skill-name:
 
 ```yaml
 ---
-name: code-review
-model: haiku  # Quick reviews don't need deep reasoning
-modelOverrides:
-  deep: opus  # Architecture analysis needs best model
-costEstimate:
-  quick: 5000   # Haiku: ~$0.03
-  deep: 30000   # Opus: ~$0.90
+description: Reviews a diff for correctness, style, and obvious bugs. Use before committing.
+model: haiku     # Quick reviews don't need deep reasoning
+effort: low
 ---
 ```
 

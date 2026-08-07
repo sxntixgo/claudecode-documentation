@@ -53,7 +53,7 @@ Let's build this up step by step.
 
 ### Step 1: The Anatomy of a Command
 
-Every custom command is just a markdown file in `.claude/commands/` with special frontmatter:
+Every custom command is just a markdown file in `.claude/commands/` with frontmatter:
 
 ```
 your-project/
@@ -63,6 +63,19 @@ your-project/
         ├── run-tests.md
         └── deploy.md
 ```
+
+> 📌 **Commands and skills are now the same system.** A file at
+> `.claude/commands/deploy.md` and a skill at `.claude/skills/deploy/SKILL.md` both create
+> `/deploy` and behave identically. Your existing `.claude/commands/` files keep working, so
+> nothing here is deprecated.
+>
+> The skill form adds three things a flat command file cannot do: a directory for supporting
+> files that load only when needed, frontmatter to control whether you or Claude invokes it,
+> and automatic invocation when Claude judges it relevant. Reach for `.claude/commands/` when
+> you want a single file and a name you type; reach for a skill directory when the workflow
+> grows supporting material or you want Claude to trigger it on its own.
+>
+> See [Skills Overview](../04-skills/1-overview.md) for the skill form.
 
 Here's what happens when you type `/review-pr`:
 
@@ -115,13 +128,11 @@ Now let's level up with **dynamic commands** that accept input:
 ```markdown
 ---
 description: Review a pull request with comprehensive checks
-arguments:
-  - name: pr_number
-    description: PR number to review (e.g., 123)
-    required: true
+argument-hint: "[pr-number]"
+arguments: [pr_number]
 ---
 
-Review pull request #$PR_NUMBER with the following checklist:
+Review pull request #$pr_number with the following checklist:
 
 ## Security Review
 - [ ] No hardcoded secrets or API keys
@@ -154,10 +165,31 @@ Provide specific feedback for each failing item with line numbers and suggestion
 ```
 
 **What Claude does**:
-1. Replaces `$PR_NUMBER` with `456`
+1. Replaces `$pr_number` with `456`
 2. Fetches PR #456 (if GitHub MCP is configured)
 3. Reviews code against every checklist item
 4. Returns detailed feedback with line numbers
+
+### Argument Substitutions
+
+`arguments` declares names, and those names map to argument positions in order. There is no
+per-argument type, description, or `required` flag — validate in the body instead, as the deploy
+example later in this guide does.
+
+| Placeholder | Expands to |
+|-------------|-----------|
+| `$ARGUMENTS` | Everything passed after the command name |
+| `$ARGUMENTS[N]` | A single argument by 0-based index |
+| `$N` | Shorthand for the same, such as `$0` for the first |
+| `$name` | A name declared in `arguments`, such as `$pr_number` |
+| `${CLAUDE_SESSION_ID}` | The current session ID |
+| `${CLAUDE_PROJECT_DIR}` | Project root, for referencing project-local scripts |
+| `${CLAUDE_SKILL_DIR}` | The directory holding this file, for bundled scripts |
+
+If `$ARGUMENTS` does not appear anywhere in the body, arguments are appended automatically as
+`ARGUMENTS: <value>`, so a command still receives them.
+
+`argument-hint` is separate: it only supplies the hint text shown during autocomplete.
 
 ---
 
@@ -169,13 +201,11 @@ Provide specific feedback for each failing item with line numbers and suggestion
 ```markdown
 ---
 description: Run tests and report results
-arguments:
-  - name: path
-    description: Test file or directory path (optional)
-    required: false
+argument-hint: "[path]"
+arguments: [path]
 ---
 
-Run tests for ${path:-.} (current directory if no path specified).
+Run tests for $path. If no path was given, test the current directory.
 
 Steps:
 1. Identify the test framework (pytest, jest, go test, etc.)
@@ -204,16 +234,12 @@ If tests fail, suggest fixes for the failures.
 ```markdown
 ---
 description: Generate a REST API endpoint
-arguments:
-  - name: resource
-    description: Resource name (e.g., 'user', 'product')
-    required: true
-  - name: methods
-    description: HTTP methods (e.g., 'GET,POST,PUT,DELETE')
-    required: false
+argument-hint: "[resource] [methods]"
+arguments: [resource, methods]
 ---
 
-Generate a RESTful API endpoint for **$RESOURCE** with methods: ${METHODS:-GET,POST,PUT,DELETE}
+Generate a RESTful API endpoint for **$resource** with methods: $methods
+(default to GET, POST, PUT, DELETE if none were given)
 
 Include:
 1. Route definitions
@@ -294,13 +320,11 @@ Create commands that orchestrate complex workflows:
 ```markdown
 ---
 description: Complete checklist before marking feature as done
-arguments:
-  - name: feature_name
-    description: Feature name
-    required: true
+argument-hint: "[feature-name]"
+arguments: [feature_name]
 ---
 
-Run pre-merge checklist for feature: **$FEATURE_NAME**
+Run pre-merge checklist for feature: **$feature_name**
 
 ## Step 1: Code Quality
 - Run linter and fix issues
@@ -419,11 +443,10 @@ Provide specific refactoring suggestions with code examples.
 ```markdown
 ---
 description: Deploy to environment
-arguments:
-  - name: env
+arguments: [env]
 ---
 
-Deploy to $ENV
+Deploy to $env
 ```
 
 **Why it fails**: User could type `/deploy prodduction` (typo) and deploy to wrong environment!
@@ -433,24 +456,22 @@ Deploy to $ENV
 ```markdown
 ---
 description: Deploy to environment (staging or production)
-arguments:
-  - name: env
-    description: Environment - must be 'staging' or 'production'
-    required: true
+argument-hint: "[staging|production]"
+arguments: [env]
 ---
 
-**SAFETY CHECK**: Deploying to **$ENV**
+**SAFETY CHECK**: Deploying to **$env**
 
-If $ENV is not exactly "staging" or "production", STOP and ask user to correct.
+If $env is not exactly "staging" or "production", STOP and ask user to correct.
 
-If $ENV is "production":
+If $env is "production":
 - Confirm: "⚠️ Deploying to PRODUCTION. Are you sure? (yes/no)"
 - Wait for explicit "yes" before proceeding
 
 Deployment steps:
 1. Run all tests
 2. Build production bundle
-3. Deploy to $ENV
+3. Deploy to $env
 4. Run smoke tests
 5. Report success/failure
 ```
@@ -475,10 +496,8 @@ Ready to practice? Here's a hands-on exercise:
 ```markdown
 ---
 description: Generate comprehensive bug report
-arguments:
-  - name: title
-    description: Brief bug description
-    required: true
+argument-hint: "[title]"
+arguments: [title]
 ---
 
 Create a bug report for: **$TITLE**
@@ -501,10 +520,8 @@ Format as GitHub issue markdown.
 ```markdown
 ---
 description: Generate comprehensive bug report with system info
-arguments:
-  - name: title
-    description: Brief bug description
-    required: true
+argument-hint: "[title]"
+arguments: [title]
 ---
 
 # Bug Report: $TITLE

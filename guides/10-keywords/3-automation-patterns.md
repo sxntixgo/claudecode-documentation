@@ -16,19 +16,16 @@ Learn advanced patterns for automating workflows with keywords, triggers, and ho
 
 ### Pattern 1: Keyword-Based Triggers
 
-Auto-invoke skills based on natural language:
+Auto-invoke skills based on natural language. The trigger is the `description` — Claude reads it
+and decides whether your request matches. `when_to_use` is appended to the description and is
+where the example phrasings go. There is no regex list and no confidence threshold:
 
 `.claude/skills/code-review/SKILL.md`:
 ```yaml
 ---
 name: code-review
-autoTrigger:
-  patterns:
-    - "review.*code"
-    - "check.*pr"
-    - "audit.*code"
-    - "look.*over.*changes"
-  confidence: 0.85
+description: Reviews code for security, logic, and style issues before it is merged.
+when_to_use: review my code, check this PR, audit this file, look over my changes
 ---
 ```
 
@@ -41,36 +38,41 @@ autoTrigger:
 "Can you look over my changes?"
 ```
 
+Write the description in third person and make it slightly pushy — Claude under-invokes skills
+whose descriptions are vague ("Helps with code review"). `description` + `when_to_use` are
+truncated at 1,536 characters in the skill listing, so lead with the primary use case.
+
 ---
 
 ### Pattern 2: File Pattern Triggers
 
-Auto-select skills based on file types:
+Auto-select skills based on file types. This lives in the skill itself, via the `paths` field
+in its frontmatter — there is no central trigger registry:
 
-`.claude/config.json`:
-```json
-{
-  "autoTriggers": {
-    "filePatterns": [
-      {
-        "pattern": "**/*.test.ts",
-        "skill": "test-runner",
-        "confidence": 0.9
-      },
-      {
-        "pattern": "**/migrations/*.sql",
-        "skill": "database-migration",
-        "confidence": 0.95
-      },
-      {
-        "pattern": "**/*.md",
-        "skill": "documentation",
-        "confidence": 0.8
-      }
-    ]
-  }
-}
+`.claude/skills/test-runner/SKILL.md`:
+```yaml
+---
+name: test-runner
+description: Run and interpret the test suite
+paths:
+  - "**/*.test.ts"
+  - "**/*.spec.ts"
+---
 ```
+
+`.claude/skills/database-migration/SKILL.md`:
+```yaml
+---
+name: database-migration
+description: Write and review database migrations
+paths:
+  - "**/migrations/*.sql"
+---
+```
+
+Each skill declares the files it cares about, so adding a skill needs no edit anywhere else.
+Keep `description` sharp regardless of `paths` — it is still what Claude reads when deciding
+whether the skill is relevant.
 
 ---
 
@@ -239,7 +241,7 @@ jobs:
         env:
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
         run: |
-          claude --skill=code-review --output=review.md
+          claude -p "/code-review Review the changes in this PR" > review.md
 
       - name: Post Review as Comment
         uses: actions/github-script@v6
@@ -259,33 +261,39 @@ jobs:
 
 ## Smart Defaults
 
-### Auto-Select Optimal Model
+### Set a Sensible Default Model
 
-`.claude/config.json`:
+There is no rule engine that matches your prompt against patterns and picks a model. Model
+selection has two layers, and both are explicit.
+
+**Layer 1 — the session default**, in `.claude/settings.json`:
+
 ```json
 {
-  "smartDefaults": {
-    "enabled": true,
-    "rules": [
-      {
-        "taskPattern": "search|find|list",
-        "model": "haiku",
-        "reason": "Searches don't need deep reasoning"
-      },
-      {
-        "taskPattern": "design|architect|optimize",
-        "model": "opus",
-        "reason": "Complex tasks need maximum reasoning"
-      },
-      {
-        "taskPattern": ".*",
-        "model": "sonnet",
-        "reason": "Default to balanced Sonnet"
-      }
-    ]
-  }
+  "model": "sonnet",
+  "fallbackModel": "haiku"
 }
 ```
+
+Sonnet is the balanced default worth starting from; `fallbackModel` is what Claude Code drops
+to if the primary model is unavailable.
+
+**Layer 2 — per-behavior overrides**, declared where the behavior is defined. A search-heavy
+subagent pins Haiku in its own frontmatter; a skill that reasons about architecture pins Opus
+in its `SKILL.md`:
+
+```yaml
+---
+name: explore
+description: Search the codebase and report findings
+model: haiku
+---
+```
+
+That is the real version of "auto-select the optimal model": you decide once, per skill or per
+subagent, at the place that already describes what the work is.
+
+See [Model Assignment for Skills](../04-skills/4-model-assignment.md) for how far to push this.
 
 ---
 
