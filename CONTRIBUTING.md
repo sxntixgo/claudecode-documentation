@@ -613,5 +613,5 @@ Your contributions make this documentation better for everyone. Whether you're f
 
 ---
 
-**Last Updated**: 2025-01-15
+**Last Updated**: 2026-08-07
 **Maintained By**: Documentation Team

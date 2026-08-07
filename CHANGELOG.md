@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [3.0.0] - 2026-08-07
+
+**Why a major version**: this release removes documentation for APIs that do not
+exist. Anyone who followed the previous guides created files Claude Code never
+reads and ran commands that do not resolve, so the corrections are breaking for
+existing readers even though no software changed.
+
 ### Added
 
 **Prompt Engineering** (6 guides)
@@ -77,7 +86,10 @@ would have created files Claude Code never reads and run commands that do not re
 - Rust project template
 - Additional skill templates and examples
 
-## [1.0.0] - 2025-12-22
+## [2.1.0] - 2025-12-22
+
+> Previously published as `1.0.0`, which duplicated the 2025-01-10 entry and
+> placed this release out of order. Renumbered to reflect that it followed 2.0.0.
 
 ### Milestone: Complete Production-Ready Documentation
 
