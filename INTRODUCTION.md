@@ -64,7 +64,7 @@ Now that Claude has tools (via MCP) and you know how to communicate well (prompt
 Skills are like training manuals that agents follow. Once you know how agents work, you can write instructions (skills) that make them experts at specific tasks—TDD workflows, API documentation, code reviews. Skills turn generic agents into specialists.
 
 **5. Model Selection** (Understanding the Engine)
-Not every task needs the most powerful model. Haiku 4.5 is 3x cheaper than Sonnet and perfect for searches. Opus 4.5 excels at complex architecture but costs more. Knowing which model to use is crucial for balancing quality and cost.
+Not every task needs the most powerful model. Haiku 4.5 is 3x cheaper than Sonnet and perfect for searches. Opus 5 excels at complex architecture but costs more. Knowing which model to use is crucial for balancing quality and cost.
 
 **6. Thinking Modes** (Optimizing Reasoning)
 Sometimes you need Claude to think deeply about a problem; other times, a quick answer is fine. Thinking modes let you control how much reasoning Claude does, which directly impacts token usage and quality.

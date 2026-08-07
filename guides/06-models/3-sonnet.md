@@ -1,4 +1,4 @@
-# Sonnet 4.5 Deep Dive
+# Sonnet 5 Deep Dive
 
 **Reading Time**: 15 minutes  
 **Skill Level**: Intermediate
@@ -8,7 +8,7 @@
 
 ## The All-Around Workhorse ⚖️
 
-Sonnet 4.5 is the sweet spot for most development tasks - balancing quality, speed, and cost.
+Sonnet 5 is the sweet spot for most development tasks - balancing quality, speed, and cost.
 
 ---
 
@@ -123,7 +123,7 @@ claude --model=haiku "Format code with Prettier"
 
 ## Next Steps
 
-- [Opus 4.5 Deep Dive](4-opus.md) - Maximum reasoning power
+- [Opus 5 Deep Dive](4-opus.md) - Maximum reasoning power
 - [Model Selection Guide](5-selection-guide.md) - Decision frameworks
 
 ---

@@ -43,8 +43,8 @@ Learn how to monitor, measure, and optimize Claude Code performance for cost eff
 | Model | Tokens/Second | Latency (P50) | Latency (P99) |
 |-------|---------------|---------------|---------------|
 | **Haiku 4.5** | ~200 | 0.5s | 1.2s |
-| **Sonnet 4.5** | ~100 | 1.2s | 3.0s |
-| **Opus 4.5** | ~50 | 2.5s | 7.0s |
+| **Sonnet 5** | ~100 | 1.2s | 3.0s |
+| **Opus 5** | ~50 | 2.5s | 7.0s |
 
 ### Cost vs. Speed Trade-offs
 
@@ -358,9 +358,9 @@ Learn from real teams who dramatically improved their Claude Code performance an
 Monthly Usage:
 - Total Tokens: 12.5M tokens
 - Model Distribution:
-  - Sonnet 4.5: 85% (10.6M tokens)
+  - Sonnet 5: 85% (10.6M tokens)
   - Haiku 4.5: 10% (1.25M tokens)
-  - Opus 4.5: 5% (625K tokens)
+  - Opus 5: 5% (625K tokens)
 
 Cost Breakdown:
 - Sonnet: $371.00 (74%)
@@ -485,8 +485,8 @@ Monthly Usage:
 - Total Tokens: 10.8M tokens (14% reduction)
 - Model Distribution:
   - Haiku 4.5: 65% (7.0M tokens)
-  - Sonnet 4.5: 30% (3.2M tokens)
-  - Opus 4.5: 5% (540K tokens)
+  - Sonnet 5: 30% (3.2M tokens)
+  - Opus 5: 5% (540K tokens)
 
 Cost Breakdown:
 - Haiku: $49.00 (28%)
@@ -1079,7 +1079,7 @@ def profile_api_call(url: str, payload: dict) -> LatencyBreakdown:
 
 # Usage
 breakdown = profile_api_call('https://api.anthropic.com/v1/messages', {
-    'model': 'claude-sonnet-4.5-20251101',
+    'model': 'claude-sonnet-5',
     'messages': [{'role': 'user', 'content': 'Hello'}]
 })
 
@@ -2288,7 +2288,7 @@ for op, cost in sorted(operations.items(), key=lambda x: x[1], reverse=True)[:5]
 def process_ticket(ticket_text: str):
     # BUG: Defaulting to Opus for everything!
     response = claude.complete(
-        model='claude-opus-4-5-20251101',  # ⚠️ WRONG!
+        model='claude-opus-5',  # ⚠️ WRONG!
         prompt=f"Classify this support ticket: {ticket_text}"
     )
     return response
@@ -2303,7 +2303,7 @@ def process_ticket(ticket_text: str):
 def process_ticket(ticket_text: str):
     # Use Haiku for simple classification
     response = claude.complete(
-        model='claude-haiku-4.5-20241022',  # ✅ CORRECT!
+        model='claude-haiku-4-5-20251001',  # ✅ CORRECT!
         prompt=f"Classify this support ticket: {ticket_text}"
     )
     return response
@@ -2429,7 +2429,7 @@ def process_reviews(reviews: List[str]):
 
     for review in reviews:  # ⚠️ One at a time!
         result = claude.complete(
-            model='claude-sonnet-4.5-20251101',
+            model='claude-sonnet-5',
             prompt=f"Analyze sentiment: {review}"
         )
         results.append(result)
@@ -2460,7 +2460,7 @@ def process_reviews_batched(reviews: List[str], batch_size: int = 10):
             prompt += f"{j+1}. {review}\n\n"
 
         batch_result = claude.complete(
-            model='claude-sonnet-4.5-20251101',
+            model='claude-sonnet-5',
             prompt=prompt
         )
 

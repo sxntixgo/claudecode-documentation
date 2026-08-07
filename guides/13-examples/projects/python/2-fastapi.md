@@ -258,7 +258,7 @@ class User(UserBase):
 ---
 name: fastapi-endpoint
 description: Generate async FastAPI endpoint with CRUD operations
-model: claude-sonnet-4-5
+model: claude-sonnet-5
 invocationPattern: /fastapi-endpoint
 ---
 

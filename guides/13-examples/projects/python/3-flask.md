@@ -641,7 +641,7 @@ class ProductForm(FlaskForm):
 ---
 name: flask-api
 description: Build RESTful API endpoint with JSON responses
-model: claude-sonnet-4-5
+model: claude-sonnet-5
 ---
 
 # Flask API Generator

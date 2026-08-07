@@ -731,7 +731,7 @@ Create `.claude/skills/code-review/SKILL.md`:
 ---
 name: code-review
 description: Comprehensive code review covering quality, security, and performance with configurable depth
-model: claude-sonnet-4-5
+model: claude-sonnet-5
 ---
 
 # Code Review Skill
@@ -1030,8 +1030,8 @@ Winner: Haiku
 
 # Shows menu:
 # - Haiku 4.5 (fast & cheap)
-# - Sonnet 4.5 (balanced) ← current
-# - Opus 4.5 (maximum capability)
+# - Sonnet 5 (balanced) ← current
+# - Opus 5 (maximum capability)
 
 # Select new model
 ```
@@ -1118,8 +1118,8 @@ Savings: 43% ($4.10/day, $1,230/year)
 | Model | Input | Output | Use Case |
 |-------|-------|--------|----------|
 | **Haiku 4.5** | $1/M tokens | $5/M tokens | Fast & cheap |
-| **Sonnet 4.5** | $3/M tokens | $15/M tokens | Balanced |
-| **Opus 4.5** | Premium* | Premium* | Maximum quality |
+| **Sonnet 5** | $3/M tokens | $15/M tokens | Balanced |
+| **Opus 5** | Premium* | Premium* | Maximum quality |
 
 *Opus pricing is higher than Sonnet but exact rates vary
 

@@ -25,8 +25,8 @@ By the end of this guide, you'll understand:
 graph LR
     subgraph "Claude 4.5 Model Family"
         Haiku["Haiku 4.5<br/>⚡ Fastest<br/>💰 Most Affordable<br/>🎯 Simple Tasks"]
-        Sonnet["Sonnet 4.5<br/>⚖️ Balanced<br/>💡 Versatile<br/>🎯 Most Tasks"]
-        Opus["Opus 4.5<br/>🧠 Smartest<br/>🔬 Deep Reasoning<br/>🎯 Complex Tasks"]
+        Sonnet["Sonnet 5<br/>⚖️ Balanced<br/>💡 Versatile<br/>🎯 Most Tasks"]
+        Opus["Opus 5<br/>🧠 Smartest<br/>🔬 Deep Reasoning<br/>🎯 Complex Tasks"]
     end
 
     Haiku -->|"Cost-effective"| Tasks1["File operations<br/>Pattern matching<br/>Formatting"]
@@ -44,7 +44,7 @@ graph LR
 
 **Pricing as of January 2025** ([Verify current rates](https://www.anthropic.com/pricing))
 
-| Feature | Haiku 4.5 | Sonnet 4.5 | Opus 4.5 |
+| Feature | Haiku 4.5 | Sonnet 5 | Opus 5 |
 |---------|-----------|------------|----------|
 | **Speed** | 🚀🚀🚀 Fastest | 🚀🚀 Fast | 🚀 Slower |
 | **Cost (Input)** | $1/M tokens | $3/M tokens | Premium* |
@@ -104,7 +104,7 @@ graph LR
 
 ---
 
-### Sonnet 4.5: The Workhorse ⚖️
+### Sonnet 5: The Workhorse ⚖️
 
 **Philosophy**: Balanced performance, quality, and cost for most development tasks
 
@@ -147,7 +147,7 @@ graph LR
 
 ---
 
-### Opus 4.5: The Genius 🧠
+### Opus 5: The Genius 🧠
 
 **Philosophy**: Maximum reasoning power for complex, critical tasks
 
@@ -203,13 +203,13 @@ graph LR
 - Average operation: 5,000 tokens total
 - Cost: ~$0.03 per operation
 
-**Sonnet 4.5:**
+**Sonnet 5:**
 - Input: $3 per million tokens
 - Output: $15 per million tokens
 - Average operation: 12,000 tokens total
 - Cost: ~$0.18 per operation
 
-**Opus 4.5:**
+**Opus 5:**
 - Input: Premium (est. $6-9 per million)
 - Output: Premium (est. $30-45 per million)
 - Average operation: 25,000 tokens total
@@ -350,13 +350,13 @@ graph TD
 
     Q2 -->|Yes| Q3{"Is it critical<br/>or complex?"}
 
-    Q3 -->|No| Sonnet1["Use Sonnet 4.5<br/>Standard coding tasks"]
+    Q3 -->|No| Sonnet1["Use Sonnet 5<br/>Standard coding tasks"]
 
     Q3 -->|Yes| Q4{"Architecture or<br/>security critical?"}
 
-    Q4 -->|No| Sonnet2["Use Sonnet 4.5<br/>Bug fixes, features"]
+    Q4 -->|No| Sonnet2["Use Sonnet 5<br/>Bug fixes, features"]
 
-    Q4 -->|Yes| Opus1["Use Opus 4.5<br/>Maximum quality needed"]
+    Q4 -->|Yes| Opus1["Use Opus 5<br/>Maximum quality needed"]
 
     style Haiku1 fill:#d4f4dd
     style Haiku2 fill:#d4f4dd
@@ -541,8 +541,8 @@ Now that you understand the three models, dive deeper:
 
 **Detailed Model Guides:**
 - [Haiku 4.5 Deep Dive](2-haiku.md) (20 min) - Master fast, cost-effective development
-- [Sonnet 4.5 Deep Dive](3-sonnet.md) (20 min) - Maximize the all-around workhorse
-- [Opus 4.5 Deep Dive](4-opus.md) (20 min) - Harness maximum reasoning power
+- [Sonnet 5 Deep Dive](3-sonnet.md) (20 min) - Maximize the all-around workhorse
+- [Opus 5 Deep Dive](4-opus.md) (20 min) - Harness maximum reasoning power
 
 **Practical Applications:**
 - [Model Selection Guide](5-selection-guide.md) (25 min) - Decision frameworks and real-world examples

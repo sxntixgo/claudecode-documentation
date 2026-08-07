@@ -55,8 +55,8 @@ Opus (premium):
 | Model | Input | Output | Use Case |
 |-------|--------|--------|----------|
 | **Haiku 4.5** | $1/M tokens | $5/M tokens | Searches, formatting, simple tasks |
-| **Sonnet 4.5** | $3/M tokens | $15/M tokens | Coding, reviews, general development |
-| **Opus 4.5** | Premium* | Premium* | Architecture, complex analysis |
+| **Sonnet 5** | $3/M tokens | $15/M tokens | Coding, reviews, general development |
+| **Opus 5** | Premium* | Premium* | Architecture, complex analysis |
 
 > ⚠️ **Pricing subject to change**. Verify at [anthropic.com/pricing](https://www.anthropic.com/pricing)
 
