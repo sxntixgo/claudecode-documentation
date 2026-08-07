@@ -1,0 +1,2 @@
+# Documentation site dependencies. Pinned so CI and local builds match.
+mkdocs-material==9.5.49

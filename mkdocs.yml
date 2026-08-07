@@ -1,6 +1,8 @@
 site_name: Claude Code Documentation
 site_description: A comprehensive, verified guide to Claude Code — MCP servers, agents, skills, hooks, context engineering, and cost optimization.
-site_url: https://sxntixgo.github.io/claudecode-documentation/
+# The sxntixgo.github.io user site has a custom domain, so GitHub serves
+# every project page under it rather than github.io.
+site_url: https://gimenezocano.com/claudecode-documentation/
 repo_url: https://github.com/sxntixgo/claudecode-documentation
 repo_name: sxntixgo/claudecode-documentation
 edit_uri: edit/main/
