@@ -785,5 +785,4 @@ model: sonnet
 
 ---
 
-**Last Updated**: Phase 5 - Reference & Maintenance
 **Questions?** [Submit an issue](https://github.com/anthropics/claude-code/issues)

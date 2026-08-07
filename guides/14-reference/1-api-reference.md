@@ -29,8 +29,7 @@ This is your complete technical reference for all Claude Code configuration sche
 
 ### Overview
 
-A custom subagent is a single Markdown file with YAML frontmatter. There is no `subagent file` file
-and no registry — Claude Code discovers subagents by reading the directory, so the agent exists
+A custom subagent is a single Markdown file with YAML frontmatter. There is no `AGENT.md` and no registry — Claude Code discovers subagents by reading the directory, so the agent exists
 the moment the file does.
 
 | Scope | Path |
@@ -1029,7 +1028,6 @@ You can import additional context files:
 
 ---
 
-**Last Updated**: 2025-01-15
 **Maintained By**: Development Team
 **Questions?**: Open an issue or contact the team
 ```
