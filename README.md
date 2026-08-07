@@ -2,8 +2,7 @@
 
 > Comprehensive documentation for mastering Claude Code - from fundamentals to advanced optimization
 
-**Version**: 3.0.0
-**Last Updated**: August 7, 2026
+**Version**: see [CHANGELOG.md](CHANGELOG.md)
 **Status**: Production Ready ✅
 
 ## 📚 What's This?
