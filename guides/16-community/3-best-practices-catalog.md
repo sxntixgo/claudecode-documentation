@@ -1,7 +1,6 @@
 # Community Best Practices Catalog
 
 **Reading Time**: 25 minutes
-**Last Updated**: December 21, 2025
 
 ---
 

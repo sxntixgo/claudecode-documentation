@@ -2,7 +2,6 @@
 
 **Reading Time**: 30-50 minutes (varies by topic interest)
 **Skill Level**: All levels
-**Last Updated**: 2025-01-15
 
 ---
 
@@ -2389,5 +2388,4 @@ Found a question not covered here? Submit a PR or open an issue:
 - Include: Question + detailed answer + examples
 - We'll add it to help others!
 
-**Last Updated**: 2025-01-15
 **Contributors**: Community submissions welcome!

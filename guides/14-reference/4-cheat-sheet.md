@@ -447,7 +447,6 @@ Need planning? → Plan
 
 ## Version Info
 
-**Last Updated**: 2025-01-15
 **Claude Code Version**: 1.0.x
 **For**: Haiku 4.5, Sonnet 4.5, Opus 4.5
 

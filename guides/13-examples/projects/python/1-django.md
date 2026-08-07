@@ -1123,5 +1123,4 @@ volumes:
 
 ---
 
-**Last Updated**: 2025-01-15
 **Maintained By**: Documentation Team
