@@ -1,7 +1,6 @@
 # Community Contribution Guide
 
 **Reading Time**: 20 minutes
-**Last Updated**: December 21, 2025
 
 ---
 

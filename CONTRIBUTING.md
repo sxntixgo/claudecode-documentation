@@ -143,7 +143,10 @@ git push origin feature/improve-mcp-docs
 **Skill Level**: Beginner/Intermediate/Advanced
 **Prerequisites**: Link to prerequisite guides
 
-> **Note**: "Last Updated" metadata is optional. Git commit history is the primary source of truth for when content was last modified.
+> **Note**: Do not add "Last Updated" or "Version" stamps to guides. Git commit
+> history is the source of truth for when content changed. Hand-maintained
+> stamps drift silently — every one in this repo was between seven months and
+> a year and a half stale before they were removed.
 
 ---
 
@@ -613,5 +616,4 @@ Your contributions make this documentation better for everyone. Whether you're f
 
 ---
 
-**Last Updated**: 2026-08-07
 **Maintained By**: Documentation Team
