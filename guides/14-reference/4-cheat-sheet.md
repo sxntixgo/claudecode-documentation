@@ -55,15 +55,18 @@ Press [Tab]                     # Toggle extended thinking on/off
 
 ---
 
-## Model Pricing (2025)
+## Model Pricing
 
 | Model | Input | Output | Use Case |
 |-------|-------|--------|----------|
 | **Haiku 4.5** | $1/M | $5/M | Fast & cheap (searches, simple tasks) |
-| **Sonnet 4.5** | $3/M | $15/M | Balanced (standard coding) |
-| **Opus 4.5** | Premium | Premium | Maximum reasoning (architecture) |
+| **Sonnet 5** | $3/M | $15/M | Balanced (standard coding) |
+| **Opus 5** | $5/M | $25/M | Maximum reasoning (architecture) |
+| **Fable 5** | $10/M | $50/M | Highest capability |
 
-**M = Million tokens**
+**M = Million tokens.** Sonnet 5 is $2/$10 introductory through 31 Aug 2026, then $3/$15.
+Haiku 4.5 is still the current Haiku — there is no Haiku 5.
+[Verify current rates](https://platform.claude.com/docs/en/about-claude/pricing).
 
 ---
 
@@ -92,14 +95,13 @@ Press [Tab]                     # Toggle extended thinking on/off
 ## Quick Config Examples
 
 ### Optimal Cost Configuration
+`.claude/settings.json` sets the session default. There is no `agents` key — each subagent
+carries its own `model` in its own file:
+
 ```json
 {
-  "agents": {
-    "Explore": {"model": "haiku"},
-    "general-purpose": {"model": "sonnet"},
-    "Plan": {"model": "sonnet"}
-  },
-  "model": "haiku"
+  "model": "sonnet",
+  "fallbackModel": "haiku"
 }
 ```
 
@@ -205,15 +207,17 @@ there are no `allowedPaths`, `deniedPaths`, or `timeout` fields.
 
 ## Slash Command
 
+`.claude/commands/review.md` — the command name comes from the filename:
+
 ```yaml
 ---
-command: review
-description: Code review
-usage: /review [options] <file>
+description: Reviews a diff for correctness and security. Use before committing.
+argument-hint: "[file]"
+arguments: [file]
 model: sonnet
 ---
 
-# Command instructions here
+Review $file for correctness, security, and missing error handling.
 ```
 
 ---
@@ -227,12 +231,17 @@ model: sonnet
 | **Notification** | Claude notifies | OS alerts, logging |
 | **Stop** | Response complete | Git checks, cleanup |
 
-### Hook Variables
-- `$TOOL`: Tool name
-- `$FILE`: File path
-- `$STATUS`: Exit code
-- `$OUTPUT`: Tool output
-- `$MESSAGE`: Notification message
+### Hook Input
+
+Hooks receive JSON on **stdin**, not shell variables. Parse it with `jq`:
+
+```bash
+f=$(jq -r '.tool_input.file_path')   # tool events
+```
+
+Common fields: `hook_event_name`, `tool_name`, `tool_input`, `cwd`, `session_id`.
+Exit `0` for success, `2` to block (stderr becomes the reason).
+Available in the environment: `$CLAUDE_PROJECT_DIR`, `$CLAUDE_EFFORT`.
 
 ---
 
@@ -270,10 +279,10 @@ You: "Implement authentication"
 - [ ] General-Purpose → Haiku/Sonnet
 - [ ] Plan agent → Sonnet
 - [ ] Default model → Haiku
-- [ ] Cost tracking enabled
+- [ ] Know how to check `/usage` and `/context`
 
 ### Context
-- [ ] CLAUDE.md < 300 lines
+- [ ] CLAUDE.md < 200 lines
 - [ ] Use file imports (@docs/...)
 - [ ] Memory hierarchy configured
 - [ ] Clear history between unrelated tasks
@@ -285,7 +294,7 @@ You: "Implement authentication"
 - [ ] Skip thinking keywords for simple tasks
 
 ### Monitoring
-- [ ] Review cost logs weekly
+- [ ] Review `/usage` weekly (press `w` for 7 days)
 - [ ] Check model distribution
 - [ ] Adjust based on actual usage
 
@@ -298,7 +307,7 @@ You: "Implement authentication"
 ### MCP Server Not Loading
 ```bash
 claude mcp list          # Verify installation
-cat ~/.config/claude/claude_desktop_config.json | jq .
+cat .mcp.json | jq .     # Project servers (~/.claude.json for user scope)
 claude mcp remove NAME && claude mcp add NAME
 # Restart Claude
 ```
@@ -410,7 +419,7 @@ Need planning? → Plan
 ✅ No thinking keywords for formatting/searches
 
 ❌ 1000-line CLAUDE.md
-✅ < 300 lines + @imports
+✅ < 200 lines + @imports
 
 ❌ All default settings
 ✅ Configure agents, enable cost tracking
@@ -448,7 +457,7 @@ Need planning? → Plan
 ## Version Info
 
 **Claude Code Version**: 1.0.x
-**For**: Haiku 4.5, Sonnet 4.5, Opus 4.5
+**For**: Haiku 4.5, Sonnet 5, Opus 5
 
 ---
 

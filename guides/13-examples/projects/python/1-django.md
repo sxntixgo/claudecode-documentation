@@ -428,7 +428,7 @@ I'll remind you to:
 ---
 name: django-api
 description: Build REST API endpoint with DRF
-model: claude-sonnet-4-5
+model: claude-sonnet-5
 invocationPattern: /django-api
 ---
 

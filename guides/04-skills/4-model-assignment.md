@@ -59,8 +59,8 @@ Total savings: 61% reduction in cost
 | Model | Best For Skills That... | Example Skills |
 |-------|-------------------------|----------------|
 | **Haiku 4.5** | Format, validate, simple generation | code-formatter, spell-checker, linter |
-| **Sonnet 4.5** | Analyze, review, standard generation | code-review, test-generator, api-scaffold |
-| **Opus 4.5** | Complex reasoning, architecture | system-design, security-audit-deep, refactor-architect |
+| **Sonnet 5** | Analyze, review, standard generation | code-review, test-generator, api-scaffold |
+| **Opus 5** | Complex reasoning, architecture | system-design, security-audit-deep, refactor-architect |
 
 ### Decision Tree
 
@@ -71,13 +71,13 @@ graph TD
     Skill --> Q1{"Does it require<br/>deep reasoning?"}
 
     Q1 -->|No| Q2{"Does it need<br/>code understanding?"}
-    Q1 -->|Yes| UseOpus["Use Opus 4.5<br/>Complex analysis needed"]
+    Q1 -->|Yes| UseOpus["Use Opus 5<br/>Complex analysis needed"]
 
     Q2 -->|No| UseHaiku["Use Haiku 4.5<br/>Simple operations"]
     Q2 -->|Yes| Q3{"Simple or complex<br/>code analysis?"}
 
-    Q3 -->|Simple| UseSonnet1["Use Sonnet 4.5<br/>Standard code work"]
-    Q3 -->|Complex| UseOpus2["Use Opus 4.5<br/>Architecture/refactoring"]
+    Q3 -->|Simple| UseSonnet1["Use Sonnet 5<br/>Standard code work"]
+    Q3 -->|Complex| UseOpus2["Use Opus 5<br/>Architecture/refactoring"]
 
     style UseHaiku fill:#d4f4dd
     style UseSonnet1 fill:#fff9e6

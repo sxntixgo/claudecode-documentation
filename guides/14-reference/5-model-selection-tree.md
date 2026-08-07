@@ -22,9 +22,9 @@ graph TD
 
     Q2 -->|Yes| Q3{"Do you have<br/>Opus budget<br/>available?"}
 
-    Q3 -->|Yes| Opus["✅ Use Opus 4.5<br/><br/>Speed: Slower<br/>Cost: Premium<br/>Best for: Architecture,<br/>complex planning,<br/>advanced reasoning"]
+    Q3 -->|Yes| Opus["✅ Use Opus 5<br/><br/>Speed: Slower<br/>Cost: Premium<br/>Best for: Architecture,<br/>complex planning,<br/>advanced reasoning"]
 
-    Q3 -->|No| Sonnet["⚠️ Use Sonnet 4.5<br/><br/>Speed: Good<br/>Cost: Balanced<br/>Better than Haiku<br/>for complex work"]
+    Q3 -->|No| Sonnet["⚠️ Use Sonnet 5<br/><br/>Speed: Good<br/>Cost: Balanced<br/>Better than Haiku<br/>for complex work"]
 
     Q2 -->|No| Sonnet
 

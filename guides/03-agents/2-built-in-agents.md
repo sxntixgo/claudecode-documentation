@@ -1016,7 +1016,7 @@ Before I implement:
 
 **Task**: "Search for authentication code"
 
-| Agent | Tokens | Cost (Sonnet 4.5) |
+| Agent | Tokens | Cost (Sonnet 5) |
 |-------|--------|-------------------|
 | Explore | 2,300 | $0.0069 |
 | General-Purpose | 6,800 | $0.0204 |
@@ -1024,7 +1024,7 @@ Before I implement:
 
 **Task**: "Add a feature"
 
-| Agent | Tokens | Cost (Sonnet 4.5) |
+| Agent | Tokens | Cost (Sonnet 5) |
 |-------|--------|-------------------|
 | Explore | N/A | N/A |
 | General-Purpose | 18,500 | $0.0555 |
