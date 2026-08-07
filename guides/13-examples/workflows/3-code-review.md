@@ -894,7 +894,7 @@ Review them together, identify common issues."
 ---
 name: code-reviewer
 description: Systematic code review with quality, security, and test checks
-model: claude-sonnet-4-5
+model: claude-sonnet-5
 ---
 
 When invoked, review the PR using this checklist:

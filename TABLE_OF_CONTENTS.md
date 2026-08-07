@@ -194,7 +194,7 @@ graph TD
 
 | Guide | Time | Topics |
 |-------|------|--------|
-| [Model Overview](guides/06-models/1-overview.md) | 20 min | Haiku 4.5, Sonnet 4.5, Opus 4.5 capabilities |
+| [Model Overview](guides/06-models/1-overview.md) | 20 min | Haiku 4.5, Sonnet 5, Opus 5 capabilities |
 | [Selection Guide](guides/06-models/5-selection-guide.md) | 30 min | Decision matrix, when to use each model |
 
 **Total Time**: ~50 minutes

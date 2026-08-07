@@ -1,4 +1,4 @@
-# Opus 4.5 Deep Dive
+# Opus 5 Deep Dive
 
 **Reading Time**: 15 minutes
 **Skill Level**: Advanced
@@ -8,7 +8,7 @@
 
 ## Harness Maximum Reasoning Power 🧠
 
-Opus 4.5 is Claude's most capable model - use it strategically for complex, critical tasks.
+Opus 5 is Claude's most capable model - use it strategically for complex, critical tasks.
 
 ---
 

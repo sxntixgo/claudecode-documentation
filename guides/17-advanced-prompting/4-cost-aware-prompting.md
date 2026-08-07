@@ -16,12 +16,19 @@ Cost-aware prompting is designing prompts to **maximize value per dollar** while
 
 ```
 Haiku 4.5:   $1.00 / 1M input tokens,  $5.00 / 1M output tokens
-Sonnet 4.5:  $3.00 / 1M input tokens, $15.00 / 1M output tokens
-Opus 4.5:    $5.00 / 1M input tokens, $25.00 / 1M output tokens
+Sonnet 5:  $3.00 / 1M input tokens, $15.00 / 1M output tokens
+Opus 5:    $5.00 / 1M input tokens, $25.00 / 1M output tokens
 
 Sonnet is 3x more expensive than Haiku for input
 Opus is 5x more expensive than Haiku for input
 ```
+
+> ⚠️ **Two things that move these numbers.** Sonnet 5 is $2/$10 introductory through
+> 31 August 2026, reverting to the $3/$15 shown above. And Claude 4.7-and-later models,
+> including Opus 5 and Sonnet 5, use a newer tokenizer that produces roughly **30% more
+> tokens for the same text** than Sonnet 4.6 and earlier. Token counts quoted throughout
+> these guides predate that change, so treat them as relative comparisons rather than
+> absolute forecasts, and measure your own with `/usage`.
 
 **Question**: Do you really need Sonnet for "list files in this directory"?
 

@@ -210,8 +210,8 @@ Contributions welcome! Please open an issue first to discuss changes.
 
 **Testing**:
 - [ ] Tested with Haiku 4.5
-- [ ] Tested with Sonnet 4.5
-- [ ] Tested with Opus 4.5
+- [ ] Tested with Sonnet 5
+- [ ] Tested with Opus 5
 - [ ] Includes examples
 - [ ] Includes documentation
 
