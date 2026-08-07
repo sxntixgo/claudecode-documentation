@@ -1117,7 +1117,7 @@ Audit your dependencies for this too — it's a common source of "works standalo
 
 **Explore Advanced Topics:**
 - [Token Optimization](../12-optimization/1-cost-optimization.md) - Achieve 70%+ cost savings
-- [Keywords & Triggers](../10-keywords/) - Power user features and automation
+- [Keywords & Triggers](../10-keywords/1-overview.md) - Power user features and automation
 
 ---
 

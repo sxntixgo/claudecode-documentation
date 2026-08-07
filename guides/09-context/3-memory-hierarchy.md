@@ -140,8 +140,8 @@ Optimize context usage with a strategic hierarchy.
 **Phase 2 Complete!** 🎉
 
 **Continue to**:
-- [Keywords & Triggers](../10-keywords/) - Power user features
-- [Token Optimization](../12-optimization/) - Advanced savings
+- [Keywords & Triggers](../10-keywords/1-overview.md) - Power user features
+- [Token Optimization](../12-optimization/1-cost-optimization.md) - Advanced savings
 
 ---
 

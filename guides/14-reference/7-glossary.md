@@ -21,16 +21,14 @@ Terms are organized alphabetically. Each entry includes:
 ### Agent
 **Definition**: A specialized AI assistant with specific capabilities and constraints. Agents can be configured with different models, tool permissions, and file path access restrictions.
 
-**Example**:
-```json
-{
-  "agents": {
-    "frontend-agent": {
-      "model": "haiku",
-      "tools": ["Read", "Write"],
-    }
-  }
-}
+**Example** (`.claude/agents/frontend-agent.md`):
+```markdown
+---
+name: frontend-agent
+description: Builds and modifies React components
+model: haiku
+tools: Read, Write, Edit
+---
 ```
 
 **Types**: Explore (read-only), General-Purpose (read/write), Plan (architecture)
@@ -43,14 +41,12 @@ Terms are organized alphabetically. Each entry includes:
 **See Also**: [API Reference](../14-reference/1-api-reference.md)
 
 ### Approval Required
-**Definition**: A skill or agent feature that requires human confirmation before executing sensitive operations.
+**Definition**: Requiring human confirmation before a sensitive operation. There is no
+`approvalRequired` field — this is achieved with `permissions.ask` in settings.json, a
+`PreToolUse` hook that returns a `permissionDecision` of `ask`, or an instruction in the skill
+body telling Claude to stop and confirm.
 
-**Example**:
-```yaml
----
-name: database-migration-skill
----
-```
+**See Also**: [Hooks](../11-hooks/1-overview.md)
 
 ### Auto-Invocation
 **Definition**: Claude loading a skill on its own, without a `/command`. It is description-driven: Claude reads each skill's `description` (plus `when_to_use`, which is appended to it) and decides whether the request matches. There are no regex patterns and no confidence score. A `paths` glob narrows activation to matching files, `disable-model-invocation: true` turns auto-invocation off.
@@ -182,7 +178,7 @@ npm test       # Run tests
 - Memory (.claude/memory.md)
 - Previous conversation history
 
-**See Also**: [Context Management](../09-context/)
+**See Also**: [Context Management](../09-context/1-overview.md)
 
 ### Context Window
 **Definition**: The maximum number of tokens Claude can consider at once, including your input and output.
@@ -239,7 +235,7 @@ Comprehensive checks...
 - `"think hard"`: ~10K token budget
 - `"ultrathink"`: ~32K token budget
 
-**See Also**: [Thinking Modes](../08-thinking/)
+**See Also**: [Thinking Modes](../08-thinking/1-overview.md)
 
 ---
 
@@ -260,7 +256,7 @@ description: Automated code reviews
 ### Function Calling
 **Definition**: When Claude invokes MCP tools to accomplish tasks (reading files, executing code, etc.).
 
-**See Also**: [MCP Servers](../01-mcp-servers/)
+**See Also**: [MCP Servers](../01-mcp-servers/1-overview.md)
 
 ---
 
@@ -368,7 +364,7 @@ description: Automated code reviews
 - `"quick"`: Prefer faster response
 - `"deep"`: Comprehensive analysis
 
-**See Also**: [Keywords Reference](../10-keywords/)
+**See Also**: [Keywords Reference](../10-keywords/1-overview.md)
 
 ---
 
@@ -410,13 +406,13 @@ description: Automated code reviews
 **Definition**: A program that implements the Model Context Protocol to provide tools to Claude.
 
 **Example**: GitHub MCP provides PR management tools
-**See Also**: [MCP Servers](../01-mcp-servers/)
+**See Also**: [MCP Servers](../01-mcp-servers/1-overview.md)
 
 ### Model
 **Definition**: The underlying AI engine Claude Code uses (Haiku, Sonnet, or Opus).
 
 **Selection Factors**: Task complexity, cost, speed, quality
-**See Also**: [Model Selection](../06-models/)
+**See Also**: [Model Selection](../06-models/1-overview.md)
 
 ### Model Selection
 **Definition**: Process of choosing the right model for a task.
@@ -646,7 +642,7 @@ Optional advanced features...
 
 **Cost**: Charged per million tokens
 
-**See Also**: [Token Optimization](../12-optimization/)
+**See Also**: [Token Optimization](../12-optimization/1-cost-optimization.md)
 
 ### Tool
 **Definition**: Capability available to Claude Code, either built-in (Read, Write) or from MCP servers.
@@ -654,7 +650,7 @@ Optional advanced features...
 **Built-in Tools**: Read, Write, Edit, Grep, Bash, Glob
 **MCP Tools**: Vary by server (GitHub, database queries, API calls)
 
-**See Also**: [MCP Servers](../01-mcp-servers/)
+**See Also**: [MCP Servers](../01-mcp-servers/1-overview.md)
 
 ---
 

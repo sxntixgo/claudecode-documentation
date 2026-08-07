@@ -590,10 +590,10 @@ We value **all contributions**, including:
 
 ### Resources
 
-- [Documentation Plan](DOCUMENTATION_PLAN.md) - Overall structure and roadmap
+- [Table of Contents](TABLE_OF_CONTENTS.md) - Overall structure and reading order
 - [Table of Contents](TABLE_OF_CONTENTS.md) - Navigation guide
 - [Changelog](CHANGELOG.md) - Recent changes
-- [Style Guide](CLAUDE.md) - Internal writing guidelines
+- [Style Guide](https://github.com/sxntixgo/claudecode-documentation/blob/main/CLAUDE.md) - Internal writing guidelines
 
 ---
 
