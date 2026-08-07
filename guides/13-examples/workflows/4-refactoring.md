@@ -1382,7 +1382,7 @@ if (order.total > FREE_SHIPPING_THRESHOLD) {
 name: refactorer
 description: Systematic refactoring with TDD safety net
 model: claude-sonnet-4-5
-modelOverrides:
+# One model per skill; use effort as the cheaper dial
   plan: claude-opus-4-5
 ---
 

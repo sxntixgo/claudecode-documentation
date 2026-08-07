@@ -928,7 +928,7 @@ When invoked, review the PR using this checklist:
 
 ### 4. Hook for Auto-Review
 
-**.claude/config.json**:
+**.claude/settings.json**:
 ```json
 {
   "hooks": {

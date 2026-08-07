@@ -64,76 +64,125 @@ graph TB
 
 ## Browsing Available Skills
 
-### Method 1: CLI Browse
+Skills reach you two ways, and it is worth knowing which you are dealing with before you go
+looking:
 
-```bash
-# List all available skills
-claude skills browse
+| Source | What you get | Invoked as |
+|--------|-------------|-----------|
+| **A plugin from a marketplace** | Versioned, updatable, may bundle agents and hooks too | `/plugin-name:skill-name` |
+| **A directory you place yourself** | Whatever you wrote or copied in | `/skill-name` |
 
-# Search for specific skills
-claude skills search "code review"
+There is no `claude skills` command and no separate skills registry. Marketplace skills ship
+inside **plugins**, so browsing and installing go through the plugin manager.
 
-# Show skill details
-claude skills info code-review
+### Method 1: The plugin manager
 
-# Filter by category
-claude skills browse --category=testing
-claude skills browse --category=documentation
-claude skills browse --category=security
+```text
+/plugin
 ```
 
-### Method 2: Web Interface
+This opens the manager, where you can browse the marketplaces you have added, install and
+remove plugins, and check the **Errors** tab when something fails to load.
 
-Visit the marketplace website:
-- [Official Marketplace](https://skills.claude.com) ← (if available)
-- [GitHub Skills Repository](https://github.com/anthropics/skills)
-- [Community Skills](https://github.com/obra/superpowers)
+Anthropic maintains two marketplaces:
 
-### Method 3: GitHub Topics
+| Marketplace | Contents | How to get it |
+|-------------|----------|---------------|
+| `claude-plugins-official` | Curated by Anthropic | Registered automatically on first interactive start |
+| `claude-community` | Third-party submissions, after review | `/plugin marketplace add anthropics/claude-plugins-community` |
 
-Search GitHub for:
-- `topic:claude-code-skills`
-- `topic:claude-skills`
-- `topic:anthropic-skills`
+If a script runs before your first interactive session, add the official marketplace
+explicitly:
+
+```bash
+claude plugin marketplace add anthropics/claude-plugins-official
+```
+
+### Method 2: Browse the catalogs on GitHub
+
+- [Anthropic skills](https://github.com/anthropics/skills) — reference skills, including `skill-creator`
+- [Official plugin marketplace](https://github.com/anthropics/claude-plugins-official) — the curated catalog
+- [Community catalog](https://github.com/anthropics/claude-plugins-community) — the reviewed community marketplace
+- [obra/superpowers](https://github.com/obra/superpowers) — a large community collection
+
+Reading `marketplace.json` in either Anthropic catalog is the reliable way to check whether a
+plugin is installable yet, since the public catalog syncs on a delay.
+
+### Method 3: GitHub topics
+
+Search GitHub for `topic:claude-code-skills`, `topic:claude-skills`, or
+`topic:anthropic-skills`.
 
 ---
 
 ## Installing Skills
 
-### Quick Install: Official Skills
+### From a marketplace
 
-```bash
-# Install a single skill
-claude skills install code-review
-
-# Install multiple skills
-claude skills install code-review tdd-workflow api-docs
-
-# Install all skills in a category
-claude skills install --category=testing
-
-# Install with specific version
-claude skills install code-review@1.2.0
+```text
+/plugin install <plugin>@<marketplace>
+/reload-plugins
 ```
 
-**What happens:**
-1. Skill downloaded to `.claude/skills/code-review/`
-2. Skill registered in `.claude/config.json`
-3. Dependencies installed (if any)
-4. Skill ready to use immediately
+For example, to install the skill-creator plugin from the official marketplace:
 
-### Custom Install: Community Skills
+```text
+/plugin install skill-creator@claude-plugins-official
+/reload-plugins
+```
+
+`/reload-plugins` makes the plugin's skills available in the current session without
+restarting. Without it you will not see the new skills until your next session.
+
+**If the install fails**, two errors are common and both have specific fixes:
+
+| Error | Fix |
+|-------|-----|
+| `Marketplace "claude-plugins-official" not found` | `/plugin marketplace add anthropics/claude-plugins-official` |
+| Plugin not found in the marketplace | Your local copy is stale: `/plugin marketplace update claude-plugins-official`, then retry |
+
+**Namespacing**: plugin skills are always invoked as `/plugin-name:skill-name`, never as the
+bare name. This is deliberate — it prevents two plugins that both ship a `review` skill from
+colliding.
+
+### By placing a directory
+
+For a skill you wrote, copied from a repo, or are still iterating on, there is no install step
+at all. Put the directory where Claude Code looks:
+
+| Scope | Path |
+|-------|------|
+| Just you, every project | `~/.claude/skills/<name>/SKILL.md` |
+| This project, shared via git | `.claude/skills/<name>/SKILL.md` |
 
 ```bash
-# Install from GitHub URL
-claude skills install github.com/obra/superpowers/skills/tdd-master
-
-# Install from local directory
-claude skills install ./my-custom-skill
-
-# Install from git repository
-claude skills install git@github.com:yourname/your-skill.git
+# Copy a skill out of a cloned collection
+git clone https://github.com/obra/superpowers /tmp/superpowers
+cp -r /tmp/superpowers/skills/tdd-master .claude/skills/
 ```
+
+The skill exists the moment its directory does. Nothing registers it, nothing enables it, and
+**deleting the directory uninstalls it.** Copying one in by hand installs it. Nothing else has
+to agree.
+
+The command name comes from the **directory name**, so `.claude/skills/tdd-master/SKILL.md`
+gives you `/tdd-master` regardless of what the frontmatter `name` field says.
+
+### Trying a plugin without installing it
+
+To evaluate a plugin, or to test one you are developing, load it for a single session:
+
+```bash
+claude --plugin-dir ./my-plugin      # a local directory, or a .zip
+claude --plugin-url https://example.com/my-plugin.zip
+```
+
+A `--plugin-dir` copy takes precedence over an installed plugin of the same name for that
+session, which lets you test a change without uninstalling anything first.
+
+> ⚠️ **Plugins run code.** A plugin can bundle hooks, MCP servers, and executables that run on
+> your machine. Apply the same scrutiny you would to any dependency, and prefer the curated
+> marketplace or repositories you can read.
 
 ---
 
@@ -147,11 +196,7 @@ claude skills install git@github.com:yourname/your-skill.git
 **Model**: Sonnet (default)
 **Cost**: ~5K-20K tokens depending on depth
 
-```bash
-# Install
-claude skills install code-review
-
-# Use
+```text
 /code-review               # Quick review
 /code-review --deep        # Comprehensive review
 /code-review --security    # Security-focused
@@ -172,11 +217,7 @@ claude skills install code-review
 **Model**: Sonnet
 **Cost**: ~8K-15K tokens per TDD cycle
 
-```bash
-# Install
-claude skills install tdd-workflow
-
-# Use
+```text
 /tdd "Add user authentication"
 
 # Guides you through:
@@ -199,11 +240,7 @@ claude skills install tdd-workflow
 **Model**: Sonnet
 **Cost**: ~10K-25K tokens
 
-```bash
-# Install
-claude skills install test-generator
-
-# Use
+```text
 /generate-tests src/auth.ts
 
 # Generates:
@@ -223,11 +260,7 @@ claude skills install test-generator
 **Model**: Sonnet
 **Cost**: ~8K-20K tokens
 
-```bash
-# Install
-claude skills install api-docs
-
-# Use
+```text
 /api-docs api/users.ts              # Single file
 /api-docs api/**                    # Entire directory
 /api-docs api/** --interactive      # With examples
@@ -247,11 +280,7 @@ claude skills install api-docs
 **Model**: Sonnet
 **Cost**: ~12K-30K tokens
 
-```bash
-# Install
-claude skills install readme-generator
-
-# Use
+```text
 /readme-gen
 
 # Generates:
@@ -272,11 +301,7 @@ claude skills install readme-generator
 **Model**: Opus (deep), Sonnet (quick)
 **Cost**: ~15K-50K tokens
 
-```bash
-# Install
-claude skills install security-audit
-
-# Use
+```text
 /security-audit --quick     # Fast scan
 /security-audit --deep      # OWASP Top 10 + more
 
@@ -296,11 +321,7 @@ claude skills install security-audit
 **Model**: Haiku (fast, cheap)
 **Cost**: ~3K-8K tokens
 
-```bash
-# Install
-claude skills install secrets-scanner
-
-# Use
+```text
 /scan-secrets
 
 # Detects:
@@ -321,11 +342,7 @@ claude skills install secrets-scanner
 **Model**: Sonnet
 **Cost**: ~8K-15K tokens
 
-```bash
-# Install
-claude skills install component-generator
-
-# Use
+```text
 /component LoginForm --framework=react
 /component UserCard --framework=vue
 /component Modal --framework=svelte
@@ -346,11 +363,7 @@ claude skills install component-generator
 **Model**: Sonnet
 **Cost**: ~6K-12K tokens
 
-```bash
-# Install
-claude skills install css-optimizer
-
-# Use
+```text
 /optimize-css src/styles/app.css
 
 # Optimizations:
@@ -371,11 +384,7 @@ claude skills install css-optimizer
 **Model**: Sonnet
 **Cost**: ~15K-30K tokens
 
-```bash
-# Install
-claude skills install api-scaffold
-
-# Use
+```text
 /api-scaffold User --type=rest
 
 # Generates:
@@ -396,11 +405,7 @@ claude skills install api-scaffold
 **Model**: Sonnet
 **Cost**: ~10K-20K tokens
 
-```bash
-# Install
-claude skills install database-migration
-
-# Use
+```text
 /migration "Add email verification to users table"
 
 # Generates:
@@ -422,8 +427,8 @@ Visit: [github.com/obra/superpowers](https://github.com/obra/superpowers)
 **Notable Skills**:
 
 #### **commit-message-generator**
-```bash
-claude skills install github.com/obra/superpowers/skills/commit-msg
+```text
+# Copy it in: cp -r superpowers/skills/commit-msg .claude/skills/
 
 # Auto-generates conventional commit messages
 /commit-msg
@@ -437,8 +442,8 @@ claude skills install github.com/obra/superpowers/skills/commit-msg
 ```
 
 #### **pr-description-generator**
-```bash
-claude skills install github.com/obra/superpowers/skills/pr-desc
+```text
+# Copy it in: cp -r superpowers/skills/pr-desc .claude/skills/
 
 # Generates comprehensive PR descriptions
 /pr-desc
@@ -452,8 +457,8 @@ claude skills install github.com/obra/superpowers/skills/pr-desc
 ```
 
 #### **refactor-assistant**
-```bash
-claude skills install github.com/obra/superpowers/skills/refactor
+```text
+# Copy it in: cp -r superpowers/skills/refactor .claude/skills/
 
 # Interactive refactoring guide
 /refactor src/legacy-code.ts
@@ -469,123 +474,136 @@ claude skills install github.com/obra/superpowers/skills/refactor
 
 ## Configuring Installed Skills
 
-### Per-Project Configuration
+### Per-Skill Configuration
 
-Edit `.claude/config.json`:
+A skill is configured in its own `SKILL.md` frontmatter. There is no central file listing your
+skills and their options.
+
+`.claude/skills/api-docs/SKILL.md`:
+```yaml
+---
+name: api-docs
+description: Generate OpenAPI documentation from route handlers
+model: haiku
+allowed-tools: Read, Glob, Grep, Write
+---
+```
+
+Useful frontmatter fields when tuning an installed skill:
+
+| Field | What it does |
+|-------|--------------|
+| `model` | Which model runs the skill (`haiku`, `sonnet`, `opus`, `fable`, or a full model ID) |
+| `effort` | Reasoning effort: `low`, `medium`, `high`, `xhigh`, `max` |
+| `allowed-tools` / `disallowed-tools` | Narrow what the skill is permitted to touch |
+| `disable-model-invocation` | Make the skill manual-only, never auto-selected |
+| `user-invocable` | Whether it appears as a slash command |
+| `paths` | File patterns the skill is relevant to |
+
+Note that `model` is scoped to the current turn — it does not rewrite your session model. The
+next prompt goes back to whatever model the session was on.
+
+### Behavior That Isn't a Frontmatter Field
+
+Things like a style guide, a coverage threshold, or which files to skip are not settings — they
+are instructions. Put them in the skill's markdown body, where the model actually reads them:
+
+`.claude/skills/code-review/SKILL.md`:
+```markdown
+## Review Rules
+
+- Enforce the Airbnb style guide; flag lines over 100 characters
+- Require tests for any new exported function
+- Treat `console.log` in committed code as a warning, not an error
+- Always run the security checks, even on small diffs
+
+Skip `**/*.test.ts`, `**/vendor/**`, and `**/.generated/**`.
+```
+
+If a skill needs machine-readable data of its own, it can ship files alongside `SKILL.md` and
+reference them from its instructions. Claude Code does not look for a config file in the skill
+directory.
+
+### Project-Wide Settings
+
+Genuinely project-wide choices go in `.claude/settings.json` — committed to git, shared by the
+team:
 
 ```json
 {
-  "skills": {
-    "code-review": {
-      "enabled": true,
-      "model": "sonnet",
-      "defaultMode": "quick",
-      "autoTrigger": true,
-      "options": {
-        "minTestCoverage": 80,
-        "securityLevel": "high",
-        "styleGuide": "airbnb"
-      }
-    },
-    "tdd-workflow": {
-      "enabled": true,
-      "model": "sonnet",
-      "options": {
-        "testFramework": "jest",
-        "coverageThreshold": 90,
-        "strictMode": true
-      }
-    },
-    "api-docs": {
-      "enabled": true,
-      "model": "haiku",  // Cheaper for docs
-      "options": {
-        "format": "openapi",
-        "includeExamples": true,
-        "interactive": false
-      }
-    }
+  "model": "sonnet",
+  "permissions": {
+    "allow": ["Bash(npm test:*)"],
+    "ask": ["Bash(git push:*)"]
   }
 }
 ```
 
-### Skill-Specific Configuration
-
-Some skills use their own config files:
-
-`.claude/skills/code-review/config.json`:
-```json
-{
-  "rules": {
-    "max-line-length": 100,
-    "require-tests": true,
-    "no-console-log": "warn",
-    "security-scan": "always"
-  },
-  "ignore": [
-    "**/*.test.ts",
-    "**/vendor/**",
-    "**/.generated/**"
-  ]
-}
-```
+Keep personal, uncommitted overrides in `.claude/settings.local.json`, which takes precedence
+and is gitignored.
 
 ---
 
 ## Managing Your Skills
 
-### List Installed Skills
+How you manage a skill depends on how it got there. Plugin skills go through the plugin
+manager; skills you placed yourself are just files.
 
-```bash
-# Show all installed skills
-claude skills list
+### See what you have
 
-# Output:
-# Installed Skills:
-# ✅ code-review (v1.2.0)
-# ✅ tdd-workflow (v2.0.1)
-# ✅ api-docs (v1.5.0)
-# ⚠️  security-audit (v3.0.0) - update available (v3.1.0)
+```text
+/plugin      # installed plugins, per marketplace, with an Errors tab
+/context     # what actually loaded this session, including skills
+/help        # the Custom commands tab lists every invocable skill
 ```
 
-### Update Skills
+For skills you placed yourself, the filesystem is the source of truth:
 
 ```bash
-# Update single skill
-claude skills update code-review
-
-# Update all skills
-claude skills update --all
-
-# Check for updates without installing
-claude skills outdated
+ls ~/.claude/skills/     # personal
+ls .claude/skills/       # project
 ```
 
-### Uninstall Skills
+### Update
+
+Plugin skills update through the manager. Refresh the marketplace catalog first, since a stale
+local copy is the usual reason an update appears unavailable:
+
+```text
+/plugin marketplace update claude-plugins-official
+/plugin
+```
+
+Whether a plugin offers an update depends on its `version` field. If the author omits it and
+distributes via git, every commit counts as a new version.
+
+Skills you placed yourself do not update — they are your files. Re-copy from upstream if you
+pulled one from a collection.
+
+### Remove
+
+```text
+/plugin      # uninstall a plugin from the manager
+```
 
 ```bash
-# Remove single skill
-claude skills uninstall code-review
-
-# Remove multiple skills
-claude skills uninstall code-review tdd-workflow
-
-# Remove all skills in category
-claude skills uninstall --category=testing
+rm -rf .claude/skills/code-review     # a skill you placed yourself
 ```
 
-### Disable/Enable Skills
+Deleting the directory is the uninstall. There is no separate registry to clean up.
 
-```bash
-# Temporarily disable a skill
-claude skills disable code-review
+### Turn a skill off without deleting it
 
-# Re-enable a skill
-claude skills enable code-review
+Three options, in increasing scope:
 
-# Disable all skills
-claude skills disable --all
-```
+| Goal | How |
+|------|-----|
+| Stop Claude auto-invoking it, keep `/name` | `disable-model-invocation: true` in its frontmatter |
+| Hide it from the `/` menu entirely | `user-invocable: false` |
+| Block skills by name across the project | `permissions.deny` in `.claude/settings.json` |
+
+For a plugin, disabling it in `/plugin` turns off everything it ships — skills, agents, hooks,
+and MCP servers together.
 
 ---
 
@@ -616,10 +634,12 @@ Create a bundle for your team:
 }
 ```
 
-**Install bundle:**
-```bash
-claude skills install --bundle=team-skills.json
-```
+**Share the collection**: there is no bundle installer. Two real options:
+
+- **Commit `.claude/skills/`** to the project repo. Teammates get every skill on clone, and
+  nothing has to be installed.
+- **Package them as a plugin** and distribute through a marketplace, which gives you versioning
+  and updates. See [Plugin Ecosystem](../07-plugins/1-overview.md).
 
 ---
 
@@ -668,25 +688,27 @@ claude --version
 # Ensure you have latest version
 npm install -g @anthropic/claude-code
 
-# Install with verbose logging
-claude skills install code-review --verbose
+# For a plugin, check the /plugin manager's Errors tab, then see why with:
+claude --debug
 
-# Try manual install
+# For a skill you place yourself, "installing" is a copy — so verify the copy:
 git clone https://github.com/anthropics/skills
 cp -r skills/code-review ~/.claude/skills/
+ls ~/.claude/skills/code-review/SKILL.md
 ```
 
 ### Skill Not Triggering
 
 ```bash
-# Check if skill is enabled
-claude skills list
+# Confirm the skill actually loaded this session
+/context
 
-# Verify skill trigger patterns
-cat .claude/skills/code-review/SKILL.md | grep "autoTrigger"
+# Check what the skill advertises — `description` (plus `when_to_use`) is what Claude
+# reads to decide whether to invoke it. A vague description is the usual cause.
+head -10 .claude/skills/code-review/SKILL.md
 
 # Force skill invocation
-claude --skill=code-review "Review my code"
+/code-review Review my code
 ```
 
 ### Skill Errors
@@ -695,28 +717,32 @@ claude --skill=code-review "Review my code"
 # Check skill logs
 cat .claude/logs/skills/code-review.log
 
-# Validate skill configuration
-claude skills validate code-review
+# Validate a plugin's structure (plugins only; add --strict to fail on warnings)
+claude plugin validate ./my-plugin
 
-# Reset skill to defaults
-claude skills reset code-review
+# For a skill you placed yourself there is nothing to validate or reset —
+# check the frontmatter parses as YAML and that the file is where you think:
+head -10 .claude/skills/code-review/SKILL.md
+ls -la .claude/skills/code-review/
 ```
 
 ### Conflicting Skills
 
+Two skills whose descriptions overlap ("review my code") compete for the same requests. Claude
+picks one by reading the descriptions — there is no ranking or confidence score to inspect.
+
 ```bash
-# Two skills might trigger on same pattern
-# Check which skill is selected
-claude skills test "review my code"
+# Fix 1: Skip the guessing and name the skill you want
+/security-audit Review my code
+```
 
-# Output:
-# Matched skills:
-# 1. code-review (confidence: 0.9)
-# 2. security-audit (confidence: 0.7)
-# Selected: code-review
+```yaml
+# Fix 2: Narrow the descriptions so they no longer overlap
+# .claude/skills/code-review/SKILL.md
+description: Reviews code for logic errors, style, and maintainability.
 
-# Explicitly choose skill
-claude --skill=security-audit "Review my code"
+# .claude/skills/security-audit/SKILL.md
+description: Audits code for security vulnerabilities: injection, authn, secret handling.
 ```
 
 ---
@@ -725,12 +751,14 @@ claude --skill=security-audit "Review my code"
 
 ### 1. Start with Official Skills
 
-✅ **Do**: Install official skills first
-```bash
-claude skills install code-review tdd-workflow api-docs
+✅ **Do**: Start from the curated marketplace
+```text
+/plugin marketplace update claude-plugins-official
+/plugin
 ```
 
-❌ **Don't**: Install untested community skills right away
+❌ **Don't**: Copy in untested community skills right away — a skill can carry hooks and
+scripts that run on your machine
 
 ---
 
@@ -758,8 +786,9 @@ claude skills install code-review tdd-workflow api-docs
 
 ✅ **Do**: Regular updates
 ```bash
-# Weekly or monthly
-claude skills update --all
+# Weekly or monthly: refresh catalogs, then review updates in the manager
+/plugin marketplace update claude-plugins-official
+/plugin
 ```
 
 ❌ **Don't**: Let skills get outdated (security risks)
@@ -768,12 +797,21 @@ claude skills update --all
 
 ### 4. Disable Unused Skills
 
-✅ **Do**: Disable skills you're not using
-```bash
-claude skills disable unused-skill
+✅ **Do**: Turn off what you are not using. Every enabled skill's description sits in your
+context at startup, and a crowded listing makes Claude's selection less accurate.
+
+```text
+/plugin      # disable a whole plugin
 ```
 
-❌ **Don't**: Keep all skills enabled (slows down selection)
+```bash
+rm -rf .claude/skills/unused-skill    # or just delete it
+```
+
+To keep a skill but stop Claude reaching for it, set `disable-model-invocation: true` in its
+frontmatter — it stays available as `/unused-skill`.
+
+❌ **Don't**: Keep dozens of skills enabled and wonder why the wrong one fires
 
 ---
 
@@ -809,40 +847,50 @@ Want to share your skill? See: [Creating Custom Skills](3-creating-skills.md)
 
 ### Essential Commands
 
+In-session, for plugin skills:
+
+```text
+/plugin                                    # browse, install, remove; Errors tab
+/plugin marketplace add <owner/repo>       # add a marketplace
+/plugin marketplace update <marketplace>   # refresh a stale catalog
+/plugin install <plugin>@<marketplace>     # install
+/reload-plugins                            # load without restarting
+/context                                   # confirm what loaded
+```
+
+From the shell, for plugin development:
+
 ```bash
-# Browse and search
-claude skills browse
-claude skills search "keyword"
-claude skills info <skill-name>
+claude plugin init <name>            # scaffold a plugin
+claude plugin validate ./my-plugin   # validate; --strict fails on warnings
+claude --plugin-dir ./my-plugin      # load for one session, no install
+claude --debug                        # see why a plugin failed to load
+```
 
-# Install and manage
-claude skills install <skill-name>
-claude skills update --all
-claude skills uninstall <skill-name>
+For skills you place yourself, the shell commands are just file operations:
 
-# List and status
-claude skills list
-claude skills outdated
-
-# Control
-claude skills enable <skill-name>
-claude skills disable <skill-name>
+```bash
+ls .claude/skills/                    # what you have
+cp -r <source> .claude/skills/        # install
+rm -rf .claude/skills/<name>          # uninstall
 ```
 
 ### Recommended Starter Pack
 
-For most projects, install:
-```bash
-claude skills install \
-  code-review \
-  tdd-workflow \
-  api-docs \
-  readme-generator \
-  secrets-scanner
+Most of the workflows people reach for first are things you write rather than install — a
+review checklist, a TDD loop, a docs generator. The fastest way to get a good version of each
+is to let `skill-creator` build and measure them:
+
+```text
+/plugin install skill-creator@claude-plugins-official
+/reload-plugins
 ```
 
-**Cost**: ~$0.50-2.00/day depending on usage
-**Benefit**: Comprehensive development workflow automation
+Then ask Claude to create the skill you want. See
+[Creating Custom Skills](3-creating-skills.md) for the authoring workflow and
+[Advanced Patterns](5-advanced-patterns.md#advanced-evaluation-patterns) for evaluating them.
+
+**Benefit**: skills matched to your codebase and conventions, rather than generic ones
 
 ---
 
@@ -860,17 +908,15 @@ claude skills install \
 
 **Solutions**:
 ```bash
-# List installed skills
-claude skill list
+# Is the file where Claude Code looks?
+ls .claude/skills/<name>/SKILL.md
+ls ~/.claude/skills/<name>/SKILL.md
 
-# Check skill location
-ls .claude/skills/
+# Does the frontmatter parse? A broken --- block silently drops the skill
+head -10 .claude/skills/<name>/SKILL.md
 
-# Reinstall skill from marketplace
-claude skill install <skill-name>
-
-# Validate skill syntax
-claude skill validate .claude/skills/my-skill/SKILL.md
+# For plugin skills, check the manager's Errors tab, then:
+claude --debug
 ```
 
 ---
@@ -892,8 +938,9 @@ name: my-skill
 model: sonnet  # Try upgrading to opus for better quality
 ---
 
-# Use model override when invoking
-claude --skill=my-skill --model=opus "Complex task"
+# Switch the session model with /model, then invoke the skill
+/model opus
+/my-skill Complex task
 
 # Review skill instructions for clarity
 # Skills should have specific, actionable steps
@@ -914,10 +961,9 @@ claude --skill=my-skill --model=opus "Complex task"
 ```yaml
 # Assign cheaper model for simple tasks
 ---
-name: my-skill
-model: haiku  # Use haiku instead of sonnet
-modelOverrides:
-  deep: sonnet  # Only use sonnet for --deep flag
+description: What the skill does and when to use it
+model: haiku     # Use haiku instead of sonnet
+effort: low      # Lower the effort dial before lowering the model tier
 ---
 ```
 
@@ -947,18 +993,20 @@ Detailed instructions for complex scenarios
 
 **Solutions**:
 ```yaml
-# Make auto-trigger patterns more specific
+# Make the description more specific — it is what Claude matches on
 ---
-autoTrigger:
-  - pattern: "review.*security"  # Specific
-  # NOT: pattern: "review"       # Too broad
+description: Reviews code for security vulnerabilities (injection, authn, secrets).  # Specific
+# NOT: description: Reviews code                                                     # Too broad
+paths:
+  - "**/auth/**"   # Optional: only activate for the files this skill cares about
 ---
 
-# Disable conflicting skill temporarily
-claude skill disable <other-skill-name>
+# Sharpen the descriptions so they stop overlapping — this is the real fix, since
+# description is what Claude matches on. Or set disable-model-invocation: true on
+# the one you want to invoke manually only.
 
-# Manually specify which skill to use
-claude --skill=security-review "Review my code"
+# Meanwhile, name the skill you want explicitly:
+/security-review Review my code
 ```
 
 ---
@@ -973,20 +1021,28 @@ claude --skill=security-review "Review my code"
 - Required tools not available
 
 **Solutions**:
-```yaml
-# Check skill dependencies in frontmatter
----
-dependencies:
-  - code-review  # Must install this skill first
-  - github-mcp   # Must configure GitHub MCP
----
 
-# Install missing dependencies
-claude skill install code-review
+There is no `dependencies` field and no dependency resolution between skills. A skill that
+needs another one's behavior should say so in its instructions, and a skill that needs an MCP
+server should name the tool with its server prefix.
+
+Name MCP tools with their server prefix so the right one resolves:
+
+```markdown
+Use the GitHub:create_issue tool to open the issue.
+```
+
+> 📌 **Two prefixes, two contexts — both correct.** In a skill's written instructions, use
+> `ServerName:tool_name` as above. In anything that *matches* a tool by name — a permission
+> rule, a subagent's `tools` list, a hook matcher — use the runtime form
+> `mcp__<server>__<tool>`, so `mcp__github__create_issue`. Seeing both is not a typo. See
+> [MCP Servers](../01-mcp-servers/1-overview.md) for the runtime naming.
+
+Then make sure the server is actually configured:
+
+```bash
+claude mcp list
 claude mcp add github
-
-# Verify all dependencies
-claude skill check-deps my-skill
 ```
 
 ---

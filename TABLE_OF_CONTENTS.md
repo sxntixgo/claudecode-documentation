@@ -135,8 +135,10 @@ graph TD
 | [Built-in Agent Types](guides/03-agents/2-built-in-agents.md) | 30 min | Explore, General-Purpose, Plan agents |
 | [Model Assignment](guides/03-agents/3-model-assignment.md) | 25 min | Per-agent model selection for cost optimization |
 | **[Creating Custom Agents](guides/03-agents/4-custom-agents.md)** | **50 min** | **Build specialized agents for your workflows** |
+| **[Orchestration Patterns](guides/03-agents/5-orchestration-patterns.md)** | **30 min** | **Fan-out/fan-in, pipelines, nested delegation, graph engineering vocabulary** |
+| **[Loops and Scheduling](guides/03-agents/6-loops-and-scheduling.md)** | **30 min** | **`/goal`, `/loop`, cron tasks, polling vs events, unattended runs** |
 
-**Total Time**: ~2 hours
+**Total Time**: ~3 hours
 **Dependencies**: MCP Servers (Agents use MCP tools)
 **Next**: Skills (leverage agents with reusable instructions)
 
@@ -222,14 +224,15 @@ graph TD
 
 **Level**: 🟡 Advanced
 **Prerequisites**: All previous topics
-**What You'll Master**: Memory, CLAUDE.md files, context optimization
+**What You'll Master**: Memory, CLAUDE.md files, and managing the context window at runtime
 
 | Guide | Time | Topics |
 |-------|------|--------|
 | [CLAUDE.md Files](guides/09-context/2-claude-md.md) | 30 min | System-level context, best practices |
 | [Memory Hierarchy](guides/09-context/3-memory-hierarchy.md) | 25 min | Hierarchy, precedence, organization |
+| **[Context Engineering](guides/09-context/4-context-engineering.md)** | **35 min** | **Attention budget, context rot, subagent isolation, compaction vs clearing, `/context` and `/usage`** |
 
-**Total Time**: ~55 minutes
+**Total Time**: ~90 minutes
 **Dependencies**: Understanding of entire system
 **Next**: Keywords & Triggers (customize behavior)
 
@@ -403,7 +406,7 @@ graph TD
 |----------|---------|
 | [CHANGELOG.md](CHANGELOG.md) | Version history and updates |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute to this documentation |
-| [DOCUMENTATION_PLAN.md](DOCUMENTATION_PLAN.md) | Complete documentation roadmap and plan |
+| [DOCUMENTATION_REVIEW_PLAN.md](https://github.com/sxntixgo/claudecode-documentation/blob/main/DOCUMENTATION_REVIEW_PLAN.md) | Documentation review report and action plan |
 
 ---
 

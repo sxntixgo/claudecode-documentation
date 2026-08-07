@@ -1117,9 +1117,9 @@ volumes:
 
 - [FastAPI Template](2-fastapi.md) - Modern async Python API
 - [Flask Template](3-flask.md) - Lightweight Python web framework
-- [Testing & Quality Guide](../../15-security/2-testing-quality.md) - Comprehensive testing strategies
+- [Testing & Quality Guide](../../../15-security/2-testing-quality.md) - Comprehensive testing strategies
 - [Bug Fixing Workflow](../../workflows/2-bug-fixing.md) - Debug Django apps
-- [API Development](../../01-mcp-servers/1-overview.md) - MCP server patterns
+- [API Development](../../../01-mcp-servers/1-overview.md) - MCP server patterns
 
 ---
 

@@ -1,0 +1,4 @@
+
+# MkDocs build artifacts (assembled at build time)
+docs/
+site/

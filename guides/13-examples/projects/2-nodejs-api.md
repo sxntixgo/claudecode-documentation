@@ -15,13 +15,17 @@
 ```
 .claude/
 ├── CLAUDE.md
-├── config.json
+├── settings.json
+├── agents/
+│   └── explore.md
 ├── commands/
 │   ├── endpoint.md
 │   ├── migration.md
 │   └── test.md
 └── skills/
-    └── api-generator/
+    ├── api-generator/
+    │   └── SKILL.md
+    └── security-audit/
         └── SKILL.md
 ```
 
@@ -103,34 +107,67 @@ src/
 
 ---
 
-## config.json
+## settings.json
 
+`.claude/settings.json`:
 ```json
 {
-  "agents": {
-    "Explore": { "model": "haiku" },
-    "general-purpose": { "model": "sonnet" }
-  },
-  "skills": {
-    "api-generator": {
-      "model": "sonnet",
-      "enabled": true
-    },
-    "test-generator": {
-      "model": "sonnet",
-      "enabled": true
-    },
-    "security-audit": {
-      "model": "opus",
-      "enabled": true
-    }
-  },
-  "costTracking": {
-    "enabled": true,
-    "dailyBudget": 75000
-  }
+  "model": "sonnet"
 }
 ```
+
+Sonnet handles endpoint generation, migrations, and tests. Model choices for individual
+agents and skills are not settings keys — they belong in the frontmatter of the agent or
+skill file.
+
+### Agent Frontmatter
+
+`.claude/agents/explore.md`:
+```markdown
+---
+name: explore
+description: Fast file searches across routes, controllers, services, and repositories.
+model: haiku
+---
+
+Locate the relevant files and report their paths with the matching snippets. Do not edit.
+```
+
+Agents that omit `model` inherit the session model, so a general development agent needs no
+override here.
+
+### Skill Frontmatter
+
+`.claude/skills/api-generator/SKILL.md`:
+```markdown
+---
+name: api-generator
+description: Generate REST endpoints with controller, service, repository, and tests
+model: sonnet
+---
+```
+
+`.claude/skills/security-audit/SKILL.md`:
+```markdown
+---
+name: security-audit
+description: Audit endpoints for auth, input validation, and data exposure issues
+model: opus
+---
+```
+
+A skill's `model` applies for the rest of that turn only, then the session returns to
+Sonnet. A test-generation skill that wants the session default can simply omit `model`.
+
+### Tracking Cost
+
+Claude Code has no budget setting and writes no spend file. Run `/usage` for this session's tokens and
+locally computed cost (`d` and `w` switch to 24-hour and 7-day windows); on Pro, Max, Team,
+and Enterprise plans it also attributes usage to individual skills, subagents, plugins, and
+MCP servers and flags anything over 10% of the total. `/context` shows what is occupying
+the context window, and the [Console usage page](https://platform.claude.com/usage) is the
+authoritative source for billing. For a whole team, export per-user token and cost metrics
+via OpenTelemetry into your own observability stack.
 
 ---
 
@@ -184,4 +221,4 @@ Generates:
 
 ---
 
-**Next**: [Python Data Science](3-python-datascience.md)
+**Next**: [Python Projects: Django](python/1-django.md)

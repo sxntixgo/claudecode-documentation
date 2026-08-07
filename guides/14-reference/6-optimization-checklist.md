@@ -2,7 +2,7 @@
 
 **Reading Time**: 20 minutes
 **Skill Level**: Intermediate
-**Prerequisites**: [Token Optimization Guide](../12-optimization/strategies.md)
+**Prerequisites**: [Token Optimization Guide](../12-optimization/1-cost-optimization.md)
 
 ---
 
@@ -54,7 +54,7 @@ Complete this BEFORE starting a project or new feature.
 - [ ] **Update CLAUDE.md** - Keep it fresh as project evolves
   - [ ] Remove outdated information
   - [ ] Add recent learnings
-  - [ ] Keep under 300 lines
+  - [ ] Keep under 200 lines — longer files reduce adherence
 
 ---
 
@@ -64,24 +64,37 @@ Set up your `.claude/` directory correctly.
 
 ### Agent Configuration
 
-- [ ] **Create `.claude/config.json`** with optimal models
+- [ ] **Set the session default** in `.claude/settings.json`
   ```json
   {
-    "agents": {
-      "Explore": {"model": "haiku"},
-      "general-purpose": {"model": "sonnet"},
-      "Plan": {"model": "opus"}
-    }
+    "model": "sonnet",
+    "fallbackModel": "haiku"
   }
   ```
 
-- [ ] **Set default model** - Should be Haiku
-  - [ ] `"defaultModel": "haiku"` in config
+- [ ] **Pin models on custom subagents** — one file each, `model` defaults to `inherit`
+  ```markdown
+  <!-- .claude/agents/code-searcher.md -->
+  ---
+  name: code-searcher
+  description: Locates files, symbols, and usage patterns
+  model: haiku
+  tools: Read, Glob, Grep
+  ---
+  ```
+  Built-in agents (Explore, Plan, general-purpose) have no file, so their models cannot be
+  reassigned. Define your own when you need a model pinned.
 
-- [ ] **Configure agent permissions** - Restrict file access
-  - [ ] Frontend agent: only `src/components/**`, `src/pages/**`
-  - [ ] Backend agent: only `src/api/**`, `src/services/**`
-  - [ ] All agents: deny `.env*`, `**/*.secret.*`
+- [ ] **Restrict tool and file access** — two real mechanisms, no `allowedPaths` field
+  - [ ] Limit a subagent's tools with `tools:` in its own frontmatter
+  - [ ] Deny paths globally with `permissions` in `.claude/settings.json`:
+  ```json
+  {
+    "permissions": {
+      "deny": ["Read(./.env*)", "Read(./**/*.secret.*)"]
+    }
+  }
+  ```
 
 ### Skill Configuration
 
@@ -94,13 +107,12 @@ Set up your `.claude/` directory correctly.
 - [ ] **Set skill frontmatter correctly**
   ```yaml
   ---
-  name: skill-name
-  model: sonnet
-  modelOverrides:
-    quick: haiku
-    deep: opus
+  description: What it does and when to use it
+  model: sonnet     # turn-scoped; not saved to settings
+  effort: low       # try lowering effort before dropping a model tier
   ---
   ```
+  One skill, one model. For a quick pass and a deep pass, ship two skills.
 
 ### Hooks Configuration
 
@@ -116,16 +128,11 @@ Set up your `.claude/` directory correctly.
   }
   ```
 
-- [ ] **Cost tracking** - Monitor usage
-  ```json
-  {
-    "costTracking": {
-      "enabled": true,
-      "dailyBudget": 100000,
-      "alertThreshold": 0.8
-    }
-  }
-  ```
+- [ ] **Cost tracking** - Monitor usage with `/usage`
+
+  There is no cost-tracking or budget key in settings. `/usage` reports session tokens and
+  cost, and on paid plans attributes recent usage to individual skills, subagents, plugins,
+  and MCP servers. Spend caps live at the organization level, not in a local file.
 
 ---
 
@@ -152,14 +159,16 @@ Use this while working with Claude Code.
   Difference: 20% cost savings
   ```
 
-- [ ] **Save context to memory** - Reuse across sessions
-  - [ ] Save key decisions
-  - [ ] Document discovered patterns
-  - [ ] Record architectural choices
+- [ ] **Let auto memory accumulate learnings** — Claude writes these itself
+  - Stored per repository at `~/.claude/projects/<project>/memory/`
+  - `MEMORY.md` is the index; its first 200 lines or 25KB load every session
+  - Browse or edit it with `/memory`
+  - Durable decisions you want guaranteed in context belong in CLAUDE.md instead
 
-- [ ] **Clear memory between unrelated tasks**
-  - Prevents irrelevant context overhead
+- [ ] **`/clear` between unrelated tasks**
+  - Prevents irrelevant context overhead and stops you paying to carry it
   - Improves response quality for new tasks
+  - Use `/rename` first if you may want to `/resume` later
 
 ### Code Quality
 
@@ -197,8 +206,8 @@ Track and optimize your actual usage.
 ### Weekly Monitoring
 
 - [ ] **Review token usage**
-  ```bash
-  cat .claude/cost-log.json | jq '.weekly'
+  ```text
+  /usage      # press w for the 7-day window
   ```
 
 - [ ] **Check model distribution**
@@ -223,9 +232,9 @@ Track and optimize your actual usage.
   - Are model assignments optimal?
 
 - [ ] **Update configuration** based on insights
-  - [ ] Adjust agent model assignments
-  - [ ] Modify skill model overrides
-  - [ ] Refine CLAUDE.md
+  - [ ] Adjust `model:` in subagent frontmatter
+  - [ ] Adjust `model:`/`effort:` in skill frontmatter
+  - [ ] Refine CLAUDE.md, moving procedures into skills
 
 - [ ] **Set new targets**
   - Reduction goal: 5-10% monthly improvement
@@ -424,19 +433,30 @@ Savings: 18%
 ### Problem: Models Always Using Sonnet
 
 **Checklist:**
-- [ ] Is default model set to Haiku?
-- [ ] Are agents configured with correct models?
-- [ ] Check: `cat .claude/config.json | jq '.agents'`
+- [ ] Is the session default model what you think it is? Check with `/model`
+- [ ] Do your custom subagents set `model` in their frontmatter, or are they on `inherit`?
+- [ ] Check: `cat .claude/settings.json | jq .model` and `grep -r "^model:" .claude/agents/`
 
 **Fix:**
+
+Session default, in `.claude/settings.json`:
 ```json
 {
-  "defaultModel": "haiku",
-  "agents": {
-    "Explore": {"model": "haiku"}
-  }
+  "model": "sonnet"
 }
 ```
+
+Per-subagent, in that subagent's own file (`.claude/agents/code-searcher.md`):
+```yaml
+---
+name: code-searcher
+description: Locates files, symbols, and usage patterns
+model: haiku
+---
+```
+
+Remember `.claude/settings.local.json` and command-line arguments both outrank
+`.claude/settings.json`, so check those if the value looks ignored.
 
 ### Problem: Token Usage Not Decreasing
 
@@ -444,13 +464,16 @@ Savings: 18%
 - [ ] Are you using Explore for searches?
 - [ ] Are you batching operations?
 - [ ] Are prompts specific enough?
-- [ ] Check cost logs: `cat .claude/cost-log.json`
+- [ ] Check `/usage` for what is actually consuming tokens
 
 **Debug:**
-```bash
-# See per-task breakdown
-npm run cost-report
+```text
+/usage      # per-skill, per-subagent, per-MCP-server attribution
+/context    # what is occupying the window right now
 ```
+
+If `/usage` flags "long context" or "cache misses" at 10% or more of recent usage, that is the
+finding — clear between unrelated tasks with `/clear`.
 
 ### Problem: Haiku Producing Poor Results
 
@@ -530,9 +553,9 @@ npm run cost-report
 
 ## Next Steps
 
-- Review [Token Optimization Guide](../12-optimization/strategies.md) for strategies
-- Set up [Model Selection Tree](1-model-selection-tree.md) bookmark
-- Check [Glossary](3-glossary.md) for terms
+- Review [Token Optimization Guide](../12-optimization/1-cost-optimization.md) for strategies
+- Set up [Model Selection Tree](5-model-selection-tree.md) bookmark
+- Check [Glossary](7-glossary.md) for terms
 - Create your project's checklist version
 
 ---

@@ -563,6 +563,12 @@ Our project uses a microservices architecture where each service is responsible 
 
 - [CLAUDE.md Structure](2-claude-md.md) - Complete file structure guide
 - [Memory Hierarchy](3-memory-hierarchy.md) - Advanced context strategies
+- [Context Engineering](4-context-engineering.md) - Managing the window at runtime: compaction, subagent isolation, and why long sessions degrade
+
+> 💡 **This guide covered authoring.** Everything above is about what you write into context
+> before a session starts. Once a session is running, the window fills with file reads and
+> tool output, and quality degrades as it does — which is a different problem with different
+> tools. [Context Engineering](4-context-engineering.md) covers that side.
 
 ---
 

@@ -383,5 +383,31 @@ Advanced prompting transforms Claude Code from a helpful assistant into a **prod
 
 ---
 
+## References & Further Reading
+
+### Official Documentation
+
+**Anthropic Resources** (Most Current):
+- [Anthropic Advanced Prompt Engineering](https://docs.anthropic.com/claude/docs/advanced-prompt-engineering) - Chain-of-thought, few-shot learning, meta-prompting techniques
+- [Anthropic Prompt Library](https://docs.anthropic.com/claude/page/prompts) - Advanced prompt examples with explanations
+- [Anthropic Research Blog](https://www.anthropic.com/research) - Latest papers on prompt optimization and cost efficiency
+
+### Security
+
+**Advanced Security Considerations**:
+- **"AI Security"** by Sean Murphy & Patrick Hall (O'Reilly, 2024)
+  - *Chapter 3*: Data poisoning and indirect prompt injection
+  - *Chapter 7*: Privacy in AI systems
+- [OWASP Top 10 for LLMs](https://owasp.org/www-project-top-10-for-large-language-model-applications/) (Updated 2024)
+  - LLM01: Prompt Injection - Advanced attack vectors
+  - LLM07: Insecure Plugin Design - Security with MCP servers
+
+### Community Resources
+
+- [Claude Code Advanced Examples](https://github.com/anthropics/claude-code/discussions) - Community-contributed advanced patterns
+- [Model Context Protocol Specification](https://modelcontextprotocol.io/specification) - Deep dive into MCP architecture
+
+---
+
 **Questions or Feedback?**
 [Open an issue](https://github.com/anthropics/claude-code/issues)

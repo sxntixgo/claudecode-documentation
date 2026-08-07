@@ -1104,7 +1104,7 @@ Excellent! You now understand:
 "Use the Explore agent to search for React components"
 
 # Check agent configuration
-cat .claude/config.json | grep -A 10 "agents"
+grep -r "^model:" .claude/agents/
 
 # Manually specify agent
 claude --agent=Explore "Find all TypeScript files"
@@ -1127,7 +1127,7 @@ claude --reset-agents
 
 **Solutions**:
 ```json
-// Increase timeout in .claude/config.json
+// Subagents have no timeout setting; narrow the task scope instead
 {
   "agents": {
     "general-purpose": {
@@ -1183,7 +1183,7 @@ claude --agent=general-purpose "Refactor auth.ts"
 
 **Solutions**:
 ```json
-// Assign appropriate models in .claude/config.json
+// Set model: in each subagent's own frontmatter (.claude/agents/<name>.md)
 {
   "agents": {
     "Explore": { "model": "haiku" },      // Cheap for searches

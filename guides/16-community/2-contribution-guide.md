@@ -80,15 +80,13 @@ All reports will be handled confidentially.
 
 #### Step 1: Develop Your Skill
 
-Create a high-quality skill following [best practices](../../04-skills/4-model-assignment.md):
+Create a high-quality skill following [best practices](../04-skills/4-model-assignment.md):
 
 ```markdown
 ---
 name: your-skill-name
 description: Clear, specific description of what the skill does. Include action verbs, file types, and use cases (100-200 chars).
-version: 1.0.0
 model: claude-haiku-4-5  # Choose appropriate model
-author: Your Name
 license: MIT
 ---
 
@@ -285,7 +283,7 @@ SOFTWARE.
 
 #### Step 1: Build Your Server
 
-Follow the [Creating Custom MCP Servers](../../01-mcp-servers/4-creating-custom-servers.md) guide.
+Follow the [Creating Custom MCP Servers](../01-mcp-servers/4-creating-custom-servers.md) guide.
 
 **Key Requirements**:
 - Follows MCP specification

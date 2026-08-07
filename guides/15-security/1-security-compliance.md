@@ -113,15 +113,24 @@ DATABASE_URL=postgresql://user:password@localhost:5432/mydb
 export GITHUB_API_KEY="ghp_xxxxxxxxxxxx"
 ```
 
-**Option 3: .claude/config.json (for Claude Code)**
+**Option 3: .claude/settings.json (for Claude Code)**
+
+Claude Code reads its configuration from `.claude/settings.json` (committed),
+`.claude/settings.local.json` (personal, gitignored), or `~/.claude/settings.json` (all
+projects). The real key is `env`, and its values are injected into every session:
+
 ```json
 {
-  "environment": {
+  "env": {
     "GITHUB_API_KEY": "${GITHUB_API_KEY}",
     "DATABASE_URL": "${DATABASE_URL}"
   }
 }
 ```
+
+⚠️ `.claude/settings.json` is committed to git. Never put a literal secret in it — reference
+an existing environment variable as shown above, or put the real value in
+`.claude/settings.local.json`, which is gitignored.
 
 ### Secret Rotation
 
@@ -503,53 +512,90 @@ app.post('/posts', authenticate, async (req, res) => {
 
 ### Agent Permissions
 
-Restrict agent tool access in `.claude/config.json`:
+There are two distinct controls here, and they answer two different questions:
+
+| Question | Mechanism | Scope |
+|----------|-----------|-------|
+| *Which tools may this agent use at all?* | `tools` in the subagent's own frontmatter | That one subagent |
+| *Which files/commands may be touched?* | `permissions` in `settings.json` | The whole project, all agents |
+
+**Control 1: limit an agent's toolset (subagent frontmatter)**
+
+Each subagent lives in its own Markdown file. Listing `tools` restricts it to exactly those
+tools; omit the field and it inherits everything:
+
+```markdown
+<!-- .claude/agents/frontend-agent.md -->
+---
+name: frontend-agent
+description: Builds and edits UI components. Use for anything under src/components.
+tools: Read, Write, Edit, Grep
+model: sonnet
+---
+
+You work only on presentation code. Never modify API handlers or database files.
+```
+
+```markdown
+<!-- .claude/agents/api-agent.md -->
+---
+name: api-agent
+description: Implements and tests API routes and services.
+tools: Read, Write, Edit, Grep, Bash
+model: sonnet
+---
+
+You work only on server-side code under src/api and src/services.
+```
+
+**Control 2: fence off files and commands (`permissions` in settings.json)**
+
+`permissions` has three arrays — `allow`, `ask`, and `deny` — evaluated in that order of
+strictness, with `deny` always winning:
 
 ```json
 {
-  "agents": {
-    "frontend-agent": {
-      "tools": ["Read", "Write", "Edit", "Grep"],
-      "constraints": {
-        "allowedPaths": [
-          "src/components/**",
-          "src/pages/**",
-          "public/**"
-        ],
-        "deniedPaths": [
-          ".env*",
-          "src/api/**",
-          "database/**"
-        ]
-      }
-    },
-    "api-agent": {
-      "tools": ["Read", "Write", "Edit", "Grep", "Bash"],
-      "constraints": {
-        "allowedPaths": [
-          "src/api/**",
-          "src/services/**"
-        ],
-        "deniedPaths": [
-          "src/components/**",
-          ".env*"
-        ]
-      }
-    }
+  "permissions": {
+    "allow": [
+      "Read(./src/**)",
+      "Edit(./src/**)",
+      "Bash(npm run test:*)"
+    ],
+    "ask": [
+      "Bash(git push:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./**/*.secret.*)",
+      "Edit(./database/**)",
+      "Bash(curl:*)"
+    ]
   }
 }
 ```
 
+⚠️ `permissions` is a project-wide setting, not a per-agent one. Claude Code has no way to
+give `frontend-agent` a different filesystem sandbox than `api-agent`. If you need
+per-agent path discipline, express it in the agent's system prompt (as above) and back it up
+with a project-wide `deny` list for the files that must never be touched by anyone.
+
 ### File Path Constraints
+
+Permission rules take the form `Tool(specifier)`. Path specifiers are gitignore-style globs:
 
 **Pattern matching rules:**
 ```
-✅ src/components/**       - All files in components
-✅ src/api/*.ts           - Only .ts files in api/
-✅ tests/**/*.test.ts     - Test files recursively
-❌ .env*                  - Deny anything starting with .env
-❌ **/*.secret.*          - Deny secret files
+✅ Edit(./src/components/**)   - All files in components
+✅ Edit(./src/api/*.ts)        - Only .ts files in api/
+✅ Read(./tests/**/*.test.ts)  - Test files recursively
+❌ Read(./.env.*)              - Deny anything starting with .env.
+❌ Read(./**/*.secret.*)       - Deny secret files
 ```
+
+Anything not matched by `allow` or `deny` falls through to an interactive prompt, so a short
+`deny` list plus the default prompting behaviour is usually safer than trying to enumerate
+every allowed path.
 
 ### Skill Permission Requirements
 
@@ -557,21 +603,16 @@ In `SKILL.md` frontmatter:
 
 ```yaml
 ---
-name: database-migration-skill
-description: Run database migrations
-version: 1.0.0
-requiredTools:
-  - Bash
-  - Read
-  - Write
-requiredAgent: database-agent
-constraints:
-  deniedPaths:
-    - "src/public/**"
-    - "src/components/**"
-warningMessage: "This skill modifies the database. Ensure you have backups."
-approvalRequired: true
+description: Runs database migrations. Use only when explicitly asked to migrate; never as part of a broader task.
+disable-model-invocation: true
+allowed-tools: Read Bash(npm run migrate *)
+disallowed-tools: Write Edit
 ---
+
+**This skill modifies the database. Ensure you have a backup before running.**
+
+Confirm with the user before applying any migration. Report the migration plan first and
+wait for explicit approval.
 ```
 
 ---
@@ -676,4 +717,4 @@ API_KEY=[actual secure key from secret manager]
 ---
 
 **Questions or Security Concerns?**
-Found a vulnerability? Please report responsibly: [Security Policy](../../SECURITY.md)
+Found a vulnerability? Please report it responsibly through the project's issue tracker: [Open an issue](https://github.com/anthropics/claude-code/issues)

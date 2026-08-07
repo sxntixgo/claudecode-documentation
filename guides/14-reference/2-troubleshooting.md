@@ -220,27 +220,15 @@ curl -I https://api.github.com
 - Incomplete operations
 
 **Common Causes**:
-- Default timeout too short
-- Complex task requires more time
+- Task scope too broad for a single agent run
 - Infinite loops in agent logic
 - Resource constraints
 
+> ℹ️ There is no timeout setting for subagents — not in `settings.json`, not in subagent frontmatter. The fix is always to reduce the scope of what a single agent run has to accomplish.
+
 **Resolution Steps**:
 
-**Step 1: Increase Agent Timeout**
-
-In `.claude/config.json`:
-```json
-{
-  "agents": {
-    "general-purpose": {
-      "timeout": 300000  // 5 minutes instead of default 2 minutes
-    }
-  }
-}
-```
-
-**Step 2: Break Down Task**
+**Step 1: Break Down Task**
 Instead of one large task, split into smaller subtasks:
 ```
 ❌ Bad:  "Refactor entire codebase to TypeScript"
@@ -249,15 +237,14 @@ Instead of one large task, split into smaller subtasks:
          "Refactor src/api to TypeScript"
 ```
 
-**Step 3: Use Appropriate Agent**
+**Step 2: Use Appropriate Agent**
 - Explore agent: Read-only searches (faster)
 - General-purpose: Complex multi-step tasks (allow more time)
 - Plan agent: Planning and research (may need extended time)
 
 **Prevention**:
-- Configure timeouts based on typical task complexity
+- Keep each delegated task specific and focused
 - Monitor agent execution times
-- Optimize task scope to be specific and focused
 - Use simpler agents (Haiku) for routine tasks
 
 ---
@@ -270,54 +257,56 @@ Instead of one large task, split into smaller subtasks:
 - Lower quality output than expected
 
 **Common Causes**:
-- Model not specified in agent config
+- Model not specified in the subagent's frontmatter, so it inherits the session model
 - Task override not working
-- Config file not loaded
+- Subagent file not being picked up
 
 **Resolution Steps**:
 
-**Step 1: Verify Agent Configuration**
+**Step 1: Verify Subagent Configuration**
 
-Check `.claude/config.json`:
-```json
-{
-  "agents": {
-    "Explore": {
-      "model": "haiku"  // ✓ Correctly specified
-    },
-    "general-purpose": {
-      // ❌ No model specified, uses default
-    }
-  }
-}
+A subagent's model lives in the YAML frontmatter of its own file in `.claude/agents/` (or `~/.claude/agents/`), not in a settings file.
+
+```yaml
+# .claude/agents/explore.md
+---
+name: explore
+description: Fast read-only codebase exploration
+model: haiku          # ✓ Correctly specified
+---
+```
+
+```yaml
+# .claude/agents/general-purpose.md
+---
+name: general-purpose
+description: Balanced multi-step coding tasks
+# ❌ No model specified — defaults to `inherit`, so it uses the session model
+---
 ```
 
 **Step 2: Add Model Assignment**
-```json
-{
-  "agents": {
-    "Explore": {
-      "model": "haiku"
-    },
-    "general-purpose": {
-      "model": "sonnet"  // ✓ Now specified
-    },
-    "Plan": {
-      "model": "opus"
-    }
-  }
-}
+
+Set `model` explicitly in each subagent file. Valid values are `sonnet`, `opus`, `haiku`, `fable`, a full model ID, or `inherit`.
+
+```yaml
+# .claude/agents/general-purpose.md
+---
+name: general-purpose
+description: Balanced multi-step coding tasks
+model: sonnet         # ✓ Now specified
+---
 ```
 
-**Step 3: Verify Config Loading**
+**Step 3: Verify the Subagent Files Are Found**
 ```bash
-# Check if config file exists
-ls -la .claude/config.json
+# List project subagents
+ls -la .claude/agents/
 
-# Validate JSON syntax
-cat .claude/config.json | jq .
+# Check the frontmatter of a specific subagent
+head -10 .claude/agents/explore.md
 
-# Restart Claude to load new config
+# Restart Claude to pick up new or edited subagents
 ```
 
 **Step 4: Use Task-Specific Override**
@@ -331,10 +320,10 @@ Task({
 ```
 
 **Prevention**:
-- Always specify `model` in agent configurations
-- Set `defaultModel` in config as fallback
+- Always specify `model` in each subagent's frontmatter
+- Set `"model"` in `.claude/settings.json` as the session default
 - Document model assignments in CLAUDE.md
-- Monitor cost logs to verify model usage
+- Run `/usage` to verify which subagents are actually consuming tokens
 
 ---
 
@@ -390,7 +379,6 @@ description: Generate comprehensive API documentation from code including REST e
 ---
 name: api-documentation
 description: Generate comprehensive API documentation from code including REST endpoints, request/response schemas, authentication methods, and example usage
-tags: ["documentation", "api", "rest", "swagger", "openapi"]
 ---
 ```
 
@@ -506,27 +494,34 @@ These are loaded only if Claude needs deeper context.
 **Resolution Steps**:
 
 **Step 1: Check Model Usage**
-```bash
-# Review cost log if enabled
-cat .claude/cost-log.json
 
-# Look for:
-# - Which models used most
-# - Which tasks consumed most tokens
-# - Patterns in high-cost operations
-```
+Run `/usage` in your session. It shows token counts and a locally computed cost, and on Pro, Max, Team, and Enterprise plans it attributes recent usage to skills, subagents, plugins, and individual MCP servers — flagging anything responsible for 10% or more of the total. Press `d` for a 24-hour window or `w` for 7 days.
+
+Look for:
+- Which models were used most
+- Which subagents, skills, or MCP servers consumed most tokens
+- Patterns in high-cost operations
+
+Use `/context` alongside it to see what is currently occupying the context window.
 
 **Step 2: Optimize Model Assignment**
+
+Downgrade the model in each subagent's frontmatter:
+
+```yaml
+# .claude/agents/explore.md
+---
+name: explore
+description: Fast read-only codebase exploration
+model: haiku          # Change from sonnet/opus
+---
+```
+
+And set a cheaper session default in `.claude/settings.json`:
+
 ```json
 {
-  "agents": {
-    "Explore": {
-      "model": "haiku"  // Change from sonnet/opus
-    },
-    "general-purpose": {
-      "model": "sonnet"  // Change from opus if possible
-    }
-  }
+  "model": "sonnet"
 }
 ```
 
@@ -546,9 +541,9 @@ You: "Format this JSON"  # No thinking keywords
 - Use focused agents with path constraints
 
 **Prevention**:
-- Enable cost tracking in config.json
-- Set daily budgets with alerts
-- Review token usage weekly
+- Check `/usage` at the end of expensive sessions
+- Review the weekly window (`w` in `/usage`) and the [Console usage page](https://platform.claude.com/usage) for authoritative billing
+- Export per-user token and cost metrics via OpenTelemetry if you need long-term tracking
 - Use Haiku by default, upgrade only when needed
 
 ---
@@ -613,10 +608,6 @@ See @docs/database-schema.md for schema
 {
   "agents": {
     "frontend-only": {
-      "constraints": {
-        "allowedPaths": ["src/frontend/**"],
-        "deniedPaths": ["src/backend/**", "docs/**"]
-      }
     }
   }
 }
@@ -639,10 +630,10 @@ See @docs/database-schema.md for schema
 
 ## Configuration Issues
 
-### Issue: config.json Syntax Errors
+### Issue: settings.json Syntax Errors
 
 **Symptoms**:
-- Error: "Failed to parse config.json"
+- Error: "Failed to parse settings.json"
 - Configuration not loading
 - Changes not taking effect
 
@@ -657,7 +648,11 @@ See @docs/database-schema.md for schema
 **Step 1: Validate JSON**
 ```bash
 # Use jq to find syntax errors
-cat .claude/config.json | jq .
+cat .claude/settings.json | jq .
+
+# Check the other scopes too
+cat .claude/settings.local.json | jq .
+cat ~/.claude/settings.json | jq .
 
 # Error will show line number and issue
 # Example: "parse error: Expected separator between values at line 12"
@@ -668,28 +663,24 @@ cat .claude/config.json | jq .
 ❌ **Missing comma**:
 ```json
 {
-  "agents": {
-    "Explore": {"model": "haiku"}  // ❌ Missing comma
-    "general-purpose": {"model": "sonnet"}
-  }
+  "model": "sonnet"  // ❌ Missing comma
+  "fallbackModel": "haiku"
 }
 ```
 
 ✅ **Fixed**:
 ```json
 {
-  "agents": {
-    "Explore": {"model": "haiku"},  // ✓ Comma added
-    "general-purpose": {"model": "sonnet"}
-  }
+  "model": "sonnet",  // ✓ Comma added
+  "fallbackModel": "haiku"
 }
 ```
 
 ❌ **Trailing comma**:
 ```json
 {
-  "agents": {
-    "Explore": {"model": "haiku"},
+  "permissions": {
+    "allow": ["Bash(npm run test:*)"],
   },  // ❌ Trailing comma
 }
 ```
@@ -697,8 +688,8 @@ cat .claude/config.json | jq .
 ✅ **Fixed**:
 ```json
 {
-  "agents": {
-    "Explore": {"model": "haiku"}
+  "permissions": {
+    "allow": ["Bash(npm run test:*)"]
   }
 }
 ```
@@ -708,8 +699,8 @@ cat .claude/config.json | jq .
 # Install jsonlint
 npm install -g jsonlint
 
-# Validate config
-jsonlint .claude/config.json
+# Validate settings
+jsonlint .claude/settings.json
 ```
 
 **Prevention**:
@@ -800,8 +791,10 @@ You: "What are the common commands for this project?"
 
 **Step 1: Identify Failing Hook**
 ```bash
-# Check hook configuration
-cat .claude/config.json | jq .hooks
+# Check hook configuration in each settings scope
+cat .claude/settings.json | jq .hooks
+cat .claude/settings.local.json | jq .hooks
+cat ~/.claude/settings.json | jq .hooks
 
 # Run git operation with verbose output
 GIT_TRACE=1 git commit -m "test"
@@ -946,7 +939,7 @@ git checkout -b claude/my-feature-abc123
       "model": "haiku"  // 2x faster than Sonnet
     }
   },
-  "defaultModel": "haiku"
+  "model": "haiku"
 }
 ```
 
@@ -1012,9 +1005,6 @@ You: "Search src/**/*.ts for 'async function'"  # Specific, no extended thinking
 {
   "agents": {
     "safe-agent": {
-      "constraints": {
-        "maxFileSize": 1048576  // 1MB limit
-      }
     }
   }
 }
