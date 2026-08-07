@@ -169,8 +169,8 @@ claude --model=sonnet "Refactor the authentication system"
 
 ## Next Steps
 
-- [Sonnet 4.5 Deep Dive](3-sonnet.md) - The all-around workhorse
-- [Opus 4.5 Deep Dive](4-opus.md) - Maximum reasoning power
+- [Sonnet 5 Deep Dive](3-sonnet.md) - The all-around workhorse
+- [Opus 5 Deep Dive](4-opus.md) - Maximum reasoning power
 - [Model Selection Guide](5-selection-guide.md) - Decision frameworks
 
 ---

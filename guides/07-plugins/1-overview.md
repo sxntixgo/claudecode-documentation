@@ -135,7 +135,7 @@ cat > .claude/skills/my-skill/SKILL.md <<EOF
 ---
 name: my-skill
 description: Description of what this skill does
-model: claude-sonnet-4-5
+model: claude-sonnet-5
 ---
 
 Skill instructions here...

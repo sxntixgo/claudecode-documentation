@@ -22,12 +22,12 @@ By the end of this guide, you'll be able to:
 
 ### The Problem: One Size Doesn't Fit All
 
-By default, Claude Code uses **Sonnet 4.5** for all operations. But consider these scenarios:
+By default, Claude Code uses **Sonnet 5** for all operations. But consider these scenarios:
 
 **Scenario 1: Simple Code Search**
 ```
 You: "Find all API endpoints in the codebase"
-Claude Code: [Uses Explore Agent → Sonnet 4.5]
+Claude Code: [Uses Explore Agent → Sonnet 5]
 Cost: ~8,000 tokens at $3/$15 per million = $0.12
 ```
 
@@ -49,7 +49,7 @@ Let's say you perform 20 agent operations per day:
 - 2 complex refactorings (General-Purpose Agent)
 
 **Without Model Assignment:**
-- All operations use Sonnet 4.5
+- All operations use Sonnet 5
 - Daily cost: ~$2.40
 - Monthly cost: ~$72.00
 
@@ -73,8 +73,8 @@ Let's say you perform 20 agent operations per day:
 | Model | Input Cost | Output Cost | Speed | Best For | Agent Match |
 |-------|-----------|-------------|-------|----------|-------------|
 | **Haiku 4.5** | $1/M tokens | $5/M tokens | 🚀 Fastest | Search, simple tasks | Explore Agent |
-| **Sonnet 4.5** | $3/M tokens | $15/M tokens | 🏃 Fast | Standard coding, docs | General-Purpose, Plan |
-| **Opus 4.5** | Premium | Premium | 🚶 Slower | Complex architecture | General-Purpose (complex tasks) |
+| **Sonnet 5** | $3/M tokens | $15/M tokens | 🏃 Fast | Standard coding, docs | General-Purpose, Plan |
+| **Opus 5** | Premium | Premium | 🚶 Slower | Complex architecture | General-Purpose (complex tasks) |
 
 > ⚠️ **Note**: Pricing is subject to change. Always verify current rates at [anthropic.com/pricing](https://www.anthropic.com/pricing).
 
@@ -89,8 +89,8 @@ graph LR
     end
 
     Simple --> Haiku["Haiku 4.5<br/>3x cheaper<br/>Same quality for simple tasks"]
-    Standard --> Sonnet["Sonnet 4.5<br/>Balanced<br/>Best all-around"]
-    Complex --> Opus["Opus 4.5<br/>Premium<br/>Maximum reasoning"]
+    Standard --> Sonnet["Sonnet 5<br/>Balanced<br/>Best all-around"]
+    Complex --> Opus["Opus 5<br/>Premium<br/>Maximum reasoning"]
 
     style Haiku fill:#d4f4dd
     style Sonnet fill:#fff9e6
@@ -344,14 +344,14 @@ graph TD
     AgentType -->|Plan Agent| PlanQ["How critical is the architecture?"]
 
     ExploreQ -->|Yes| UseHaiku1["Use Haiku 4.5<br/>Fast, cheap, perfect for searches"]
-    ExploreQ -->|No, complex analysis| UseSonnet1["Use Sonnet 4.5<br/>Better reasoning for complex searches"]
+    ExploreQ -->|No, complex analysis| UseSonnet1["Use Sonnet 5<br/>Better reasoning for complex searches"]
 
     GeneralQ -->|Simple edit/bug fix| UseHaiku2["Use Haiku 4.5<br/>Save 66% on routine tasks"]
-    GeneralQ -->|Standard feature| UseSonnet2["Use Sonnet 4.5<br/>Balanced quality + cost"]
-    GeneralQ -->|Complex refactoring| UseOpus1["Use Opus 4.5<br/>Maximum reasoning for critical work"]
+    GeneralQ -->|Standard feature| UseSonnet2["Use Sonnet 5<br/>Balanced quality + cost"]
+    GeneralQ -->|Complex refactoring| UseOpus1["Use Opus 5<br/>Maximum reasoning for critical work"]
 
-    PlanQ -->|Small feature| UseSonnet3["Use Sonnet 4.5<br/>Good planning capability"]
-    PlanQ -->|System architecture| UseOpus2["Use Opus 4.5<br/>Critical decisions need best model"]
+    PlanQ -->|Small feature| UseSonnet3["Use Sonnet 5<br/>Good planning capability"]
+    PlanQ -->|System architecture| UseOpus2["Use Opus 5<br/>Critical decisions need best model"]
 
     style UseHaiku1 fill:#d4f4dd
     style UseHaiku2 fill:#d4f4dd
@@ -540,8 +540,8 @@ For per-user metrics across a team, use OpenTelemetry export, which streams toke
 | Model | Use For | Don't Use For |
 |-------|---------|---------------|
 | **Haiku 4.5** | • Code searches<br/>• File operations<br/>• Simple edits<br/>• Documentation formatting | • Complex refactorings<br/>• Architecture design<br/>• Critical business logic |
-| **Sonnet 4.5** | • Standard coding tasks<br/>• Bug fixes<br/>• Feature additions<br/>• Planning sessions<br/>• Documentation writing | • Simple searches (waste money)<br/>• Mission-critical architecture (use Opus) |
-| **Opus 4.5** | • System architecture<br/>• Complex refactorings<br/>• Critical business logic<br/>• Large-scale migrations | • Simple searches<br/>• Routine bug fixes<br/>• Documentation updates |
+| **Sonnet 5** | • Standard coding tasks<br/>• Bug fixes<br/>• Feature additions<br/>• Planning sessions<br/>• Documentation writing | • Simple searches (waste money)<br/>• Mission-critical architecture (use Opus) |
+| **Opus 5** | • System architecture<br/>• Complex refactorings<br/>• Critical business logic<br/>• Large-scale migrations | • Simple searches<br/>• Routine bug fixes<br/>• Documentation updates |
 
 ### Configuration Templates
 

@@ -195,7 +195,7 @@ Check for shared dependencies before updating.
 ---
 name: auto-document-changes
 description: Automatically update documentation to match code changes after refactoring or new features
-model: claude-sonnet-4-5
+model: claude-sonnet-5
 ---
 
 # Auto-Document Changes
@@ -250,7 +250,7 @@ You: "I just refactored the authentication module. Use auto-document-changes ski
 ---
 name: progressive-review
 description: Perform comprehensive code review in progressive stages from high-level to detailed
-model: claude-sonnet-4-5
+model: claude-sonnet-5
 ---
 
 # Progressive Code Review

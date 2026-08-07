@@ -185,8 +185,8 @@ npm test       # Run tests
 
 **Limits by Model**:
 - Haiku 4.5: 200K tokens
-- Sonnet 4.5: 200K tokens
-- Opus 4.5: 200K tokens
+- Sonnet 5: 200K tokens
+- Opus 5: 200K tokens
 
 ---
 
@@ -430,7 +430,7 @@ Standard coding? → Sonnet
 
 ## O
 
-### Opus 4.5
+### Opus 5
 **Definition**: Claude's most capable model, ideal for complex reasoning and architecture.
 
 **Characteristics**:
@@ -589,7 +589,7 @@ Optional advanced features...
 
 **See Also**: [Compliance Guide](../15-security/1-security-compliance.md)
 
-### Sonnet 4.5
+### Sonnet 5
 **Definition**: Claude's balanced model, ideal for most development tasks.
 
 **Characteristics**:
@@ -726,7 +726,7 @@ model: sonnet
 ## Quick Lookup by Category
 
 ### Models
-- Haiku 4.5, Sonnet 4.5, Opus 4.5
+- Haiku 4.5, Sonnet 5, Opus 5
 - Model Selection, Context Window
 - Thinking Budget
 

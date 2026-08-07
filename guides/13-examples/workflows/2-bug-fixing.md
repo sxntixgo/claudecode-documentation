@@ -743,7 +743,7 @@ Consider all edge cases and timing issues."
 ---
 name: bug-fixer
 description: Systematic bug fixing workflow with test-driven approach
-model: claude-sonnet-4-5
+model: claude-sonnet-5
 ---
 
 When invoked, follow this process:
